@@ -13,7 +13,9 @@ const BalanceHistoryDialog = ({open, onClose, debits, onRemove}) =>{
         <Dialog open={open}>
         <DialogContent>
             {debits.map(debit => (
-                <div style={{
+                <div 
+                key={debit._id}
+                style={{
                     display: 'flex', 
                     padding: '5px 10px', 
                     margin: '5px', 

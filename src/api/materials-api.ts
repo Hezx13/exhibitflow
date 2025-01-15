@@ -12,7 +12,7 @@ export const getSavedMaterials = async () => {
 
 export const saveMaterial = async (material: string[], list: string) => {
     try {
-      const response = await http.post('/materials/saveMaterial', {
+      const response = await http.post('/materials', {
         materialId: material, listId: list
       });
       return response.status;
@@ -31,6 +31,15 @@ export const removeMaterial = async (material) => {
       throw new Error("Error while deleting material.");
     }
   };
+
+export const editMaterial = async (material) =>{
+  try {
+    const response = await http.patch(`/materials`, material);
+    return response.status;
+  } catch(error: any) {
+    console.error(error.message)
+  }
+}
 
 export const getMaterialCount = async () =>{
   try {
@@ -54,3 +63,48 @@ export const addToProject = async (material, list) => {
       throw new Error("Error while deleting material.");
     }
   };
+
+  export const getCategories = async () => {
+    try {
+      const response = await http.get(`/materials/categories`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error while fetching materials count:', error.response || error);
+      throw new Error("Error while fetching materials count.");
+    }
+  }
+
+  export const addCategory = async (name) => {
+    try {
+      const response = await http.post(`/materials/createCategory`,{name});
+      return response.status;
+    } catch (error: any) {
+      console.error('Error while fetching materials count:', error.response || error);
+      throw new Error("Error while fetching materials count.");
+    }
+  }
+
+  export const getSuppliers = async ( ) => {
+    try {
+      const response = await http.get(`/materials/suppliers`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error while fetching materials count:', error.response || error);
+      throw new Error("Error while fetching materials count.");
+    }
+  }
+
+  export const addSupplier = async (
+    name: string,
+    phone: string,
+    email: string,
+    category: string
+  ) => {
+    try {
+      const response = await http.post(`/materials/supplier`,{name,phone,email,category});
+      return response.status;
+    } catch (error: any) {
+      console.error('Error while fetching materials count:', error.response || error);
+      throw new Error("Error while fetching materials count.");
+    }
+  }

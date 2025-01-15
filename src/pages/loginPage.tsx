@@ -21,7 +21,6 @@ function Login() {
       event.preventDefault();
       setLoading(true)
        const response = await login({username, password})
-       console.log(response)
        switch (response) {
         case 200: {
           setIsLoggedIn(!!localStorage.getItem('token'))

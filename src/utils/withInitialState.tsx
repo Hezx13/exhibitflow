@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { AppState } from "../state/appStateReducer";
 import { load } from "../api";
 import CircularProgress from '@mui/material/CircularProgress';
 import { eventEmitter } from "../state/EventEmitter";
@@ -40,7 +39,14 @@ export function withInitialState<TProps>(
   return (props: PropsWithoutInjected<TProps>) => {
     const [initialState, setInitialState] = useState<AppState>({
       lists: [],
+      listsToAdd: {},
+      archiveToAdd: {},
+      listsToRemove: {},
+      archiveToRemove: {},
+      listsToUpdate: {},
+      archiveToUpdate: {},
       archive: [],
+      processSave: true,
       role: 'User',
     });
     const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +57,16 @@ export function withInitialState<TProps>(
         setIsLoading(true);
         try {
           const data = await load();
-          setInitialState(data);
+          setInitialState({
+            ...data,
+             listsToAdd: {},
+            archiveToAdd: {},
+            listsToRemove: {},
+            archiveToRemove: {},
+            listsToUpdate: {},
+            archiveToUpdate: {},
+            processSave: false
+          });
         } catch (e) {
           if (e instanceof Error) {
             setError(e);

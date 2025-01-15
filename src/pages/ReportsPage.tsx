@@ -27,7 +27,6 @@ const ReportsPage = () => {
         calculateTotalReports(reports)
     },[reports])
 
-    console.log(reports);
     function calculateTotalReports(reportss){
         let total = 0;
         for (let report of reportss) {

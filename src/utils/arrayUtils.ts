@@ -9,6 +9,15 @@ export function removeItemAtIndex<TItem>(
   return [...array.slice(0, index), ...array.slice(index + 1)]
 }
 
+export function hasNonEmptyObject(obj, keysToCheck) {
+  for (let key of keysToCheck) {
+      if (obj.hasOwnProperty(key) && Object.keys(obj[key]).length > 0) {
+          return true;
+      }
+  }
+  return false;
+}
+
 export function insertItemAtIndex<TItem>(
   array: TItem[],
   item: TItem,

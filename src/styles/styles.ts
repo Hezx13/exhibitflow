@@ -19,8 +19,9 @@ type DragPreviewContainerProps = {
   isPreview?: boolean
 }
 
-type StyledLinkProps = {
-  isActive?: boolean
+interface StyledLinkProps extends NavLinkProps {
+  color?: string; // Optional override for color
+  isActive?: boolean; // This might be redundant if you rely on NavLink's active behavior
 }
 
 export const DragPreviewContainer = styled.div<DragPreviewContainerProps>`

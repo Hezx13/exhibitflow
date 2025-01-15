@@ -88,7 +88,7 @@ export const DashboardPage = () => {
         lists.forEach((list) => {
             list.tasks.forEach((task) => {
                 if (task.status !== "Done") {
-                    const price = parseFloat(task.price?.split(' ')[0] || task.price);
+                    const price = parseFloat(task.price);
                     const quantity = task.quantity;
                     if (task.payment?.toLowerCase() === "cash") {
                         _totalPrice += !Number.isNaN(price) ? price * quantity : 0;

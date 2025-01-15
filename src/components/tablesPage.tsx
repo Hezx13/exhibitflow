@@ -1,12 +1,15 @@
-import React from 'react';
+import {FC, useEffect, useState} from 'react';
 import TableComponent from "./tableComponent";
 import { useLocation } from 'react-router-dom';
 import {Grid} from "@mui/material";
 import NavBar from './navBar'
 import FullFeaturedCrudGrid from './DataGridComponent';
+import { useUser } from '../state/userContext';
 
-const TablesPage: React.FC = () => {
+const TablesPage: FC = () => {
     const location = useLocation();
+    const {currentUser, users} = useUser()
+    
     const receivedData = location.state?.myData || 0;
     return(
         <>
@@ -17,6 +20,8 @@ const TablesPage: React.FC = () => {
                 <Grid item xs={12}>
                     <FullFeaturedCrudGrid
                         tableId={receivedData}
+                        userData={currentUser}
+                        users={users}
                     />
                 </Grid>
 

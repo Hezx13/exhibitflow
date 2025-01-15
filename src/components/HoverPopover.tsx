@@ -43,8 +43,6 @@ const HoverPopover = ({openHook, debit, onRemoveDebit}) => {
             style={{ color: '#fff' }}>Income: </span>
             <span style={{ fontWeight: '600' }}>
                 {debit.reduce((a, b) => {
-                  console.log("a= " + a + " b= " + b)
-                  console.log(b)
                 return a.amount || a + b.amount || 0;
               }, 0).toFixed(2)}</span>
         </span>

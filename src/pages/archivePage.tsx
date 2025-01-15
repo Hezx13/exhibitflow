@@ -58,6 +58,10 @@ export default function ArchivePage() {
         setValue(newValue);
     };
 
+    const handleOnAdd = (text) => {
+        
+    }
+
     return (
         <Grid container>
             {!isLoggedIn && <Navigate to="/login"/>}

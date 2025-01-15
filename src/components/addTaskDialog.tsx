@@ -19,7 +19,6 @@ const Transition = React.forwardRef(function Transition(
 
 export default function AddTaskDialog({isOpen}) {
     const [open, setOpen] = React.useState(isOpen);
-    console.log(open)
     const handleClickOpen = () => {
         setOpen(true);
     };

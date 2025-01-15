@@ -30,7 +30,6 @@ const ReportGenerationDialog = ({onNewReport}) =>{
         if (month && year && payment){
             setIsGenerating(true);
             let dates = getFirstAndLastDay(month, year);
-            console.log(dates)
             try {
             await generateReport(dates, payment);
                 onNewReport();

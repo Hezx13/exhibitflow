@@ -26,7 +26,7 @@ const ListRow = ({ list, index, isArchive }) => {
     const calculateTotal = () => {
         let _totalPrice = 0;
         list.tasks.forEach((task) => {
-            const price = parseFloat(task.price?.split(' ')[0] || task.price);
+            const price = parseFloat(task.price);
             const quantity = task.quantity;
                 _totalPrice += !Number.isNaN(price) ? price * quantity : 0;
         });
@@ -36,7 +36,7 @@ const ListRow = ({ list, index, isArchive }) => {
         let _totalPrice = 0;
         list.tasks.forEach((task) => {
             if (task.status === "Done") {
-                const price = parseFloat(task.price?.split(' ')[0] || task.price);
+                const price = parseFloat(task.price);
                 const quantity = task.quantity;
                 _totalPrice += !Number.isNaN(price) ? price * quantity : 0;
             }
@@ -47,7 +47,7 @@ const ListRow = ({ list, index, isArchive }) => {
         let _totalPrice = 0;
         list.tasks.forEach((task) => {
             if (task.status !== "Done") {
-                const price = parseFloat(task.price?.split(' ')[0] || task.price);
+                const price = parseFloat(task.price);
 
                 const quantity = task.quantity;
                 _totalPrice += !Number.isNaN(price) ? price * quantity : 0;

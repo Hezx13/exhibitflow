@@ -230,7 +230,6 @@ const ReportDetailedTable = () => {
   };
 
   const handleRemoveDebitClick = async (num: number) => {
-    console.log(period.start);
 
     try {
       removeDebit(period.start, num, payment).then(() => {

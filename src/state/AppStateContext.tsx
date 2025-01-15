@@ -1,54 +1,50 @@
 import { createContext, useContext, useEffect, useCallback, useRef } from "react"
 import { useImmerReducer } from "use-immer"
-import {
-  appStateReducer,
-  AppState,
-  List,
-  Task
-} from "./appStateReducer"
-import { Action } from "./actions"
+import { appStateReducer} from "./appStateReducer"
+import { Action, resetRequests } from "./actions"
 import { withInitialState } from "../utils/withInitialState"
 import { debounce } from "throttle-debounce-ts"
 import { save } from "../api"
 import { DragItem } from "../components/DragItem"
-
-type AppStateContextProps = {
-    lists: List[]
-    archive: List[]
-    role: string
-    getTasksByListId(id: string): Task[]
-    getTasksByArchiveId(id: string) : Task[]
-    dispatch: React.Dispatch<Action>
-}
+import { useSocket } from "./socketContext"
 
 const AppStateContext = createContext<AppStateContextProps>(
   {} as AppStateContextProps
 )
 
-type AppStateProviderProps = {
-  children: React.ReactNode
-  initialState: AppState
-}
 
 export const AppStateProvider = withInitialState<AppStateProviderProps>(
   ({ children, initialState }) => {
     const [state, dispatch] = useImmerReducer(appStateReducer, initialState);
-    console.log(state)
     // useRef to keep track of the previous state
     const prevStateRef = useRef(initialState);
-
+    const socket = useSocket()
     const debouncedSave = useCallback(debounce(500, (currentState, prevState) => {
-      save(currentState, prevState);
+      save(currentState, prevState).then((res)=>{
+        if(res === 200)
+          dispatch(resetRequests())
+      });
       prevStateRef.current = currentState;
     }), []);
     
     useEffect(() => {
-      if(!!localStorage.getItem('token'))
+      if(!!localStorage.getItem('token') && state.processSave)
       debouncedSave(state, prevStateRef.current);
-    }, [state, debouncedSave]);
-    
+      
+    }, [state.lists, state.archive, debouncedSave]);
 
-    const { lists, archive, role } = state;
+    const { 
+    lists, 
+    listsToAdd,
+    archiveToAdd,
+    listsToRemove,
+    archiveToRemove,
+    listsToUpdate,
+    archiveToUpdate,
+    archive,
+    role 
+  } = state;
+
     const getTasksByListId = (id: string) => {
       return lists.find((list) => list.id === id)?.tasks || [];
     };
@@ -58,7 +54,12 @@ export const AppStateProvider = withInitialState<AppStateProviderProps>(
 
     return (
       <AppStateContext.Provider
-        value={{ lists, archive, role, getTasksByListId, getTasksByArchiveId, dispatch }}
+        value={{ lists, archive,listsToAdd,
+          archiveToAdd,
+          listsToRemove,
+          archiveToRemove,
+          listsToUpdate,
+          archiveToUpdate, role, getTasksByListId, getTasksByArchiveId, dispatch }}
       >
         {children}
       </AppStateContext.Provider>

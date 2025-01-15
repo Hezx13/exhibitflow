@@ -1,22 +1,13 @@
 import { useEffect, useState } from "react";
 import { approveUser, deleteUser, demoteUser, disapproveUser, getUserData, getUsers, promoteUser, resetUserPassword } from "../api/user-api";
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, CircularProgress, Badge, Chip } from "@mui/material";
-import { StyledChip, StyledTableContainer } from "../styles/styles";
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, CircularProgress, Badge, Chip, TextField } from "@mui/material";
+import { Status, StyledChip, StyledTableContainer } from "../styles/styles";
 import { act } from "@testing-library/react";
-
-
-type User = {
-    _id: string;
-    username: string;
-    email: string;
-    department: string;
-    role: string;
-    isApproved: boolean;
-}
+import { useSocket } from "../state/socketContext";
+import { useAppState } from "../state/AppStateContext";
 
 const fetchUsers = async () => {
     const users = await getUsers();
-    console.log(users)  
     return users
 }
 
@@ -29,17 +20,40 @@ const UserManagementTable = ({onAlert}) => {
 
     const [users, setUsers] = useState<User[]>([]);
     const [activeUser, setActiveUser] = useState<User | null >(null);
+    const [usersOnline, setUsersOnline] = useState<TODO>([])
+    const [usersInProjects, setUsersInProjects] = useState<TODO>()
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [resetUser, setResetUser] = useState<string | null>(null);
+    const socket = useSocket();
+    const {lists, archive} = useAppState();
 
     useEffect(()=>{
         fetchUsers().then(
             (data)=>setUsers(data)
         )
-          getUserData().then(
-            (data)=>setActiveUser(data)
-          );
+        getUserData().then(
+          (data)=>setActiveUser(data)
+        );
+        handleRequestOnlineUsers()
     },[])
+
+    useEffect(()=>{
+      //@ts-expect-error
+      socket?.on("receive_active_users", (data: TODO) => {
+        setUsersOnline(data)
+      })
+      //@ts-expect-error
+      socket?.on("user_in_project", (data: TODO) => {
+        console.log(data)
+        setUsersInProjects(data)
+      })
+    },[socket])
+
+    const handleRequestOnlineUsers = () =>{
+      //@ts-expect-error
+      socket?.emit('get_active_users')
+    }
+
     const handleApproveUser = async (username: string) => {
         if (username === activeUser?.username){
           onAlert("selfEdit")
@@ -52,6 +66,7 @@ const UserManagementTable = ({onAlert}) => {
             )
         }
     }
+
     const handleDisapproveUser = async (username: string) => {
       if (username === activeUser?.username){
         onAlert("selfEdit")
@@ -130,7 +145,7 @@ const UserManagementTable = ({onAlert}) => {
           <TableRow>
             <TableCell>Username</TableCell>
             <TableCell align="right">Email</TableCell>
-            <TableCell align="right">Department</TableCell>
+            <TableCell align="right">Current activity</TableCell>
             <TableCell align="right">Role</TableCell>
             <TableCell align="right">Approved</TableCell>
           </TableRow>
@@ -149,13 +164,14 @@ const UserManagementTable = ({onAlert}) => {
               }}
             >
               <TableCell component="th" scope="row">
+              <Status color={usersOnline.includes(row._id) ? 'green' :'grey'}></Status>
                 {row.username} &nbsp;
                 {
                   resetUser === row.username ? <StyledChip label="Reset!" /> : null
                 }
               </TableCell>
               <TableCell align="right">{row.email}</TableCell>
-              <TableCell align="right">{row.department}</TableCell>
+              <TableCell align="right">{usersInProjects && lists.find((list) => list.id === usersInProjects[row._id])?.text || "Inactive"}</TableCell>
               <TableCell align="right">{row.role}</TableCell>
               <TableCell align="right">{row.isApproved ? 'Yes' : 'No'}</TableCell>
             
@@ -185,6 +201,7 @@ const UserManagementTable = ({onAlert}) => {
                 <Button variant="outlined" onClick={()=>handleDeleteUser(users[selectedRow].username)}>Delete User</Button>
                 </div>
               </TableCell>
+
             </TableRow>
             : null
           }

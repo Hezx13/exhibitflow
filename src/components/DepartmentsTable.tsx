@@ -1,16 +1,17 @@
-import { Grid, Paper, Table, TableBody, TableCell, TableHead, TableRow, Button, TextField, Fab, Box } from '@mui/material';
+import { Grid, Paper, Table, TableBody, TableCell, TableHead, TableRow, Button, TextField, Fab, Box, TablePagination, TableFooter } from '@mui/material';
 import {useState, useEffect} from 'react';
 import { StyledTableContainer } from '../styles/styles';
 import { addDepartment, deleteDepartment, getDepartments } from '../api/projects-api';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
+
 const DepartmentsTable = () => {
 
     const [departments, setDepartments] = useState<Department[]>([]);
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [addingDepartment, setAddingDepartment] = useState<boolean>(false);
     const [newDepartmentName, setNewDepartmentName] = useState<string>("");
-    
+
     const loadDepartments = async () => {
         getDepartments().then(departments => setDepartments(departments))
     }
@@ -42,8 +43,10 @@ const DepartmentsTable = () => {
         <Grid container>
             <StyledTableContainer 
             //@ts-ignore
-            component={Paper}>
-                    <Table>
+            component={Paper}
+            sx={{ maxHeight: 320 }}
+            >
+                    <Table stickyHeader>
                         <TableHead>
                             <TableRow>
                                 <TableCell>Department Name</TableCell>
@@ -103,27 +106,29 @@ const DepartmentsTable = () => {
                             </TableRow>
                         }
                         <TableRow>
+
                             <TableCell colSpan={5}>
-                                <div style={{
-                                display:"flex", 
-                                flexDirection:"row",
-                                gap:10
-                                }}>
-                                 <Button variant="outlined" onClick={handleOpenAddField}>Add Department</Button>
-                    
-                            {
-                            selectedRow !== null ? 
-                                <>
-                                        <Button variant="outlined" 
-                                        onClick={()=>handleDeleteDepartment(departments[selectedRow].name)}>Delete department</Button>
-                                </>: null
-                            }
+                            <div style={{
+                            display:"flex", 
+                            flexDirection:"row",
+                            gap:10
+                            }}>
+                                <Button variant="outlined" onClick={handleOpenAddField}>Add Department</Button>
+
+                                {
+                                selectedRow !== null ? 
+                                    <>
+                                            <Button variant="outlined" 
+                                            onClick={()=>handleDeleteDepartment(departments[selectedRow].name)}>Delete department</Button>
+                                    </>: null
+                                }   
                                 </div>
                             </TableCell>
                         </TableRow>
                         </TableBody>
                     </Table>
             </StyledTableContainer>
+            
         </Grid>
     )
 

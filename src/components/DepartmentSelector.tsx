@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import Cookies from 'js-cookie';
 import { getDepartments } from '../api/projects-api'; // Assuming you have an API utility to fetch departments
 import { Select, MenuItem } from '@mui/material';
@@ -9,7 +9,6 @@ function DepartmentSelector() {
   const [departments, setDepartments] = useState<Department[]>([]);
   useEffect(() => {
     fetchDepartments().then((departments)=>{
-      console.log(departments);
       setDepartments(departments)
       const departmentInCookies = localStorage.getItem('selectedDepartment');
       if (departmentInCookies) {
@@ -60,4 +59,4 @@ function DepartmentSelector() {
   );
 }
 
-export default DepartmentSelector;
+export default memo(DepartmentSelector);
