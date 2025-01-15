@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {register} from '../api/user-api'
+import { register } from '../api/user-api';
 import NavBar from '../components/navBar';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -32,7 +32,7 @@ const Register = () => {
 
     try {
       // Replace with your backend API endpoint as needed.
-      const response = await register({username, password, email, department})
+      const response = await register({ username, password, email, department });
 
       if (response.data) {
         setSuccessMessage('Successfully registered!');
@@ -46,98 +46,102 @@ const Register = () => {
   };
 
   return (
-              <Grid container>
-          { isLoggedIn && <Navigate to="/"/>}
-                <Grid item xs={12} sx={{marginBottom: '15px'}}>
-                    <NavBar/>
-                </Grid>
-                <Grid item xs={12} sx={{marginBottom: '15px'}}>
-                <Container component="main" maxWidth="xs">
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'orange' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5" color="#e3f2fd">
-            Registration
-          </Typography>
-          {errorMessage && <Typography component="h1" variant="h5" color="error">
-            {errorMessage}
-          </Typography>}
-          {successMessage && <Typography component="h1" variant="h5" color="success.dark">
-            {successMessage}
-          </Typography>}
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              value={username} 
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              fullWidth
-              label="Username"
-              name="username"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              fullWidth
-              label="Email"
-              name="email"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              value={department} 
-              onChange={(e) => setDepartment(e.target.value)}
-              required
-              fullWidth
-              label="Department"
-              name="department"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Confirm Password"
-              type="password"
-              value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={!!successMessage}
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign up
-            </Button>
+    <Grid container>
+      {isLoggedIn && <Navigate to="/" />}
+      <Grid item xs={12} sx={{ marginBottom: '15px' }}>
+        <NavBar />
+      </Grid>
+      <Grid item xs={12} sx={{ marginBottom: '15px' }}>
+        <Container component="main" maxWidth="xs">
+          <Box
+            sx={{
+              marginTop: 8,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 1, bgcolor: 'orange' }}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5" color="#e3f2fd">
+              Registration
+            </Typography>
+            {errorMessage && (
+              <Typography component="h1" variant="h5" color="error">
+                {errorMessage}
+              </Typography>
+            )}
+            {successMessage && (
+              <Typography component="h1" variant="h5" color="success.dark">
+                {successMessage}
+              </Typography>
+            )}
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+              <TextField
+                margin="normal"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                fullWidth
+                label="Username"
+                name="username"
+                autoFocus
+              />
+              <TextField
+                margin="normal"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                fullWidth
+                label="Email"
+                name="email"
+                autoFocus
+              />
+              <TextField
+                margin="normal"
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                required
+                fullWidth
+                label="Department"
+                name="department"
+                autoFocus
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Confirm Password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={!!successMessage}
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Sign up
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Container>
-                </Grid>
-                </Grid>
+        </Container>
+      </Grid>
+    </Grid>
   );
 };
 

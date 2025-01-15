@@ -16,14 +16,14 @@ class EventEmitter {
 
   off(eventName: string, fn: EventListener): void {
     if (this.events[eventName]) {
-      this.events[eventName] = this.events[eventName].filter(eventFn => eventFn !== fn);
+      this.events[eventName] = this.events[eventName].filter((eventFn) => eventFn !== fn);
     }
   }
 
   emit(eventName: string, ...args: any[]): void {
     const event = this.events[eventName];
     if (event) {
-      event.forEach(fn => {
+      event.forEach((fn) => {
         fn(...args);
       });
     }

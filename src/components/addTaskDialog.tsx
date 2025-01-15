@@ -9,27 +9,23 @@ import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 
 const Transition = React.forwardRef(function Transition(
-    props: TransitionProps & {
-        children: React.ReactElement<any, any>;
-        },
-    ref: React.Ref<unknown>,
-    ) {
-    return <Slide direction="up" ref={ref} {...props} />;
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>;
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AddTaskDialog({isOpen}) {
-    const [open, setOpen] = React.useState(isOpen);
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
+export default function AddTaskDialog({ isOpen }) {
+  const [open, setOpen] = React.useState(isOpen);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-    return (
-
-           <></>
-
-        );
+  return <></>;
 }

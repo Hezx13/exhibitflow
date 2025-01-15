@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useAppState } from "../state/AppStateContext";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
+import { useAppState } from '../state/AppStateContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -16,32 +16,27 @@ import {
   DialogContent,
   DialogTitle,
   Button,
-} from "@mui/material";
-import {
-  addTask,
-  editTask,
-  moveFromArchive,
-  removeTask,
-} from "../state/actions";
-import { Task } from "../state/appStateReducer";
-import HoverPopover from "./HoverPopover";
+} from '@mui/material';
+import { addTask, editTask, moveFromArchive, removeTask } from '../state/actions';
+import { Task } from '../state/appStateReducer';
+import HoverPopover from './HoverPopover';
 import {
   StyledTableContainer,
   StyledTableRow,
   StyledTableCell,
   Status,
   AddItemButton,
-} from "../styles/styles";
-import { CardQuantityText, CardPriceText } from "../styles/textStyles";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs from "dayjs";
-import { AddNewItem } from "./AddNewItem";
-import { getCurrentDateAndTime, getNextWeek } from "../utils/timeUtils";
-import { FormControl, InputLabel } from "@mui/material";
-import { useReport } from "../state/reportsContext"; // Adjust the import to your file structure
-import { addDebit, removeDebit } from "../api";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import DebitDialog from "./DebitDialog";
+} from '../styles/styles';
+import { CardQuantityText, CardPriceText } from '../styles/textStyles';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import { AddNewItem } from './AddNewItem';
+import { getCurrentDateAndTime, getNextWeek } from '../utils/timeUtils';
+import { FormControl, InputLabel } from '@mui/material';
+import { useReport } from '../state/reportsContext'; // Adjust the import to your file structure
+import { addDebit, removeDebit } from '../api';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DebitDialog from './DebitDialog';
 type debit = {
   amount: number;
   date: string;
@@ -89,16 +84,14 @@ const CollapsibleText = ({ text, maxLength }) => {
       {shouldDisplayButton && (
         <span
           onClick={toggleExpanded}
-          style={{ fontWeight: 700, cursor: "pointer", color: "blue" }}
+          style={{ fontWeight: 700, cursor: 'pointer', color: 'blue' }}
         >
-          {isExpanded ? " <<" : " ..."}
+          {isExpanded ? ' <<' : ' ...'}
         </span>
       )}
     </span>
   );
 };
-
-
 
 const ReportDetailedTable = () => {
   const { reports, updateReports } = useReport();
@@ -109,17 +102,17 @@ const ReportDetailedTable = () => {
   const [tasks, setTasks] = useState<Material[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<Material[]>([]);
   const [activeProjects, setActiveProjects] = useState<string[]>([]);
-  const [selectedProject, setSelectedProject] = useState("");
+  const [selectedProject, setSelectedProject] = useState('');
   const [credit, setCredit] = useState(0);
   const [editedTask, setEditedTask] = useState<any>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const { lists, archive, dispatch } = useAppState();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const fileInput = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(0);
-  const [inputDate, setInputDate] = useState("");
-  const [inputCheck, setInputCheck] = useState("");
+  const [inputDate, setInputDate] = useState('');
+  const [inputCheck, setInputCheck] = useState('');
   const [debit, setDebit] = useState<Array<debit>>([]);
 
   type Project = {
@@ -134,10 +127,9 @@ const ReportDetailedTable = () => {
       updateReports();
       return;
     }
-    if (!period) navigate("/reports");
+    if (!period) navigate('/reports');
     const detailedReport = reports.filter(
-      (report) =>
-        report.month.start === period.start && report.payment === payment
+      (report) => report.month.start === period.start && report.payment === payment
     );
     const act_proj: string[] = [];
     setTasks(detailedReport[0].materials);
@@ -153,13 +145,13 @@ const ReportDetailedTable = () => {
   useEffect(() => {
     let newFilteredTasks = tasks;
 
-    if (searchTerm !== "") {
+    if (searchTerm !== '') {
       newFilteredTasks = newFilteredTasks.filter((task) =>
         task.text.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    if (selectedProject !== "") {
+    if (selectedProject !== '') {
       newFilteredTasks = newFilteredTasks.filter(
         (task) => task.listParent.name === selectedProject
       );
@@ -180,7 +172,7 @@ const ReportDetailedTable = () => {
   const calculateTotalCredit = () => {
     let totalCredit = 0;
     for (let task of filteredTasks) {
-      let price = Number(task.price?.split(" ")[0] || task.price);
+      let price = Number(task.price?.split(' ')[0] || task.price);
       let quantity = Number(task.quantity);
       if (!isNaN(price) && !isNaN(quantity)) totalCredit += price * quantity;
     }
@@ -219,9 +211,9 @@ const ReportDetailedTable = () => {
         addDebit(period.start, data, payment).then(() => {
           updateReports();
         });
-        setInputCheck("");
+        setInputCheck('');
         setInputValue(0);
-        setInputDate("");
+        setInputDate('');
       } catch (err) {
         console.log(err);
       }
@@ -230,13 +222,12 @@ const ReportDetailedTable = () => {
   };
 
   const handleRemoveDebitClick = async (num: number) => {
-
     try {
       removeDebit(period.start, num, payment).then(() => {
         updateReports();
       });
     } catch (error) {
-      console.error("Error in removeDebit:", error);
+      console.error('Error in removeDebit:', error);
     }
   };
 
@@ -247,7 +238,7 @@ const ReportDetailedTable = () => {
           <TableHead>
             <StyledTableRow>
               <StyledTableCell>
-                <IconButton onClick={() => navigate("/reports")}>
+                <IconButton onClick={() => navigate('/reports')}>
                   <ArrowBackIcon htmlColor="#fff" />
                 </IconButton>
               </StyledTableCell>
@@ -259,17 +250,17 @@ const ReportDetailedTable = () => {
                   color="primary"
                   InputProps={{
                     style: {
-                      color: "#000",
-                      backgroundColor: "#ffffff50",
-                      padding: "5px",
+                      color: '#000',
+                      backgroundColor: '#ffffff50',
+                      padding: '5px',
                     },
                   }}
                   InputLabelProps={{
                     style: {
-                      zIndex: "10",
-                      color: "orange",
-                      fontSize: "1rem",
-                      padding: "5px",
+                      zIndex: '10',
+                      color: 'orange',
+                      fontSize: '1rem',
+                      padding: '5px',
                     },
                   }}
                   style={{}}
@@ -277,10 +268,7 @@ const ReportDetailedTable = () => {
                 />
               </StyledTableCell>
               <StyledTableCell colSpan={7}>
-                <FormControl
-                  variant="outlined"
-                  style={{ margin: "0 10px", width: "200px" }}
-                >
+                <FormControl variant="outlined" style={{ margin: '0 10px', width: '200px' }}>
                   <InputLabel>Project</InputLabel>
                   <Select
                     value={selectedProject}
@@ -304,14 +292,14 @@ const ReportDetailedTable = () => {
               <StyledTableCell colSpan={3}>
                 <Typography
                   sx={{
-                    background: "#FF000050",
-                    maxWidth: "300px",
-                    padding: "10px",
-                    borderRadius: "8px",
+                    background: '#FF000050',
+                    maxWidth: '300px',
+                    padding: '10px',
+                    borderRadius: '8px',
                   }}
                 >
-                  <span style={{ color: "#FFF" }}>Expences: </span>
-                  <span style={{ fontWeight: "600" }}>{credit.toFixed(2)}</span>
+                  <span style={{ color: '#FFF' }}>Expences: </span>
+                  <span style={{ fontWeight: '600' }}>{credit.toFixed(2)}</span>
                 </Typography>
               </StyledTableCell>
               <StyledTableCell colSpan={5}>
@@ -352,44 +340,28 @@ const ReportDetailedTable = () => {
           </TableHead>
           <TableBody>
             {filteredTasks.map((task, index) => (
-              <StyledTableRow
-                key={task.id}
-                color={index % 2 === 0 ? "#00000005" : "white"}
-              >
+              <StyledTableRow key={task.id} color={index % 2 === 0 ? '#00000005' : 'white'}>
+                <StyledTableCell>{dayjs(task.date).format('DD-MM-YYYY HH:MM')}</StyledTableCell>
                 <StyledTableCell>
-                    {dayjs(task.date).format("DD-MM-YYYY HH:MM")}
+                  <CollapsibleText text={task.text} maxLength={60} />
                 </StyledTableCell>
                 <StyledTableCell>
-                    <CollapsibleText text={task.text} maxLength={60} />
+                  <CardQuantityText>{task.listParent.name}</CardQuantityText>
                 </StyledTableCell>
                 <StyledTableCell>
-                    <CardQuantityText>{task.listParent.name}</CardQuantityText>
+                  <CardPriceText>
+                    {(Number(task.price?.split(' ')[0] || task.price) * task.quantity).toFixed(2)}
+                  </CardPriceText>
                 </StyledTableCell>
-                <StyledTableCell>
-                    <CardPriceText>
-                      {(
-                        Number(task.price?.split(" ")[0] || task.price) *
-                        task.quantity
-                      ).toFixed(2)}
-                    </CardPriceText>
-                </StyledTableCell>
-                <StyledTableCell>
-                    {task.unit}
-                </StyledTableCell>
+                <StyledTableCell>{task.unit}</StyledTableCell>
                 <StyledTableCell>
                   {editing === task.id ? (
                     <TextField
                       value={editedTask.comment}
-                      onChange={(e) =>
-                        handleInputChange("comment", e.target.value)
-                      }
+                      onChange={(e) => handleInputChange('comment', e.target.value)}
                     />
                   ) : isUrl(task.comment) ? (
-                    <a
-                      href={task.comment}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={task.comment} target="_blank" rel="noopener noreferrer">
                       Link
                     </a>
                   ) : (
@@ -397,41 +369,33 @@ const ReportDetailedTable = () => {
                   )}
                 </StyledTableCell>
                 <StyledTableCell>
-                  {
-                    task.deliveryDate ? dayjs(task.deliveryDate).format("DD-MM-YYYY") : ''
-                  }
+                  {task.deliveryDate ? dayjs(task.deliveryDate).format('DD-MM-YYYY') : ''}
                 </StyledTableCell>
                 <StyledTableCell>
                   {editing === task.id ? (
                     <Select
                       value={editedTask.status}
-                      onChange={(e) =>
-                        handleInputChange("status", e.target.value)
-                      }
+                      onChange={(e) => handleInputChange('status', e.target.value)}
                     >
                       <MenuItem value="Pending">Pending</MenuItem>
-                      <MenuItem value="Waiting for approval">
-                        Waiting for approval
-                      </MenuItem>
+                      <MenuItem value="Waiting for approval">Waiting for approval</MenuItem>
                       <MenuItem value="In process">In process</MenuItem>
-                      <MenuItem value="Waiting for payment">
-                        Waiting for payment
-                      </MenuItem>
+                      <MenuItem value="Waiting for payment">Waiting for payment</MenuItem>
                       <MenuItem value="Done">Done</MenuItem>
                     </Select>
                   ) : (
                     <>
                       <Status
                         color={
-                          task.status === "Done"
-                            ? "green"
-                            : task.status === "Waiting for approval"
-                            ? "blue"
-                            : task.status === "In process"
-                            ? "orange"
-                            : task.status === "Waiting for payment"
-                            ? "red"
-                            : "grey"
+                          task.status === 'Done'
+                            ? 'green'
+                            : task.status === 'Waiting for approval'
+                              ? 'blue'
+                              : task.status === 'In process'
+                                ? 'orange'
+                                : task.status === 'Waiting for payment'
+                                  ? 'red'
+                                  : 'grey'
                         }
                       ></Status>
                       {task.status}
@@ -442,9 +406,7 @@ const ReportDetailedTable = () => {
                   {editing === task.id ? (
                     <Select
                       value={editedTask.payment}
-                      onChange={(e) =>
-                        handleInputChange("payment", e.target.value)
-                      }
+                      onChange={(e) => handleInputChange('payment', e.target.value)}
                     >
                       <MenuItem value="cash">Cash</MenuItem>
                       <MenuItem value="card">Card</MenuItem>

@@ -1,7 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAppState } from './AppStateContext';
-import { addList, addTask, editTask, moveFromArchive, moveToArchive, removeList, removeTask } from './actions';
+import {
+  addList,
+  addTask,
+  editTask,
+  moveFromArchive,
+  moveToArchive,
+  removeList,
+  removeTask,
+} from './actions';
 import { eventEmitter } from './EventEmitter';
 
 const SocketContext = createContext(null);
@@ -18,7 +26,7 @@ export const SocketProvider = ({ children }) => {
 
     if (token) {
       const newSocket = io('http://localhost:4500', {
-        query: { token, role }
+        query: { token, role },
       });
 
       newSocket.on('connect', () => {
@@ -34,22 +42,24 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (socket) {
       const handleUpdatedMaterials = (data) => {
-        dispatch(editTask(
-          data.material.id,
-          data.projectId,
-          data.material.text,
-          data.material.article,
-          data.material.price,
-          data.material.quantity,
-          data.material.date,
-          data.material.unit,
-          data.material.comment,
-          data.material.deliveryDate,
-          data.material.orderedBy,
-          data.material.status,
-          data.material.payment,
-          false
-        ));
+        dispatch(
+          editTask(
+            data.material.id,
+            data.projectId,
+            data.material.text,
+            data.material.article,
+            data.material.price,
+            data.material.quantity,
+            data.material.date,
+            data.material.unit,
+            data.material.comment,
+            data.material.deliveryDate,
+            data.material.orderedBy,
+            data.material.status,
+            data.material.payment,
+            false
+          )
+        );
       };
 
       const handleAddedList = (data) => {
@@ -57,43 +67,41 @@ export const SocketProvider = ({ children }) => {
       };
 
       const handleNewMaterial = (data) => {
-        dispatch(addTask(
-          data.material.text,
-          data.projectId,
-          data.material.article,
-          data.material.price,
-          data.material.quantity,
-          data.material.date,
-          data.material.unit,
-          data.material.comment,
-          data.material.deliveryDate,
-          data.material.orderedBy,
-          data.material.status,
-          data.material.payment,
-          false,
-          data.material.id,
-        ));
+        dispatch(
+          addTask(
+            data.material.text,
+            data.projectId,
+            data.material.article,
+            data.material.price,
+            data.material.quantity,
+            data.material.date,
+            data.material.unit,
+            data.material.comment,
+            data.material.deliveryDate,
+            data.material.orderedBy,
+            data.material.status,
+            data.material.payment,
+            false,
+            data.material.id
+          )
+        );
       };
 
       const handleRemovedMaterial = (data) => {
-        dispatch(removeTask(
-          data.projectId,
-          data.material,
-          false
-        ))
-      }
+        dispatch(removeTask(data.projectId, data.material, false));
+      };
 
       const handleMoveToArchive = (listId) => {
-        dispatch(moveToArchive(listId,false))
-      }
+        dispatch(moveToArchive(listId, false));
+      };
 
       const handleMoveFromArchive = (listId) => {
-        dispatch(moveFromArchive(listId,false))
-      }
+        dispatch(moveFromArchive(listId, false));
+      };
 
       const handleRemoveList = (listId) => {
-        dispatch(removeList(listId,false))
-      }
+        dispatch(removeList(listId, false));
+      };
 
       //@ts-expect-error
       socket?.on('receive_updated_materials', handleUpdatedMaterials);
@@ -110,7 +118,6 @@ export const SocketProvider = ({ children }) => {
       //@ts-expect-error
       socket?.on('receive_removed_list', handleRemoveList);
 
-      
       return () => {
         //@ts-expect-error
         socket.off('receive_updated_materials', handleUpdatedMaterials);
@@ -149,47 +156,42 @@ export const SocketProvider = ({ children }) => {
     const moveToArchiveListener = (listId) => {
       //@ts-expect-error
       socket?.emit('send_move_to_archive', listId);
-    }
+    };
 
     const moveFromArchiveListener = (listId) => {
       //@ts-expect-error
       socket?.emit('send_move_from_archive', listId);
-    }
+    };
 
     const removeListListener = (listId) => {
       //@ts-expect-error
       socket?.emit('send_remove_list', listId);
-    }
+    };
 
     const unSelectedProject = () => {
       //@ts-expect-error
       socket?.emit('unselected_project', {});
-    }
+    };
 
-    
     eventEmitter.on('added_list', addedListListener);
     eventEmitter.on('added_material', addedMaterialListener);
     eventEmitter.on('removed_material', removedMaterialListener);
-    eventEmitter.on('move_to_archive', moveToArchiveListener)
-    eventEmitter.on('move_from_archive', moveFromArchiveListener)
-    eventEmitter.on('remove_list', removeListListener)
-    eventEmitter.on('unselected_project', unSelectedProject)
+    eventEmitter.on('move_to_archive', moveToArchiveListener);
+    eventEmitter.on('move_from_archive', moveFromArchiveListener);
+    eventEmitter.on('remove_list', removeListListener);
+    eventEmitter.on('unselected_project', unSelectedProject);
     return () => {
       eventEmitter.off('added_list', addedListListener);
       eventEmitter.off('added_material', addedMaterialListener);
       eventEmitter.off('removed_material', removedMaterialListener);
-      eventEmitter.off('move_to_archive', moveToArchiveListener)
-      eventEmitter.off('move_from_archive', moveFromArchiveListener)
-      eventEmitter.off('remove_list', removeListListener)
-      eventEmitter.off('unselected_project', unSelectedProject)
+      eventEmitter.off('move_to_archive', moveToArchiveListener);
+      eventEmitter.off('move_from_archive', moveFromArchiveListener);
+      eventEmitter.off('remove_list', removeListListener);
+      eventEmitter.off('unselected_project', unSelectedProject);
     };
   }, [socket]); // Ensure socket is part of the dependency array if used in the listener
 
-  return (
-    <SocketContext.Provider value={socket}>
-      {children}
-    </SocketContext.Provider>
-  );
+  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
 };
 
 export const useSocket = () => useContext(SocketContext);

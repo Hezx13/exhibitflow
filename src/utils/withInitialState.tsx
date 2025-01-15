@@ -1,41 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { load } from "../api";
+import React, { useState, useEffect } from 'react';
+import { load } from '../api';
 import CircularProgress from '@mui/material/CircularProgress';
-import { eventEmitter } from "../state/EventEmitter";
+import { eventEmitter } from '../state/EventEmitter';
 
 type InjectedProps = {
   initialState: AppState;
 };
 
-type PropsWithoutInjected<TBaseProps> = Omit<
-  TBaseProps,
-  keyof InjectedProps
->;
+type PropsWithoutInjected<TBaseProps> = Omit<TBaseProps, keyof InjectedProps>;
 
 type WithInjectedProps<TProps> = TProps & InjectedProps;
 
-
 export const LoadingSpinner = () => {
   return (
-    <div style={{ 
-      display: 'flex',
-       flexDirection: 'column',
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
-         alignItems: 'center',
-          height: '100vh',
-          color: 'white'
-          }}>
-      <CircularProgress sx={{color: 'orange'}}/>
+        alignItems: 'center',
+        height: '100vh',
+        color: 'white',
+      }}
+    >
+      <CircularProgress sx={{ color: 'orange' }} />
       <div>Development sample</div>
       <div>Loading may take a while...</div>
     </div>
   );
 };
 
-
-export function withInitialState<TProps>(
-  WrappedComponent
-) {
+export function withInitialState<TProps>(WrappedComponent) {
   return (props: PropsWithoutInjected<TProps>) => {
     const [initialState, setInitialState] = useState<AppState>({
       lists: [],
@@ -59,13 +54,13 @@ export function withInitialState<TProps>(
           const data = await load();
           setInitialState({
             ...data,
-             listsToAdd: {},
+            listsToAdd: {},
             archiveToAdd: {},
             listsToRemove: {},
             archiveToRemove: {},
             listsToUpdate: {},
             archiveToUpdate: {},
-            processSave: false
+            processSave: false,
           });
         } catch (e) {
           if (e instanceof Error) {
@@ -77,30 +72,28 @@ export function withInitialState<TProps>(
 
       const handleRefetch = () => {
         if (localStorage.getItem('token')) {
-        fetchInitialState();
-      } else {
-        setIsLoading(false);
-      }
+          fetchInitialState();
+        } else {
+          setIsLoading(false);
+        }
       };
-  
+
       eventEmitter.on('login', handleRefetch);
       eventEmitter.on('savedMaterialsAdded', handleRefetch);
       eventEmitter.on('changedDepartment', handleRefetch);
-  
+
       if (localStorage.getItem('token')) {
         fetchInitialState();
       } else {
         setIsLoading(false);
       }
-  
+
       return () => {
         eventEmitter.off('login', handleRefetch);
         eventEmitter.off('savedMaterialsAdded', handleRefetch);
         eventEmitter.off('changedDepartment', handleRefetch);
-
       };
     }, []);
-    
 
     if (isLoading) {
       return <LoadingSpinner></LoadingSpinner>;
