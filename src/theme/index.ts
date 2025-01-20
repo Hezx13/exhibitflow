@@ -1,5 +1,6 @@
 import { createTheme } from '@mui/material/styles';
-
+import MuiIconButton from './components/MuiIconButton';
+import MuiButtonBase from './components/MuiButtonBase';
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -10,7 +11,7 @@ const theme = createTheme({
       main: '#EBEBEB',
     },
     background: {
-      default: '#161616',
+      default: '#050505',
       paper: '#1E1E1E',
     },
     text: {
@@ -19,39 +20,12 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
+    fontFamily: 'Archivo',
   },
   components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-      },
-    },
-    MuiTab: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-        },
-      },
-    },
-  },
+    MuiIconButton,
+    MuiButtonBase
+  }
 });
 
 export default theme;

@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { StyledNavBar, StyledNavBarItem, StyledLink } from '../styles/styles';
-import { Menu, MenuItem, IconButton, Drawer } from '@mui/material';
+import { Menu, MenuItem, IconButton, Drawer, Box, Stack } from '@mui/material';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import PersonIcon from '@mui/icons-material/Person';
 import { logout } from '../api/user-api';
@@ -9,7 +9,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import MenuIcon from '@mui/icons-material/Menu';
 import logo from '../assets/logo192.png';
 import DepartmentSelector from './DepartmentSelector';
-
+import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
+import { AnimatePresence, motion } from 'motion/react';
 function NavbarItems(props) {
   return (
     <>
@@ -25,22 +26,12 @@ function NavbarItems(props) {
       </StyledNavBarItem>
       <StyledNavBarItem>
         <StyledLink
-          to="/dashboard"
+          to="/"
           onClick={props.validateLogin}
           color={!props.isLoggedIn ? 'grey' : '#ffffff'}
           isActive={props.location.pathname === '/dashboard'}
         >
           Dashboard
-        </StyledLink>
-      </StyledNavBarItem>
-      <StyledNavBarItem>
-        <StyledLink
-          to="/"
-          onClick={props.validateLogin}
-          color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/'}
-        >
-          Projects
         </StyledLink>
       </StyledNavBarItem>
       <StyledNavBarItem>
@@ -67,11 +58,16 @@ function NavbarItems(props) {
   );
 }
 
-export const NavBar = () => {
+export const NavBar = ({
+  isSidebarOpen,
+  setSidebarOpen,
+}: {
+  isSidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+}) => {
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
   const [menuAnchor, setMenuAnchor] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   document.title =
     'ExhibitFlow - ' +
     (location.pathname.split('/')[1] ? location.pathname.split('/')[1] : 'projects');
@@ -96,84 +92,46 @@ export const NavBar = () => {
     if (!isLoggedIn) event?.preventDefault();
   };
 
-  const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-    setDrawerOpen(open);
-  };
-
   return (
-    <StyledNavBar>
-      <span>
-        {isMobile ? (
-          <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
-            <MenuIcon htmlColor="orange" />
-          </IconButton>
+    <Box
+      sx={{
+        height: '40px',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '2rem',
+        margin: '10px auto',
+        padding: 1,
+        backgroundColor: '#ffffff09',
+        borderRadius: '10px',
+        backdropFilter: 'blur(50px)',
+      }}
+    >
+      <AnimatePresence>
+        {!isSidebarOpen ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.2 }}
+          >
+            <IconButton onClick={() => setSidebarOpen(!isSidebarOpen)}>
+              <ViewSidebarRoundedIcon />
+            </IconButton>
+          </motion.div>
         ) : (
-          <img
-            src={logo}
-            alt="exhibitFlow"
-            style={{
-              textAlign: 'center',
-              maxHeight: '25px',
-              width: 'auto',
-              height: '100%',
-            }}
-          />
+          <div style={{ width: 34 }}></div>
         )}
-      </span>
-      <Drawer
-        open={drawerOpen}
-        anchor="top"
-        onClose={toggleDrawer(false)}
-        ModalProps={{
-          BackdropProps: {
-            style: {
-              backdropFilter: 'blur(5px)',
-            },
-          },
-        }}
-        PaperProps={{
-          style: {
-            background: '#101010F0',
-            padding: '30px 0',
-          },
-        }}
-        sx={{ textAlign: 'center' }}
-      >
+      </AnimatePresence>
+      <Stack direction="row" gap={1}>
         <NavbarItems
           location={location}
           isLoggedIn={isLoggedIn}
           validateLogin={validateLogin}
         ></NavbarItems>
-      </Drawer>
-      {!isMobile ? (
-        <span
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-          }}
-        >
-          <NavbarItems
-            location={location}
-            isLoggedIn={isLoggedIn}
-            validateLogin={validateLogin}
-          ></NavbarItems>
-        </span>
-      ) : (
-        <img
-          src={logo}
-          alt="exhibitFlow"
-          style={{
-            textAlign: 'center',
-            maxHeight: '25px',
-            width: 'auto',
-            height: '100%',
-          }}
-        />
-      )}
-
+      </Stack>
       <span>
         <StyledNavBarItem>
           <IconButton aria-label="account" onClick={openMenu}>
@@ -204,7 +162,7 @@ export const NavBar = () => {
           </Menu>
         </StyledNavBarItem>
       </span>
-    </StyledNavBar>
+    </Box>
   );
 };
 

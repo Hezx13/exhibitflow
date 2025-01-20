@@ -42,11 +42,6 @@ const ReportsPage = () => {
     <>
       <Grid container>
         {!isLoggedIn && <Navigate to="/login" />}
-
-        <Grid item xs={12} sx={{ marginBottom: '15px' }}>
-          <NavBar />
-        </Grid>
-
         <Grid item xs={12} sx={{ marginBottom: '15px' }}>
           <Grid container justifyContent="center" spacing={8}>
             <Grid item xl={2}>

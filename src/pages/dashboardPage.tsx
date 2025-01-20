@@ -1,8 +1,5 @@
-import { useAppState } from '../state/AppStateContext';
-import Cookie from 'js-cookie';
 import React, { useState, useEffect, useMemo, memo } from 'react';
 import { Grid, CircularProgress } from '@mui/material';
-import { onUpload } from '../api';
 import CardComponent from '../components/cardComponent';
 import NavBar from '../components/navBar';
 import TableListsComponent from '../components/tableListsComponent';
@@ -10,18 +7,20 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import { Navigate, useNavigate } from 'react-router-dom';
 import DebitDialog from '../components/DebitDialog';
-import {
-  addBalance,
-  currentBalance,
-  generateCashOrder,
-  loadBalance,
-  removeBalance,
-} from '../api/balance-api';
 import AddCardIcon from '@mui/icons-material/AddCard';
 import dayjs from 'dayjs';
 import BalanceHistoryDialog from '../components/BalanceHistoryDialog';
 import { StyledGenerateCashOrderButton } from '../styles/styles';
 import { getMaterialCount, getSavedMaterials } from '../api/materials-api';
+import {
+  useAddBalanceMutation,
+  useGetCurrentBalanceQuery,
+  useGetTotalsQuery,
+  useLazyGenerateCashOrderQuery,
+  useLoadBalanceQuery,
+  useRemoveBalanceMutation,
+} from '../store/api/balanceApi';
+import { useLoadListsQuery, useUploadMutation } from '../store/api/listsApi';
 
 const BalanceCardContent = ({ balance, action, historyAction }) => {
   return (
@@ -45,11 +44,7 @@ const BalanceCardContent = ({ balance, action, historyAction }) => {
 };
 
 export const DashboardPage = () => {
-  const { lists, archive, dispatch } = useAppState();
-  const [balance, setBalance] = useState([]);
-  const [current, setCurrent] = useState(0);
-  const [roughTotalPrice, setRoughTotalPrice] = useState<number>(0);
-  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const { data: lists } = useLoadListsQuery();
   const [notDoneTasksCount, setNotDoneTasksCount] = useState(0);
   const [isLoggedIn] = useState(!!localStorage.getItem('token'));
   const [open, setOpen] = useState(false);
@@ -59,57 +54,21 @@ export const DashboardPage = () => {
   const [inputCheck, setInputCheck] = useState('');
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setRoughTotalPrice(totals.totalRough);
-    setTotalPrice(totals.total);
-    fetchBalance();
-    fetchCurrentBalance();
-    fetchSavedMaterialsCount();
-  }, [lists, archive]);
-
-  useEffect(() => {
-    const countNotDoneTasks = lists.reduce((total, list) => {
-      return total + list.tasks.filter((task) => task.status !== 'Done').length;
-    }, 0);
-    setNotDoneTasksCount(countNotDoneTasks);
-  }, [lists]);
-
-  const fetchBalance = async () => {
-    const res = await loadBalance();
-    setBalance(res.reverse());
-  };
-
-  const fetchCurrentBalance = async () => {
-    const res = await currentBalance();
-    setCurrent(res);
-  };
+  const [[addBalance], [removeBalance], [generateCashOrder]] = [
+    useAddBalanceMutation(),
+    useRemoveBalanceMutation(),
+    useLazyGenerateCashOrderQuery(),
+  ];
+  const [upload] = useUploadMutation();
+  const { data: totals, isLoading: totalsLoading } = useGetTotalsQuery();
+  const [{ data: balance }, { data: current }] = [
+    useLoadBalanceQuery(),
+    useGetCurrentBalanceQuery(),
+  ];
 
   const fetchSavedMaterialsCount = async () => {
     const res = await getMaterialCount();
     setMaterialsCount(res);
-  };
-
-  const calculateTotal = () => {
-    let _totalPrice = 0;
-    let _totalPriceRough = 0;
-
-    lists.forEach((list) => {
-      list.tasks.forEach((task) => {
-        if (task.status !== 'Done') {
-          const price = parseFloat(task.price);
-          const quantity = task.quantity;
-          if (task.payment?.toLowerCase() === 'cash') {
-            _totalPrice += !Number.isNaN(price) ? price * quantity : 0;
-          }
-          _totalPriceRough += !Number.isNaN(price) ? price * quantity : 0;
-        }
-      });
-    });
-    return {
-      total: parseFloat(_totalPrice.toFixed(2)),
-      totalRough: parseFloat(_totalPriceRough.toFixed(2)),
-    };
   };
 
   const handleClickOpen = () => {
@@ -129,12 +88,10 @@ export const DashboardPage = () => {
         department: localStorage.getItem('selectedDepartment'),
       };
       try {
-        addBalance(data);
+        await addBalance(data);
         setInputCheck('');
         setInputValue('');
         setInputDate('');
-        fetchCurrentBalance();
-        fetchBalance();
       } catch (err) {
         console.log(err);
       }
@@ -153,14 +110,13 @@ export const DashboardPage = () => {
   const handleRemoveDebitClick = async (debit) => {
     try {
       await removeBalance(debit);
-      fetchBalance();
-      fetchCurrentBalance();
     } catch (error) {
       console.error('Error in removeDebit:', error);
     }
   };
 
-  const totals = useMemo(() => calculateTotal(), [lists]);
+  if (totalsLoading) return <CircularProgress />;
+
   return (
     <>
       <DebitDialog
@@ -182,17 +138,13 @@ export const DashboardPage = () => {
       />
       <Grid container>
         {!isLoggedIn && <Navigate to="/login" />}
-
-        <Grid item xs={12} sx={{ marginBottom: '15px' }}>
-          <NavBar />
-        </Grid>
         <Grid item xs={12}>
           <Grid container justifyContent="center" spacing={8}>
             <Grid item xl={2}>
               <CardComponent
                 textColor="green"
                 text="Waiting for payment"
-                amount={totalPrice.toLocaleString('en-US').replace(/,/g, ' ') + ' AED'}
+                amount={totals?.total.toLocaleString('en-US').replace(/,/g, ' ') + ' AED'}
                 //@ts-ignore
                 button={
                   <StyledGenerateCashOrderButton onClick={handleDownloadCashOrder}>
@@ -203,7 +155,7 @@ export const DashboardPage = () => {
               <CardComponent
                 textColor="red"
                 text="Cash order(Rough)"
-                amount={roughTotalPrice.toLocaleString('en-US').replace(/,/g, ' ') + ' AED'}
+                amount={totals?.totalRough.toLocaleString('en-US').replace(/,/g, ' ') + ' AED'}
               />
             </Grid>
             <Grid item xl={2}>
@@ -248,19 +200,13 @@ export const DashboardPage = () => {
               </Typography>
             </Grid>
             <Grid item xs={10} sx={{ margin: '10px auto' }}>
-              <TableListsComponent lists={lists} isArchive={false} onUpload={onUpload} />
             </Grid>
           </Grid>
         </Grid>
         <Grid item xs={12}>
           <Grid container>
             <Grid item xs={12} sx={{ margin: '25px auto 10px auto' }}>
-              <Typography textAlign="center" color="#ffffff" variant="h4">
-                Projects in archive
-              </Typography>
-            </Grid>
-            <Grid item xs={10} sx={{ margin: '10px auto' }}>
-              <TableListsComponent lists={archive} isArchive={true} onUpload={onUpload} />
+              <input type="file" accept=".xlsx" onChange={(e) => upload(e.target.files[0])} />
             </Grid>
           </Grid>
         </Grid>

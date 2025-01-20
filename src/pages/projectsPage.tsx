@@ -12,6 +12,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import FullFeaturedCrudGrid from '../components/DataGridComponent';
 import { useUser } from '../state/userContext';
 import { useState, useEffect } from 'react';
+import { useLoadListsQuery } from '../store/api/listsApi';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -56,10 +58,12 @@ function a11yProps(index: number) {
   };
 }
 
-export default function VerticalTabs() {
-  const { lists, getTasksByListId, getTasksByArchiveId, dispatch } = useAppState();
+export default function ProjectsPage() {
+  const { getTasksByListId, getTasksByArchiveId, dispatch } = useAppState();
+  const navigate = useNavigate();
+  const { data: lists, isLoading } = useLoadListsQuery();
+  const { id } = useParams();
   const matches = useMediaQuery('(max-width:1280px)');
-
   const [value, setValue] = useState<number>(0);
   const [selected, setSelected] = useState<string | null>(null);
   const { currentUser, users } = useUser();
@@ -69,17 +73,17 @@ export default function VerticalTabs() {
       if (selected && lists) {
         setValue(lists.findIndex((list) => list.text === selected));
       } else {
-        setSelected(lists[0]?.text);
+        setSelected(lists?.[0]?.text ?? null);
         setValue(0);
       }
     } catch (err) {
-      setSelected(lists[0]?.text);
+      setSelected(lists?.[0]?.text ?? null);
       setValue(0);
     }
   }, [lists, selected]);
 
   const handleChange = (event: any, newValue: number) => {
-    setSelected(event.target.childNodes[0].data);
+    navigate(`/projects/${lists?.[newValue]._id}`);
   };
 
   return (
@@ -94,30 +98,8 @@ export default function VerticalTabs() {
             width: '100%',
           }}
         >
-          <Tabs
-            orientation="vertical"
-            variant="scrollable"
-            value={value}
-            onChange={handleChange}
-            aria-label="Vertical tabs example"
-            sx={{ borderRight: 1, borderColor: 'divider', width: '250px', pb: 2 }}
-          >
-            {lists.map((list, index) =>
-              list.tasks.some(
-                (task) => task.status === 'Pending' || task.status === '' || !task.status
-              ) ? (
-                <StyledTab key={index} label={list.text} {...a11yProps(index)} />
-              ) : (
-                <Tab key={index} label={list.text} {...a11yProps(index)} />
-              )
-            )}
-          </Tabs>
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-            {lists.map((list, index) => (
-              <TabPanel key={index} value={value} index={index}>
-                <FullFeaturedCrudGrid userData={currentUser} users={users} tableId={list.id} />
-              </TabPanel>
-            ))}
+            <FullFeaturedCrudGrid userData={currentUser} users={users} tableId={id} />
           </Box>
         </Box>
       )}

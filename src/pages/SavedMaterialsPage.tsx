@@ -13,9 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Navigate } from 'react-router-dom';
-import NavBar from '../components/navBar';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { editMaterial, getCategories, getSavedMaterials, getSuppliers } from '../api/materials-api';
 import SavedMaterialsToolbar from '../components/DataGridComponents/SavedMaterialsToolbar';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import PhoneEnabledOutlinedIcon from '@mui/icons-material/PhoneEnabledOutlined';
@@ -23,30 +21,25 @@ import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlin
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import { lightBlue } from '@mui/material/colors';
+import {
+  useEditMaterialMutation,
+  useGetCategoriesQuery,
+  useGetSavedMaterialsQuery,
+  useGetSuppliersQuery,
+} from '../store/api/materialsApi';
 export default function SavedMaterialsPage() {
   const [isLoggedIn] = useState(!!localStorage.getItem('token'));
-  const [materials, setMaterials] = useState<Material[]>([]);
-  const [categories, setCategories] = useState([]);
-  const [suppliers, setSuppliers] = useState([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [value, setValue] = useState<any>(null);
   const [open, setOpen] = useState(false);
   const infoCells = ['supplier', 'listParent'];
-  useEffect(() => {
-    getSavedMaterials().then((savedMaterials) => {
-      setMaterials(savedMaterials);
-    });
-    getCategories().then((categories) => {
-      setCategories(categories);
-    });
-    getSuppliers().then((suppliers) => {
-      setSuppliers(suppliers);
-    });
-  }, []);
 
+  const { data: materials } = useGetSavedMaterialsQuery({});
+  const { data: categories } = useGetCategoriesQuery();
+  const { data: suppliers } = useGetSuppliersQuery();
+  const [editMaterial] = useEditMaterialMutation();
   const handleProcessRowUpdate = async (newRow) => {
     await editMaterial(newRow);
-    setMaterials(materials.map((material) => (material.id === newRow.id ? newRow : material)));
     return newRow;
   };
 
@@ -138,7 +131,7 @@ export default function SavedMaterialsPage() {
           }}
           fullWidth
         >
-          {suppliers.map((option) => (
+          {suppliers?.map((option) => (
             <MenuItem key={option._id} value={option}>
               {option.name}
             </MenuItem>
@@ -158,7 +151,7 @@ export default function SavedMaterialsPage() {
           freeSolo
           sx={{ width: '100%', zIndex: 10 }}
           value={params.value}
-          options={categories}
+          options={categories || []}
           onChange={(event, newValue) => {
             params.api.setEditCellValue(
               { id: params.id, field: params.field, value: newValue },
@@ -194,10 +187,6 @@ export default function SavedMaterialsPage() {
   return (
     <Grid container>
       {!isLoggedIn && <Navigate to="/login" />}
-
-      <Grid item xs={12} sx={{ marginBottom: '15px' }}>
-        <NavBar />
-      </Grid>
       {materials.length && (
         <DataGrid
           onCellEditStart={handlePopoverClose}

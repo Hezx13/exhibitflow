@@ -4,22 +4,23 @@ import { appStateReducer } from './appStateReducer';
 import { Action, resetRequests } from './actions';
 import { withInitialState } from '../utils/withInitialState';
 import { debounce } from 'throttle-debounce-ts';
-import { save } from '../api';
 import { DragItem } from '../components/DragItem';
 import { useSocket } from './socketContext';
+import { useSaveMutation } from '../store/api/listsApi';
 
 const AppStateContext = createContext<AppStateContextProps>({} as AppStateContextProps);
 
 export const AppStateProvider = withInitialState<AppStateProviderProps>(
   ({ children, initialState }) => {
     const [state, dispatch] = useImmerReducer(appStateReducer, initialState);
+    const [save] = useSaveMutation();
     // useRef to keep track of the previous state
     const prevStateRef = useRef(initialState);
     const socket = useSocket();
     const debouncedSave = useCallback(
       debounce(500, (currentState, prevState) => {
-        save(currentState, prevState).then((res) => {
-          if (res === 200) dispatch(resetRequests());
+        save({ payload: currentState, old: prevState }).then(() => {
+          dispatch(resetRequests());
         });
         prevStateRef.current = currentState;
       }),

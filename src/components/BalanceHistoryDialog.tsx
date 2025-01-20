@@ -1,15 +1,16 @@
 import { FC, useState, memo } from 'react';
-import { removeBalance } from '../api/balance-api';
 import { Dialog, DialogContent, DialogActions, Button, IconButton } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import dayjs from 'dayjs';
+import { useRemoveBalanceMutation } from '../store/api/balanceApi';
 
 const BalanceHistoryDialog = ({ open, onClose, debits, onRemove }) => {
+  const [removeBalance] = useRemoveBalanceMutation();
   return (
     <>
       <Dialog open={open}>
         <DialogContent>
-          {debits.map((debit) => (
+          {debits?.map((debit) => (
             <div
               key={debit._id}
               style={{

@@ -1,11 +1,8 @@
-// AppRouter.js
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { useAppState } from './state/AppStateContext';
-import ListsPage from './pages/listsPage';
 import TablesPage from './components/tablesPage';
 import ArchivePage from './pages/archivePage';
 import DashboardPage from './pages/dashboardPage';
-import VerticalTabs from './pages/projectsPage';
+import ProjectsPage from './pages/projectsPage';
 import ReportsPage from './pages/ReportsPage';
 import ReportDetailedTable from './components/ReportDetailedTable';
 import Login from './pages/loginPage';
@@ -13,11 +10,15 @@ import Register from './pages/registerPage';
 import ManagementPage from './pages/ManagementPage';
 import SavedMaterialsPage from './pages/SavedMaterialsPage';
 import MainLayout from './components/layout/MainLayout';
+import { useGetUserDataQuery } from './store/api/userApi';
+import { CircularProgress } from '@mui/material';
 
 const PrivateRoute = ({ children, roles }) => {
-  const currentUserRole = useAppState().role;
+  const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();
 
-  if (!currentUserRole || !roles.includes(currentUserRole)) {
+  if (userDataLoading) return <CircularProgress />;
+
+  if (!userData?.role || !roles.includes(userData.role)) {
     return <Navigate to="/" />;
   }
 
@@ -27,16 +28,12 @@ const PrivateRoute = ({ children, roles }) => {
 // Routes configuration
 const routes = [
   {
-    path: '/',
-    element: <ListsPage />,
-  },
-  {
     path: '/table',
     element: <TablesPage />,
   },
   {
-    path: '/projects',
-    element: <VerticalTabs />,
+    path: '/projects/:id',
+    element: <ProjectsPage />,
   },
   {
     path: '/login',
@@ -53,7 +50,7 @@ const routes = [
     protected: true,
   },
   {
-    path: '/dashboard',
+    path: '/',
     element: <DashboardPage />,
     protected: true,
   },

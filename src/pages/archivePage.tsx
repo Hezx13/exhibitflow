@@ -58,9 +58,6 @@ export default function ArchivePage() {
     <Grid container>
       {!isLoggedIn && <Navigate to="/login" />}
       <Grid item xs={12}>
-        <NavBar />
-      </Grid>
-      <Grid item xs={12}>
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           {matches && (
             <Box sx={{ bgcolor: 'background.paper', height: 'auto', borderRadius: '12px' }}>

@@ -14,9 +14,6 @@ const TablesPage: FC = () => {
   return (
     <Grid container>
       <Grid item xs={12}>
-        <NavBar />
-      </Grid>
-      <Grid item xs={12}>
         <FullFeaturedCrudGrid tableId={receivedData} userData={currentUser} users={users} />
       </Grid>
     </Grid>

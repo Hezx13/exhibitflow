@@ -14,9 +14,6 @@ const ManagementPage = () => {
   return (
     <Grid container justifyContent="center">
       {!isLoggedIn && <Navigate to="/login" />}
-      <Grid item xs={12}>
-        <NavBar />
-      </Grid>
       {alert && (
         <Grid item xs={12}>
           <Alert
@@ -30,7 +27,7 @@ const ManagementPage = () => {
         </Grid>
       )}
       <Grid item xs={12}>
-        <UserManagementTable onAlert={(arg) => setAlert(arg)} />
+        {/* <UserManagementTable onAlert={(arg) => setAlert(arg)} /> */}
       </Grid>
       <Grid item xs={12} md={6} sx={{ marginTop: '20px', padding: '0 1rem 0 0' }}>
         <DepartmentsTable />

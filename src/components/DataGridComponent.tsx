@@ -1,55 +1,58 @@
 import React, { useEffect, useState, useRef, memo, useCallback, useMemo } from 'react';
 import Box from '@mui/material/Box';
-
 import { findItemIndexById } from '../utils/arrayUtils';
-import { Status, AddItemButton } from '../styles/styles';
 import { addTask, editTask, moveFromArchive, removeTask } from '../state/actions';
 import { getCurrentDateAndTime } from '../utils/timeUtils';
 import { AddNewItem } from './AddNewItem';
-import { getUserData, getUsers } from '../api/user-api';
-import { onUploadSingle } from '../api';
-
-import EditToolbar from './DataGridComponents/EditToolBar';
 import { useAppState } from '../state/AppStateContext';
-import { MenuItem, Select, TextField } from '@mui/material';
 import NoDataPlaceholder from './DataGridComponents/NoDataPlaceholder';
-import dayjs from 'dayjs';
 import { useSocket } from '../state/socketContext';
-import { eventEmitter } from '../state/EventEmitter';
-import { renderColumns, userColumns } from './DataGridComponents/GridColLayout';
 import { AgGridReact } from 'ag-grid-react';
 import { themeQuartz } from 'ag-grid-community';
+import { RightClickMenu } from './actions/RigtClickMenu';
+import { useLoadSingleListQuery } from '../store/api/listsApi';
 
 // to use myTheme in an application, pass it to the theme grid option
 const myTheme = themeQuartz.withParams({
-  accentColor: '#F29C22',
-  backgroundColor: '#161616',
+  accentColor: '#D17E08',
+  backgroundColor: '#14141460',
+  borderColor: '#1F1F1F',
+  borderRadius: 2,
   browserColorScheme: 'dark',
+  cellHorizontalPaddingScale: 0.5,
   chromeBackgroundColor: {
-    ref: 'foregroundColor',
-    mix: 0.07,
-    onto: 'backgroundColor',
+    ref: 'backgroundColor',
   },
-  fontFamily: 'inherit',
-  foregroundColor: '#EBEBEB',
-  headerFontSize: 14,
+  columnBorder: true,
+  fontFamily: {
+    googleFont: 'Archivo',
+  },
+  fontSize: 15,
+  foregroundColor: '#CECECE',
+  headerBackgroundColor: '#141414',
+  headerFontFamily: 'inherit',
+  headerFontSize: 13,
+  headerFontWeight: 400,
+  headerTextColor: '#CECECE',
+  rowBorder: true,
+  rowVerticalPaddingScale: 0.6,
+  sidePanelBorder: true,
+  spacing: 6,
+  wrapperBorder: true,
+  wrapperBorderRadius: 8,
 });
 
 function FullFeaturedCrudGrid({ tableId, userData, users }) {
   const [rows, setRows] = React.useState<Task[]>([]);
-  const { lists, archive, role, dispatch } = useAppState();
+  const { archive, role, dispatch } = useAppState();
   const fileInput = useRef<HTMLInputElement>(null);
   const socket = useSocket();
+  const { data: list } = useLoadSingleListQuery(tableId);
 
   useEffect(() => {
-    const id_a = findItemIndexById(archive, tableId);
-    const id_l = findItemIndexById(lists, tableId);
-    if (id_a > -1) {
-      setRows(archive[id_a].tasks);
-    } else if (id_l > -1) {
-      setRows(lists[id_l].tasks);
-    }
-  }, [lists]);
+    if (!list) return;
+    setRows(list?.tasks || []);
+  }, [list]);
 
   // const handleUserInProject = useCallback((data) => {
   //     const list = data;
@@ -65,12 +68,10 @@ function FullFeaturedCrudGrid({ tableId, userData, users }) {
 
   useEffect(() => {
     if (socket) {
-      //@ts-expect-error
       socket?.emit('selected_project', {
         id: tableId,
         user: localStorage.getItem('token'),
       });
-      //@ts-expect-error
       socket?.emit('send_users_in_project');
       // socket.on('user_in_project', handleUserInProject);
 
@@ -228,42 +229,53 @@ function FullFeaturedCrudGrid({ tableId, userData, users }) {
         width: '100%',
       }}
     >
-      {rows.length > 0 ? (
-        <AgGridReact
-          rowData={rows}
-          theme={myTheme}
-          rowDragManaged={true}
-          columnDefs={columnDefs as any}
-          defaultColDef={defaultColDef}
-          onCellValueChanged={onCellValueChanged}
-          rowSelection="multiple"
-          animateRows={true}
-        />
-      ) : (
-        <NoDataPlaceholder>
-          <AddNewItem
-            toggleButtonText="+ Add another material"
-            onAdd={(text, article, price, quantity, unit, comment, deliveryDate, orderedBy) => {
-              dispatch(moveFromArchive(tableId));
-              dispatch(
-                addTask(
-                  text,
-                  tableId,
-                  article || '',
-                  price || '0',
-                  quantity || 1,
-                  getCurrentDateAndTime(),
-                  unit || 'pcs',
-                  comment || '',
-                  deliveryDate ? new Date(deliveryDate) : getCurrentDateAndTime(),
-                  userData?.username || 'Anonymus',
-                  'Pending',
-                  ''
-                )
-              );
-            }}
+      <RightClickMenu
+        options={[
+          {
+            name: 'Add new material',
+            action: () => {
+              console.log('add new material');
+            },
+          },
+        ]}
+      >
+        {rows.length > 0 ? (
+          <AgGridReact
+            rowData={rows}
+            theme={myTheme}
+            rowDragManaged={true}
+            columnDefs={columnDefs as any}
+            defaultColDef={defaultColDef}
+            onCellValueChanged={onCellValueChanged}
+            rowSelection="multiple"
+            animateRows={true}
+            cellSelection
           />
-          {/* <AddItemButton onClick={handleUploadClick} dark excel>
+        ) : (
+          <NoDataPlaceholder>
+            <AddNewItem
+              toggleButtonText="+ Add another material"
+              onAdd={(text, article, price, quantity, unit, comment, deliveryDate, orderedBy) => {
+                dispatch(moveFromArchive(tableId));
+                dispatch(
+                  addTask(
+                    text,
+                    tableId,
+                    article || '',
+                    price || '0',
+                    quantity || 1,
+                    getCurrentDateAndTime(),
+                    unit || 'pcs',
+                    comment || '',
+                    deliveryDate ? new Date(deliveryDate) : getCurrentDateAndTime(),
+                    userData?.username || 'Anonymus',
+                    'Pending',
+                    ''
+                  )
+                );
+              }}
+            />
+            {/* <AddItemButton onClick={handleUploadClick} dark excel>
               Excel import
           </AddItemButton>
           <input
@@ -272,8 +284,9 @@ function FullFeaturedCrudGrid({ tableId, userData, users }) {
               style={{ display: 'none' }}
               onChange={handleFileChange}
           /> */}
-        </NoDataPlaceholder>
-      )}
+          </NoDataPlaceholder>
+        )}
+      </RightClickMenu>
     </Box>
   );
 }

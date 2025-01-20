@@ -1,11 +1,36 @@
 import { Box } from '@mui/material';
-
+import { Grid2 as Grid } from '@mui/material';
 import { Outlet } from 'react-router-dom';
+import { NavBar } from '../navBar';
+import { Sidebar } from './Sidebar';
+import { useState } from 'react';
 
 export default function MainLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
-    <Box sx={{ height: 'calc(100vh)', overflow: 'hidden', width: '100%', px: 2 }}>
-      <Outlet />
-    </Box>
+    <Grid container sx={{ height: '100vh' }}>
+      <Grid size="auto">
+        <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      </Grid>
+      <Grid size="grow" container direction="column">
+        <Grid size="auto">
+          <Box width="100%" px={2}>
+            <NavBar isSidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          </Box>
+        </Grid>
+        <Grid
+          size="grow"
+          component="main"
+          sx={{
+            px: 2,
+            overflow: 'auto',
+            transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
+          }}
+        >
+          <Outlet />
+        </Grid>
+      </Grid>
+    </Grid>
   );
 }

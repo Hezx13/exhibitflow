@@ -6,7 +6,6 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { StyledGenerateCashOrderButton } from '../styles/styles';
-import { generateCashOrder } from '../api/balance-api';
 import { StyledComponent } from 'styled-components';
 type CardComponentProps = {
   text: string;

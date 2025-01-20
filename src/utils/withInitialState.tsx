@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { load } from '../api';
-import CircularProgress from '@mui/material/CircularProgress';
+import { useLoadListsQuery, useLoadSingleListQuery } from '../store/api/listsApi';
 import { eventEmitter } from '../state/EventEmitter';
+import CircularProgress from '@mui/material/CircularProgress';
 
 type InjectedProps = {
   initialState: AppState;
 };
 
 type PropsWithoutInjected<TBaseProps> = Omit<TBaseProps, keyof InjectedProps>;
-
-type WithInjectedProps<TProps> = TProps & InjectedProps;
 
 export const LoadingSpinner = () => {
   return (
@@ -30,8 +28,9 @@ export const LoadingSpinner = () => {
   );
 };
 
-export function withInitialState<TProps>(WrappedComponent) {
-  return (props: PropsWithoutInjected<TProps>) => {
+export function withInitialState<TProps>(WrappedComponent: any) {
+  return function WithInitialStateComponent(props: PropsWithoutInjected<TProps>) {
+    const { data, refetch, isLoading } = useLoadListsQuery();
     const [initialState, setInitialState] = useState<AppState>({
       lists: [],
       listsToAdd: {},
@@ -44,14 +43,11 @@ export function withInitialState<TProps>(WrappedComponent) {
       processSave: true,
       role: 'User',
     });
-    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<Error | undefined>();
 
     useEffect(() => {
       const fetchInitialState = async () => {
-        setIsLoading(true);
         try {
-          const data = await load();
           setInitialState({
             ...data,
             listsToAdd: {},
@@ -67,14 +63,12 @@ export function withInitialState<TProps>(WrappedComponent) {
             setError(e);
           }
         }
-        setIsLoading(false);
       };
 
       const handleRefetch = () => {
         if (localStorage.getItem('token')) {
+          refetch();
           fetchInitialState();
-        } else {
-          setIsLoading(false);
         }
       };
 
@@ -84,8 +78,6 @@ export function withInitialState<TProps>(WrappedComponent) {
 
       if (localStorage.getItem('token')) {
         fetchInitialState();
-      } else {
-        setIsLoading(false);
       }
 
       return () => {
@@ -93,17 +85,16 @@ export function withInitialState<TProps>(WrappedComponent) {
         eventEmitter.off('savedMaterialsAdded', handleRefetch);
         eventEmitter.off('changedDepartment', handleRefetch);
       };
-    }, []);
+    }, [data, refetch]);
 
     if (isLoading) {
-      return <LoadingSpinner></LoadingSpinner>;
+      return <LoadingSpinner />;
     }
 
     if (error) {
       return <div>{error.message}</div>;
     }
 
-    // Pass props and initialState to WrappedComponent
     return <WrappedComponent {...props} initialState={initialState} />;
   };
 }

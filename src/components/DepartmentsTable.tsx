@@ -15,23 +15,16 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { StyledTableContainer } from '../styles/styles';
-import { addDepartment, deleteDepartment, getDepartments } from '../api/projects-api';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
+import { useAddDepartmentMutation, useDeleteDepartmentMutation, useGetDepartmentsQuery } from '../store/api/departmentsApi';
 
 const DepartmentsTable = () => {
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const { data: departments, isLoading: departmentsLoading } = useGetDepartmentsQuery();
+  const [[deleteDepartment], [addDepartment]] = [useDeleteDepartmentMutation(), useAddDepartmentMutation()];
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const [addingDepartment, setAddingDepartment] = useState<boolean>(false);
   const [newDepartmentName, setNewDepartmentName] = useState<string>('');
-
-  const loadDepartments = async () => {
-    getDepartments().then((departments) => setDepartments(departments));
-  };
-
-  useEffect(() => {
-    loadDepartments();
-  }, []);
 
   const handleOpenAddField = () => {
     setAddingDepartment((prev) => !prev);
@@ -41,14 +34,12 @@ const DepartmentsTable = () => {
     if (newDepartmentName) {
       await addDepartment(newDepartmentName);
       setAddingDepartment(false);
-      loadDepartments();
       setNewDepartmentName('');
     }
   };
 
   const handleDeleteDepartment = async (name) => {
     await deleteDepartment(name);
-    loadDepartments();
     setSelectedRow(null);
   };
 
@@ -67,7 +58,7 @@ const DepartmentsTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {departments.map((row, index) => (
+            {departments?.map((row, index) => (
               <TableRow
                 onClick={() => setSelectedRow(index)}
                 key={row.name}
@@ -145,7 +136,7 @@ const DepartmentsTable = () => {
                     <>
                       <Button
                         variant="outlined"
-                        onClick={() => handleDeleteDepartment(departments[selectedRow].name)}
+                        onClick={() => handleDeleteDepartment(departments?.[selectedRow]?.name)}
                       >
                         Delete department
                       </Button>

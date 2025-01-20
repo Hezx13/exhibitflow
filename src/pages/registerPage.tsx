@@ -49,9 +49,6 @@ const Register = () => {
     <Grid container>
       {isLoggedIn && <Navigate to="/" />}
       <Grid item xs={12} sx={{ marginBottom: '15px' }}>
-        <NavBar />
-      </Grid>
-      <Grid item xs={12} sx={{ marginBottom: '15px' }}>
         <Container component="main" maxWidth="xs">
           <Box
             sx={{
