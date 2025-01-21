@@ -1,17 +1,13 @@
-import React from 'react'
-import "./index.css"
-import ReactDOM from "react-dom";
-import App from "./App"
-import { DndProvider } from "react-dnd"
-import { HTML5Backend as Backend } from "react-dnd-html5-backend"
-import { AppStateProvider } from "./state/AppStateContext"
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import './App.css';
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import { StrictMode } from 'react';
 
-ReactDOM.render(
-  <DndProvider backend={Backend}>
-    <AppStateProvider>
-      <App />
-    </AppStateProvider>
-  </DndProvider>,
-  document.getElementById("root")
-)
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
 
+ModuleRegistry.registerModules([AllCommunityModule]);

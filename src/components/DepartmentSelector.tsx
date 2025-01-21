@@ -8,17 +8,16 @@ function DepartmentSelector() {
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [departments, setDepartments] = useState<Department[]>([]);
   useEffect(() => {
-    fetchDepartments().then((departments)=>{
-      setDepartments(departments)
+    fetchDepartments().then((departments) => {
+      setDepartments(departments);
       const departmentInCookies = localStorage.getItem('selectedDepartment');
       if (departmentInCookies) {
         setSelectedDepartment(departmentInCookies);
       } else {
-          localStorage.setItem('selectedDepartment', departments[0].name);
-          setSelectedDepartment(departments[0].name)
+        localStorage.setItem('selectedDepartment', departments[0].name);
+        setSelectedDepartment(departments[0].name);
       }
-    })
-    
+    });
   }, []);
 
   const fetchDepartments = async () => {
@@ -38,24 +37,20 @@ function DepartmentSelector() {
   };
 
   return (
-
     <Select
-        size='small'
-          labelId="depSelectorLabel"
-          id="depSelector"
-          value={selectedDepartment}
-          onChange={handleDepartmentChange}
-          label=""
-        >
-            {
-                departments.map((d, index) => (
-                    <MenuItem key={index} value={d.name}>
-                      {d.name}
-                    </MenuItem>
-                  ))
-            }
-        </Select>
-
+      size="small"
+      labelId="depSelectorLabel"
+      id="depSelector"
+      value={selectedDepartment}
+      onChange={handleDepartmentChange}
+      label=""
+    >
+      {departments.map((d, index) => (
+        <MenuItem key={index} value={d.name}>
+          {d.name}
+        </MenuItem>
+      ))}
+    </Select>
   );
 }
 

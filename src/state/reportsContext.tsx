@@ -21,13 +21,12 @@ type Report = {
 const ReportContext = createContext<ReportContextType | undefined>(undefined);
 
 // Create a provider component
-export const ReportProvider: React.FC = ({ children }) => {
+export const ReportProvider = ({ children }: { children: React.ReactNode }) => {
   const [reports, setReports] = useState<Report[]>([]);
   const [reportsUpdated, setReportsUpdated] = useState(false);
 
   useEffect(() => {
-    if(!!localStorage.getItem('token') && localStorage.getItem('role') === 'Admin')
-    fetchReports();
+    if (!!localStorage.getItem('token') && localStorage.getItem('role') === 'Admin') fetchReports();
   }, [reportsUpdated]);
 
   const fetchReports = async () => {
