@@ -17,11 +17,18 @@ import { useState, useEffect } from 'react';
 import { StyledTableContainer } from '../styles/styles';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
-import { useAddDepartmentMutation, useDeleteDepartmentMutation, useGetDepartmentsQuery } from '../store/api/departmentsApi';
+import {
+  useAddDepartmentMutation,
+  useDeleteDepartmentMutation,
+  useGetDepartmentsQuery,
+} from '../store/api/departmentsApi';
 
 const DepartmentsTable = () => {
   const { data: departments, isLoading: departmentsLoading } = useGetDepartmentsQuery();
-  const [[deleteDepartment], [addDepartment]] = [useDeleteDepartmentMutation(), useAddDepartmentMutation()];
+  const [[deleteDepartment], [addDepartment]] = [
+    useDeleteDepartmentMutation(),
+    useAddDepartmentMutation(),
+  ];
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
   const [addingDepartment, setAddingDepartment] = useState<boolean>(false);
   const [newDepartmentName, setNewDepartmentName] = useState<string>('');

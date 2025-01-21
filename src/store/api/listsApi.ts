@@ -135,6 +135,19 @@ export const listsApi = createApi({
       invalidatesTags: ['Lists'],
     }),
 
+    uploadPreview: builder.mutation<void, { file: File }>({
+      query: ({ file }) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('department', localStorage.getItem('selectedDepartment') || '');
+        return {
+          url: `/lists/upload/preview`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+    }),
+
     uploadSingle: builder.mutation<void, { file: File; listId: string }>({
       query: ({ file, listId }) => {
         const formData = new FormData();
@@ -243,4 +256,5 @@ export const {
   useAddDebitMutation,
   useRemoveDebitMutation,
   useLazyDownloadReportQuery,
+  useUploadPreviewMutation,
 } = listsApi;

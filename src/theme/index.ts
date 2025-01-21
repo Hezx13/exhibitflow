@@ -1,6 +1,11 @@
 import { createTheme } from '@mui/material/styles';
 import MuiIconButton from './components/MuiIconButton';
 import MuiButtonBase from './components/MuiButtonBase';
+import MuiListItemIcon from './components/MuiListItemIcon';
+import MuiListItemButton from './components/MuiListItemButton';
+import MuiListItemText from './components/MuiListItemText';
+import MuiMenuItem from './components/MuiMenuItem';
+import MuiMenu from './components/MuiMenu';
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -12,7 +17,7 @@ const theme = createTheme({
     },
     background: {
       default: '#050505',
-      paper: '#1E1E1E',
+      paper: '#000000',
     },
     text: {
       primary: '#EBEBEB',
@@ -21,11 +26,64 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: 'Archivo',
+    fontSize: 14,
+    h1: {
+      fontSize: '2.5rem',
+      fontWeight: 600,
+    },
+    h2: {
+      fontSize: '2rem',
+      fontWeight: 600,
+    },
+    h3: {
+      fontSize: '1.75rem',
+      fontWeight: 600,
+    },
+    h4: {
+      fontSize: '1.5rem',
+      fontWeight: 600,
+    },
+    h5: {
+      fontSize: '1.25rem',
+      fontWeight: 600,
+    },
+    h6: {
+      fontSize: '1rem',
+      fontWeight: 600,
+    },
+    subtitle1: {
+      fontSize: '1.1rem',
+    },
+    subtitle2: {
+      fontSize: '0.9rem',
+    },
+    body1: {
+      fontSize: '0.875rem',
+    },
+    body2: {
+      fontSize: '0.875rem',
+    },
+    button: {
+      fontSize: '0.875rem',
+      textTransform: 'none',
+    },
+    caption: {
+      fontSize: '0.75rem',
+    },
+    overline: {
+      fontSize: '0.75rem',
+      textTransform: 'uppercase',
+    },
   },
   components: {
     MuiIconButton,
-    MuiButtonBase
-  }
+    MuiButtonBase,
+    MuiListItemIcon,
+    MuiListItemButton,
+    MuiListItemText,
+    MuiMenuItem,
+    MuiMenu,
+  },
 });
 
 export default theme;

@@ -155,7 +155,7 @@ export const DashboardPage = () => {
               <CardComponent
                 textColor="red"
                 text="Cash order(Rough)"
-                amount={totals?.totalRough.toLocaleString('en-US').replace(/,/g, ' ') + ' AED'}
+                amount={totals?.totalRough?.toLocaleString('en-US').replace(/,/g, ' ') + ' AED'}
               />
             </Grid>
             <Grid item xl={2}>
@@ -199,8 +199,7 @@ export const DashboardPage = () => {
                 Projects in work
               </Typography>
             </Grid>
-            <Grid item xs={10} sx={{ margin: '10px auto' }}>
-            </Grid>
+            <Grid item xs={10} sx={{ margin: '10px auto' }}></Grid>
           </Grid>
         </Grid>
         <Grid item xs={12}>

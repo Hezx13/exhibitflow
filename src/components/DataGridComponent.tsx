@@ -275,15 +275,6 @@ function FullFeaturedCrudGrid({ tableId, userData, users }) {
                 );
               }}
             />
-            {/* <AddItemButton onClick={handleUploadClick} dark excel>
-              Excel import
-          </AddItemButton>
-          <input
-              type="file"
-              ref={fileInput}
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-          /> */}
           </NoDataPlaceholder>
         )}
       </RightClickMenu>

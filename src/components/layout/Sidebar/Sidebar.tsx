@@ -1,4 +1,14 @@
-import { Box, IconButton, Typography, styled, alpha } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  Typography,
+  styled,
+  alpha,
+  ListItemButton,
+  ListItemText,
+  List,
+  ListItemIcon,
+} from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { RichTreeViewPro } from '@mui/x-tree-view-pro/RichTreeViewPro';
@@ -17,11 +27,11 @@ import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { TreeItem2DragAndDropOverlay } from '@mui/x-tree-view/TreeItem2DragAndDropOverlay';
 import { useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { useLoadListsQuery, usePatchListPositionMutation } from '../../store/api/listsApi';
+import { useLoadListsQuery, usePatchListPositionMutation } from '../../../store/api/listsApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { forwardRef, ReactNode, Ref, SyntheticEvent, useEffect, useMemo } from 'react';
-
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
+import SidebarActionsList from './SidebarActionsList';
 
 interface CustomTreeItemProps {
   id: string;
@@ -55,26 +65,28 @@ const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIEl
   };
   return (
     <TreeItem2Provider itemId={itemId}>
-    <TreeItem2Root {...otherRootProps}>
-      <TreeItem2Content {...getContentProps()}>
-        <TreeItem2IconContainer {...getIconContainerProps()}>
-          <TreeItem2Icon status={status} />
-        </TreeItem2IconContainer>
-        <TreeItem2IconContainer
-          draggable={draggable}
-          onDragStart={handleDragStart}
-          onDragOver={onDragOver}
-          onDragEnd={onDragEnd}
-        >
-          <DragIndicatorIcon />
-        </TreeItem2IconContainer>
-        <TreeItem2Checkbox {...getCheckboxProps()} />
-        <Typography {...getLabelProps()} noWrap>{label}</Typography>
-        <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
-      </TreeItem2Content>
-      {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
-    </TreeItem2Root>
-  </TreeItem2Provider>
+      <TreeItem2Root {...otherRootProps}>
+        <TreeItem2Content {...getContentProps()}>
+          <TreeItem2IconContainer {...getIconContainerProps()}>
+            <TreeItem2Icon status={status} />
+          </TreeItem2IconContainer>
+          <TreeItem2IconContainer
+            draggable={draggable}
+            onDragStart={handleDragStart}
+            onDragOver={onDragOver}
+            onDragEnd={onDragEnd}
+          >
+            <DragIndicatorIcon />
+          </TreeItem2IconContainer>
+          <TreeItem2Checkbox {...getCheckboxProps()} />
+          <Typography noWrap>
+            {label}
+          </Typography>
+          <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
+        </TreeItem2Content>
+        {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
+      </TreeItem2Root>
+    </TreeItem2Provider>
   );
 });
 
@@ -106,9 +118,7 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
     }
   }, [id]);
 
-  const handleItemPositionChange = (
-    data: any
-  ) => {
+  const handleItemPositionChange = (data: any) => {
     console.log(data);
     patchListPosition({ listId: data.listId, payload: data });
   };
@@ -117,22 +127,23 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
       sx={{
         width: open ? 240 : 0,
         flexShrink: 0,
-        backgroundColor: 'background.paper',
+        backgroundColor: 'background.default',
         transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
         overflowX: 'hidden',
-        borderRight: 1,
-        borderColor: 'divider',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        maxHeight: '100%',
+        overflowY: 'hidden',
       }}
     >
       <Box sx={{ p: 1 }}>
         <IconButton onClick={onToggle}>
           <ViewSidebarRoundedIcon />
         </IconButton>
+        <SidebarActionsList />
       </Box>
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
+      <Box sx={{ flex: 1, overflow: 'auto', height: '100%', px: 0.5 }}>
         <RichTreeViewPro
           items={projects}
           apiRef={apiRef}
