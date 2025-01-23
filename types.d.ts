@@ -16,18 +16,18 @@ type Material = {
   
  type Task = {
   _id?: string;
-  id: string;
+  id?: string;
   text: string;
-  article: string;
-  price: string;
-  quantity: number;
-  date: Date;
-  unit: string;
-  comment: string;
-  deliveryDate: Date;
-  orderedBy: string;
-  status: string;
-  payment: string;
+  article?: string;
+  price?: string;
+  quantity?: number;
+  date?: Date;
+  unit?: string;
+  comment?: string;
+  deliveryDate?: Date;
+  orderedBy?: string;
+  status?: string;
+  payment?: string;
 }
 
 

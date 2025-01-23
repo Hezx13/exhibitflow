@@ -3,13 +3,13 @@ import Cookies from 'js-cookie';
 import { getDepartments } from '../api/projects-api'; // Assuming you have an API utility to fetch departments
 import { Select, MenuItem } from '@mui/material';
 import { eventEmitter } from '../state/EventEmitter';
+import { useGetDepartmentsQuery } from '../store/api/departmentsApi';
 
 function DepartmentSelector() {
   const [selectedDepartment, setSelectedDepartment] = useState('');
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const {data: departments} = useGetDepartmentsQuery()
   useEffect(() => {
-    fetchDepartments().then((departments) => {
-      setDepartments(departments);
+    if (departments) {
       const departmentInCookies = localStorage.getItem('selectedDepartment');
       if (departmentInCookies) {
         setSelectedDepartment(departmentInCookies);
@@ -17,17 +17,9 @@ function DepartmentSelector() {
         localStorage.setItem('selectedDepartment', departments[0].name);
         setSelectedDepartment(departments[0].name);
       }
-    });
-  }, []);
-
-  const fetchDepartments = async () => {
-    try {
-      const deps = await getDepartments(); // Assuming this fetches an array of departments
-      return deps;
-    } catch (error) {
-      console.error('Failed to fetch departments:', error);
     }
-  };
+  }, [departments]);
+
 
   const handleDepartmentChange = (event) => {
     const newDepartment = event.target.value;
@@ -45,7 +37,7 @@ function DepartmentSelector() {
       onChange={handleDepartmentChange}
       label=""
     >
-      {departments.map((d, index) => (
+      {departments?.map((d, index) => (
         <MenuItem key={index} value={d.name}>
           {d.name}
         </MenuItem>
