@@ -8,9 +8,9 @@ import { useAppState } from '../state/AppStateContext';
 import NoDataPlaceholder from './DataGridComponents/NoDataPlaceholder';
 import { useSocket } from '../state/socketContext';
 import { AgGridReact } from 'ag-grid-react';
-import { themeQuartz } from 'ag-grid-community';
+import { CellEditRequestEvent, themeQuartz } from 'ag-grid-community';
 import { RightClickMenu } from './actions/RigtClickMenu';
-import { useLoadSingleListQuery } from '../store/api/listsApi';
+import { useLoadSingleListQuery, usePatchTaskMutation } from '../store/api/listsApi';
 
 // to use myTheme in an application, pass it to the theme grid option
 const myTheme = themeQuartz.withParams({
@@ -46,6 +46,7 @@ function FullFeaturedCrudGrid({ tableId, userData, users }) {
   const [rows, setRows] = React.useState<Task[]>([]);
   const { archive, role, dispatch } = useAppState();
   const fileInput = useRef<HTMLInputElement>(null);
+  const [patchTask] = usePatchTaskMutation();
   const socket = useSocket();
   const { data: list } = useLoadSingleListQuery(tableId);
 
@@ -196,27 +197,26 @@ function FullFeaturedCrudGrid({ tableId, userData, users }) {
     []
   );
 
-  const onCellValueChanged = (params) => {
-    const newRow = params.data;
-    dispatch(
-      editTask(
-        newRow.id,
-        tableId,
-        newRow.text,
-        newRow.article,
-        newRow.price,
-        newRow.quantity,
-        new Date(newRow.date),
-        newRow.unit,
-        newRow.comment,
-        new Date(newRow.deliveryDate),
-        newRow.orderedBy,
-        newRow.status,
-        newRow.payment
-      )
-    );
+  const onCellValueChanged = (newRow: CellEditRequestEvent<Task>) => {
+    const editedIndex = newRow.rowIndex as number;
+    const column = newRow.colDef.field as string;
+    const newRowData = newRow.newValue;
+    const id = newRow.data._id;
 
-    socket?.emit('send_updated_materials', { projectId: tableId, material: newRow });
+    setRows(currentRows => {
+      const newRows = [...currentRows];
+      newRows[editedIndex] = {
+        ...newRows[editedIndex],
+        [column]: newRowData
+      };
+      return newRows;
+    });
+
+    patchTask({
+      listId: tableId, 
+      taskId: id as string,
+      payload: {[column]: newRowData}
+    });
   };
 
   return (
@@ -241,15 +241,15 @@ function FullFeaturedCrudGrid({ tableId, userData, users }) {
       >
         {rows.length > 0 ? (
           <AgGridReact
+          singleClickEdit
             rowData={rows}
             theme={myTheme}
             rowDragManaged={true}
             columnDefs={columnDefs as any}
             defaultColDef={defaultColDef}
-            onCellValueChanged={onCellValueChanged}
-            rowSelection="multiple"
+            onCellEditRequest={onCellValueChanged}
             animateRows={true}
-            cellSelection
+            readOnlyEdit={true}
           />
         ) : (
           <NoDataPlaceholder>
