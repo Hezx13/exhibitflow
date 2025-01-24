@@ -23,7 +23,7 @@ class EventEmitter {
   emit(eventName: string, ...args: any[]): void {
     const event = this.events[eventName];
     if (event) {
-      event.forEach((fn) => {
+      event?.forEach((fn) => {
         fn(...args);
       });
     }

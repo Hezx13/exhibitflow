@@ -1,10 +1,8 @@
 import { FC, useEffect, useState } from 'react';
-import TableComponent from './tableComponent';
-import { useLocation } from 'react-router-dom';
 import { Grid } from '@mui/material';
-import NavBar from './navBar';
 import FullFeaturedCrudGrid from './DataGridComponent';
 import { useUser } from '../state/userContext';
+import { useLocation } from 'react-router-dom';
 
 const TablesPage: FC = () => {
   const location = useLocation();

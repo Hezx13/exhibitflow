@@ -109,6 +109,7 @@ export const NavBar = ({
         backdropFilter: 'blur(50px)',
       }}
     >
+      {isSidebarOpen && <Box sx={{ width: 34 }}></Box>}
       <AnimatePresence>
         {!isSidebarOpen ? (
           <motion.div
@@ -121,9 +122,7 @@ export const NavBar = ({
               <ViewSidebarRoundedIcon />
             </IconButton>
           </motion.div>
-        ) : (
-          <div style={{ width: 34 }}></div>
-        )}
+        ) : null}
       </AnimatePresence>
       <Stack direction="row" gap={1}>
         <NavbarItems

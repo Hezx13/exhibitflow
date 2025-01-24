@@ -5,7 +5,6 @@ import { Action, resetRequests } from './actions';
 import { withInitialState } from '../utils/withInitialState';
 import { debounce } from 'throttle-debounce-ts';
 import { DragItem } from '../components/DragItem';
-import { useSocket } from './socketContext';
 import { useSaveMutation } from '../store/api/listsApi';
 
 const AppStateContext = createContext<AppStateContextProps>({} as AppStateContextProps);
@@ -16,7 +15,6 @@ export const AppStateProvider = withInitialState<AppStateProviderProps>(
     const [save] = useSaveMutation();
     // useRef to keep track of the previous state
     const prevStateRef = useRef(initialState);
-    const socket = useSocket();
     const debouncedSave = useCallback(
       debounce(500, (currentState, prevState) => {
         save({ payload: currentState, old: prevState }).then(() => {

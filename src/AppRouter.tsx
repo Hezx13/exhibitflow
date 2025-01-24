@@ -1,10 +1,8 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import TablesPage from './components/tablesPage';
-import ArchivePage from './pages/archivePage';
 import DashboardPage from './pages/dashboardPage';
 import ProjectsPage from './pages/projectsPage';
 import ReportsPage from './pages/ReportsPage';
-import ReportDetailedTable from './components/ReportDetailedTable';
 import Login from './pages/loginPage';
 import Register from './pages/registerPage';
 import ManagementPage from './pages/ManagementPage';
@@ -46,7 +44,7 @@ const routes = [
   // Protected routes
   {
     path: '/archive',
-    element: <ArchivePage />,
+    element: <div>Archive</div>,
     protected: true,
   },
   {
@@ -71,7 +69,7 @@ const routes = [
   },
   {
     path: '/report',
-    element: <ReportDetailedTable />,
+    element: <div>Report</div>,
     protected: true,
   },
 ];

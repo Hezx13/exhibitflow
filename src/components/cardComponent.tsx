@@ -5,13 +5,12 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { StyledGenerateCashOrderButton } from '../styles/styles';
 import { StyledComponent } from 'styled-components';
 type CardComponentProps = {
   text: string;
   amount: JSX.Element | number | string;
   textColor?: string;
-  button?: StyledComponent<'button', any, {}, never> | Element;
+  button?: React.ReactNode;
 };
 
 const bull = (

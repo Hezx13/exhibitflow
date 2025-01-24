@@ -1,13 +1,5 @@
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { useAppState } from '../state/AppStateContext';
-import TableComponent from '../components/tableComponent';
-import NavBar from '../components/navBar';
-import { addList } from '../state/actions';
-import { AddNewItem } from '../components/AddNewItem';
-import { StyledTab } from '../styles/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import FullFeaturedCrudGrid from '../components/DataGridComponent';
 import { useUser } from '../state/userContext';
@@ -19,43 +11,6 @@ interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
-      {...other}
-      style={{ flexGrow: 1 }}
-    >
-      {value === index && (
-        <Box
-          sx={{
-            px: 1,
-            width: '100%',
-            flexGrow: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-          }}
-        >
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `vertical-tab-${index}`,
-    'aria-controls': `vertical-tabpanel-${index}`,
-  };
 }
 
 export default function ProjectsPage() {

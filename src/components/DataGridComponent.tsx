@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef, memo, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import Box from '@mui/material/Box';
-import { findItemIndexById } from '../utils/arrayUtils';
-import { addTask, editTask, moveFromArchive, removeTask } from '../state/actions';
+import { addTask, moveFromArchive, removeTask } from '../state/actions';
 import { getCurrentDateAndTime } from '../utils/timeUtils';
 import { AddNewItem } from './AddNewItem';
 import { useAppState } from '../state/AppStateContext';

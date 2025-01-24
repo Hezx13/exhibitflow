@@ -29,7 +29,7 @@ import { useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { useLoadListsQuery, usePatchListPositionMutation } from '../../../store/api/listsApi';
 import { useNavigate, useParams } from 'react-router-dom';
-import { forwardRef, ReactNode, Ref, SyntheticEvent, useEffect, useMemo } from 'react';
+import { forwardRef, ReactNode, Ref, SyntheticEvent, useEffect, useMemo, Component, ErrorInfo } from 'react';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import SidebarActionsList from './SidebarActionsList';
 
@@ -43,7 +43,6 @@ interface CustomTreeItemProps {
 
 const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIElement>) => {
   const { id, itemId, label, disabled, children, ...other } = props;
-
   const {
     getRootProps,
     getContentProps,
@@ -59,7 +58,6 @@ const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIEl
     if (!onDragStart) {
       return;
     }
-
     onDragStart(event);
     event.dataTransfer.setDragImage((event.target as HTMLElement).parentElement!, 0, 0);
   };
@@ -95,14 +93,25 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
+class TreeViewErrorBoundary extends Component<{ children: ReactNode }> {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Only log the error if it's not the specific DOM insertion error
+    if (!error.message.includes('insertBefore')) {
+      console.error('TreeView Error:', error, errorInfo);
+    }
+  }
+
+  render() {
+    return this.props.children;
+  }
+}
+
 export const Sidebar = ({ open, onToggle }: SidebarProps) => {
   const { data: projects } = useLoadListsQuery();
   const [patchListPosition] = usePatchListPositionMutation();
-  const { id } = useParams();
   const navigate = useNavigate();
-  const apiRef = useTreeViewApiRef();
 
-  const handleNodeSelect = (_: SyntheticEvent, nodeId: string) => {
+  const handleNodeSelect = (nodeId: string) => {
     navigate(`/projects/${nodeId}`);
   };
 
@@ -116,12 +125,13 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
         toRemove.remove();
       }
     }
-  }, [id]);
+  }, []);
 
   const handleItemPositionChange = (data: any) => {
-    console.log(data);
-    patchListPosition({ listId: data.listId, payload: data });
+    console.log('data', data)
+    patchListPosition({ listId: data.itemId, payload: data });
   };
+
   return (
     <Box
       sx={{
@@ -143,22 +153,31 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
         </IconButton>
         <SidebarActionsList />
       </Box>
-      <Box sx={{ flex: 1, overflow: 'auto', height: '100%', px: 0.5 }}>
+      {/* workaround to supress errors */}
+      <TreeViewErrorBoundary>
         <RichTreeViewPro
+          sx={{
+            '& > div:last-child': {
+              display: 'none'
+            },
+            height: '100%',
+            overflowY: 'auto'
+          }}
           items={projects}
-          apiRef={apiRef}
           onItemPositionChange={handleItemPositionChange}
-          onItemClick={handleNodeSelect}
+          onSelectedItemsChange={(_, itemIds) => {
+            if (itemIds) {
+              handleNodeSelect(itemIds);
+            }
+          }}
           slots={{ item: CustomTreeItem as any }}
           experimentalFeatures={{
             indentationAtItemLevel: true,
-            itemsReordering: true,
-            labelEditing: true,
+            itemsReordering: true
           }}
           itemsReordering
-          sx={{ flexGrow: 1 }}
         />
-      </Box>
+      </TreeViewErrorBoundary>
     </Box>
   );
 };

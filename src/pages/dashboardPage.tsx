@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useMemo, memo } from 'react';
+import { useState, memo } from 'react';
 import { Grid, CircularProgress } from '@mui/material';
 import CardComponent from '../components/cardComponent';
-import NavBar from '../components/navBar';
-import TableListsComponent from '../components/tableListsComponent';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -205,7 +203,7 @@ export const DashboardPage = () => {
         <Grid item xs={12}>
           <Grid container>
             <Grid item xs={12} sx={{ margin: '25px auto 10px auto' }}>
-              <input type="file" accept=".xlsx" onChange={(e) => upload(e.target.files[0])} />
+              <input type="file" accept=".xlsx" onChange={(e) => upload(e?.target?.files?.[0] as File)} />
             </Grid>
           </Grid>
         </Grid>
