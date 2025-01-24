@@ -3,21 +3,20 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  Grid2 as Grid,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
+  IconButton,
+  Stack,
 } from '@mui/material';
 import dayjs from 'dayjs';
+import { AgGridReact } from 'ag-grid-react';
+import myTheme from '../../theme/grid';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import SaveAsRoundedIcon from '@mui/icons-material/SaveAsRounded';
 
 interface Task {
   text: string;
@@ -46,8 +45,29 @@ interface TasksDialogProps {
 }
 
 export const UploadPreviewTable: React.FC<TasksDialogProps> = ({ open, onClose, data }) => {
-  const [selectedDepartment, setSelectedDepartment] = useState<number>(0);
-  console.log(data);
+  const [selectedPage, setSelectedPage] = useState<number>(0);
+
+  const columnDefs = [
+    { field: 'text', headerName: 'Description' },
+    { field: 'article', headerName: 'Article' },
+    { field: 'price', headerName: 'Price' },
+    { field: 'quantity', headerName: 'Quantity' },
+    { field: 'unit', headerName: 'Unit' },
+    { 
+      field: 'date', 
+      headerName: 'Date',
+      valueFormatter: (params: any) => dayjs(params.value).format('DD-MM-YYYY')
+    },
+    { 
+      field: 'deliveryDate', 
+      headerName: 'Delivery Date',
+      valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD-MM-YYYY') : '-'
+    },
+    { field: 'comment', headerName: 'Comment' },
+    { field: 'status', headerName: 'Status' },
+    { field: 'payment', headerName: 'Payment' }
+  ];
+
   return (
     <Dialog
       open={open}
@@ -59,69 +79,65 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({ open, onClose, 
       }}
     >
       <DialogTitle>
-        <Typography variant="h5">Tasks Overview</Typography>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Typography variant="h5">Tasks Overview</Typography>
+          <Stack direction="row" gap={1}>
+            <IconButton>
+              <SaveAsRoundedIcon />
+            </IconButton>
+            <IconButton onClick={onClose}>
+              <CloseRoundedIcon />
+            </IconButton>
+          </Stack>
+        </Stack>
       </DialogTitle>
-      <DialogContent>
-        <Grid container spacing={2}>
-          {/* Sidebar */}
-          <Grid size={3}>
-            <Paper elevation={2} sx={{ height: '100%' }}>
-              <List>
-                {data?.map((group, index) => (
-                  <ListItem key={index} disablePadding>
-                    <ListItemButton
-                      selected={selectedDepartment === index}
-                      onClick={() => setSelectedDepartment(index)}
-                    >
-                      <ListItemText 
-                        primary={group.department}
-                        secondary={group.text}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Paper>
-          </Grid>
+      <DialogContent sx={{ display: 'flex', overflow: 'hidden', gap: 2 }}>
+        {/* Sidebar */}
+        <Paper
+          variant="outlined"
+          sx={{ 
+            width: '25%',
+            overflow: 'auto',
+            flexShrink: 0,
+            px: 0.5,
+          }}
+        >
+          <List>
+            {data?.map((group, index) => (
+              <ListItem key={index} disablePadding>
+                <ListItemButton
+                  selected={selectedPage === index}
+                  onClick={() => setSelectedPage(index)}
+                >
+                  <ListItemText 
+                    primary={group.text}
+                    secondary={`${group.tasks.length} items`}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
 
-          {/* Table */}
-          <Grid size={9}>
-            <TableContainer component={Paper} sx={{ height: '100%' }}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Article</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell>Quantity</TableCell>
-                    <TableCell>Unit</TableCell>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Delivery Date</TableCell>
-                    <TableCell>Comment</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Payment</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data?.[selectedDepartment]?.tasks.map((task, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{task.text}</TableCell>
-                      <TableCell>{task.article || '-'}</TableCell>
-                      <TableCell>{task.price || '-'}</TableCell>
-                      <TableCell>{task.quantity}</TableCell>
-                      <TableCell>{task.unit}</TableCell>
-                      <TableCell>{dayjs(task.date).format('DD-MM-YYYY')}</TableCell>
-                      <TableCell>{dayjs(task.deliveryDate).format('DD-MM-YYYY')}</TableCell>
-                      <TableCell>{task.comment || '-'}</TableCell>
-                      <TableCell>{task.status}</TableCell>
-                      <TableCell>{task.payment || '-'}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-        </Grid>
+        <div 
+          style={{ 
+            flexGrow: 1,
+            height: '100%',
+            minWidth: 0
+          }}
+        >
+          <AgGridReact
+            columnDefs={columnDefs as any}
+            theme={myTheme}
+            rowData={data?.[selectedPage]?.tasks || []}
+            suppressCellFocus={true}
+            defaultColDef={{
+              sortable: true,
+              filter: true,
+              resizable: true,
+            }}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

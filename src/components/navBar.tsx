@@ -11,6 +11,7 @@ import logo from '../assets/logo192.png';
 import DepartmentSelector from './DepartmentSelector';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import { AnimatePresence, motion } from 'motion/react';
+import { opacityZoomIn } from '../animations/opacityZoomIn';
 function NavbarItems(props) {
   return (
     <>
@@ -103,28 +104,22 @@ export const NavBar = ({
         alignItems: 'center',
         gap: '2rem',
         margin: '10px auto',
-        padding: 1,
-        backgroundColor: '#ffffff09',
-        borderRadius: '10px',
-        backdropFilter: 'blur(50px)',
+        borderBottom: 1,
+        borderColor: 'divider',
+        py: 0.5,
       }}
     >
-      <AnimatePresence>
         {!isSidebarOpen ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            transition={{ duration: 0.2 }}
+           {...opacityZoomIn}
           >
             <IconButton onClick={() => setSidebarOpen(!isSidebarOpen)}>
               <ViewSidebarRoundedIcon />
             </IconButton>
           </motion.div>
-        ) : (
-          <div style={{ width: 34 }}></div>
-        )}
-      </AnimatePresence>
+        ) : <motion.img 
+          {...opacityZoomIn}
+        src={logo} alt="logo" style={{ width: 34, height: 34, padding: 4 }} />}
       <Stack direction="row" gap={1}>
         <NavbarItems
           location={location}

@@ -55,6 +55,32 @@ export const listsApi = createApi({
       providesTags: ['Lists'],
     }),
 
+    patchTask: builder.mutation<any, { listId: string; taskId: string; payload: any }>({
+      query: ({ listId, taskId, payload }) => ({
+        url: `/lists/${listId}/task/${taskId}`,
+        method: 'PATCH',
+        body: {
+          taskData: payload
+        },
+      }),
+      async onQueryStarted({ listId, taskId, payload }, { dispatch, queryFulfilled, getState }) {
+        const patchResult = dispatch(
+          listsApi.util.updateQueryData('loadSingleList', listId, (draft) => {
+            const task = draft.tasks.find(t => t._id === taskId);
+            if (task) {
+              Object.assign(task, payload);
+            }
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+      invalidatesTags: ['Lists'],
+    }),
+
     patchList: builder.mutation<any, { listId: string; payload: any }>({
       query: ({ listId, payload }) => ({
         url: `/lists/${listId}`,
@@ -257,4 +283,5 @@ export const {
   useRemoveDebitMutation,
   useLazyDownloadReportQuery,
   useUploadPreviewMutation,
+  usePatchTaskMutation,
 } = listsApi;
