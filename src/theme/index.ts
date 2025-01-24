@@ -6,6 +6,7 @@ import MuiListItemButton from './components/MuiListItemButton';
 import MuiListItemText from './components/MuiListItemText';
 import MuiMenuItem from './components/MuiMenuItem';
 import MuiMenu from './components/MuiMenu';
+import MuiPaper from './components/MuiPaper';
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -23,6 +24,9 @@ const theme = createTheme({
       primary: '#EBEBEB',
       secondary: '#A0A0A0',
     },
+  },
+  shape: {
+    borderRadius: 8,
   },
   typography: {
     fontFamily: 'Archivo',
@@ -83,6 +87,7 @@ const theme = createTheme({
     MuiListItemText,
     MuiMenuItem,
     MuiMenu,
+    MuiPaper,
   },
 });
 

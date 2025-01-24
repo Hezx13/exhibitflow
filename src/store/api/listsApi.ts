@@ -57,7 +57,7 @@ export const listsApi = createApi({
 
     patchTask: builder.mutation<any, { listId: string; taskId: string; payload: any }>({
       query: ({ listId, taskId, payload }) => ({
-        url: `/lists/${listId}/${taskId}`,
+        url: `/lists/${listId}/task/${taskId}`,
         method: 'PATCH',
         body: {
           taskData: payload

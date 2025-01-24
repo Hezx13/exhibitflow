@@ -32,6 +32,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { forwardRef, ReactNode, Ref, SyntheticEvent, useEffect, useMemo, Component, ErrorInfo } from 'react';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import SidebarActionsList from './SidebarActionsList';
+import { RightClickMenu } from '../../actions/RigtClickMenu';
 
 interface CustomTreeItemProps {
   id: string;
@@ -62,9 +63,30 @@ const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIEl
     event.dataTransfer.setDragImage((event.target as HTMLElement).parentElement!, 0, 0);
   };
   return (
+   
     <TreeItem2Provider itemId={itemId}>
       <TreeItem2Root {...otherRootProps}>
         <TreeItem2Content {...getContentProps()}>
+        <RightClickMenu options={[{
+      name: 'Edit',
+      action: () => {
+        console.log(itemId);
+      }
+      
+    },
+    {
+      name: 'Delete',
+      action: () => {
+        console.log(itemId);
+      }
+    },
+    {
+      name: 'Get Statistics',
+      action: () => {
+        console.log(itemId);
+      }
+    }
+    ]} sxContainer={{display: 'flex', flexDirection: 'row'}}>
           <TreeItem2IconContainer {...getIconContainerProps()}>
             <TreeItem2Icon status={status} />
           </TreeItem2IconContainer>
@@ -81,6 +103,8 @@ const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIEl
             {label}
           </Typography>
           <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
+      </RightClickMenu>
+
         </TreeItem2Content>
         {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
       </TreeItem2Root>
@@ -145,6 +169,8 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
         height: '100%',
         maxHeight: '100%',
         overflowY: 'hidden',
+        pl: 0.5,
+        pt: 0.75
       }}
     >
       <Box sx={{ p: 1 }}>

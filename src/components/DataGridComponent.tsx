@@ -10,36 +10,10 @@ import { AgGridReact } from 'ag-grid-react';
 import { CellEditRequestEvent, themeQuartz } from 'ag-grid-community';
 import { RightClickMenu } from './actions/RigtClickMenu';
 import { useLoadSingleListQuery, usePatchTaskMutation } from '../store/api/listsApi';
+import myTheme from '../theme/grid';
+import { Skeleton } from '@mui/material';
 
 // to use myTheme in an application, pass it to the theme grid option
-const myTheme = themeQuartz.withParams({
-  accentColor: '#D17E08',
-  backgroundColor: '#14141460',
-  borderColor: '#1F1F1F',
-  borderRadius: 2,
-  browserColorScheme: 'dark',
-  cellHorizontalPaddingScale: 0.5,
-  chromeBackgroundColor: {
-    ref: 'backgroundColor',
-  },
-  columnBorder: true,
-  fontFamily: {
-    googleFont: 'Archivo',
-  },
-  fontSize: 15,
-  foregroundColor: '#CECECE',
-  headerBackgroundColor: '#141414',
-  headerFontFamily: 'inherit',
-  headerFontSize: 13,
-  headerFontWeight: 400,
-  headerTextColor: '#CECECE',
-  rowBorder: true,
-  rowVerticalPaddingScale: 0.6,
-  sidePanelBorder: true,
-  spacing: 6,
-  wrapperBorder: true,
-  wrapperBorderRadius: 8,
-});
 
 function FullFeaturedCrudGrid({ tableId, userData, users }) {
   const [rows, setRows] = React.useState<Task[]>([]);
@@ -47,12 +21,12 @@ function FullFeaturedCrudGrid({ tableId, userData, users }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [patchTask] = usePatchTaskMutation();
   const socket = useSocket();
-  const { data: list } = useLoadSingleListQuery(tableId);
+  const { data: list, isLoading, isFetching} = useLoadSingleListQuery(tableId);
 
   useEffect(() => {
-    if (!list) return;
+    if (!list || isLoading || isFetching) return;
     setRows(list?.tasks || []);
-  }, [list]);
+  }, [list, isLoading, isFetching]);
 
   // const handleUserInProject = useCallback((data) => {
   //     const list = data;
@@ -251,30 +225,12 @@ function FullFeaturedCrudGrid({ tableId, userData, users }) {
             readOnlyEdit={true}
           />
         ) : (
-          <NoDataPlaceholder>
-            <AddNewItem
-              toggleButtonText="+ Add another material"
-              onAdd={(text, article, price, quantity, unit, comment, deliveryDate, orderedBy) => {
-                dispatch(moveFromArchive(tableId));
-                dispatch(
-                  addTask(
-                    text,
-                    tableId,
-                    article || '',
-                    price || '0',
-                    quantity || 1,
-                    getCurrentDateAndTime(),
-                    unit || 'pcs',
-                    comment || '',
-                    deliveryDate ? new Date(deliveryDate) : getCurrentDateAndTime(),
-                    userData?.username || 'Anonymus',
-                    'Pending',
-                    ''
-                  )
-                );
-              }}
-            />
-          </NoDataPlaceholder>
+          <Box sx={{ width: '100%', height: 400 }}>
+            <Skeleton variant="rectangular" height={50} sx={{ mb: 1 }} /> {/* Header */}
+            {[...Array(8)].map((_, i) => (
+              <Skeleton key={i} variant="rectangular" height={40} sx={{ mb: 0.5 }} /> /* Rows */
+            ))}
+          </Box>
         )}
       </RightClickMenu>
     </Box>
