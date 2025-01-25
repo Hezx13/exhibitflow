@@ -7,7 +7,7 @@ import { useGetDepartmentsQuery } from '../store/api/departmentsApi';
 
 function DepartmentSelector() {
   const [selectedDepartment, setSelectedDepartment] = useState('');
-  const {data: departments} = useGetDepartmentsQuery()
+  const { data: departments } = useGetDepartmentsQuery();
   useEffect(() => {
     if (departments) {
       const departmentInCookies = localStorage.getItem('selectedDepartment');
@@ -19,7 +19,6 @@ function DepartmentSelector() {
       }
     }
   }, [departments]);
-
 
   const handleDepartmentChange = (event) => {
     const newDepartment = event.target.value;

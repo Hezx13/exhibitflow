@@ -57,17 +57,11 @@ export const DashboardPage = () => {
     useRemoveBalanceMutation(),
     useLazyGenerateCashOrderQuery(),
   ];
-  const [upload] = useUploadMutation();
   const { data: totals, isLoading: totalsLoading } = useGetTotalsQuery();
   const [{ data: balance }, { data: current }] = [
     useLoadBalanceQuery(),
     useGetCurrentBalanceQuery(),
   ];
-
-  const fetchSavedMaterialsCount = async () => {
-    const res = await getMaterialCount();
-    setMaterialsCount(res);
-  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -198,13 +192,6 @@ export const DashboardPage = () => {
               </Typography>
             </Grid>
             <Grid item xs={10} sx={{ margin: '10px auto' }}></Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Grid container>
-            <Grid item xs={12} sx={{ margin: '25px auto 10px auto' }}>
-              <input type="file" accept=".xlsx" onChange={(e) => upload(e?.target?.files?.[0] as File)} />
-            </Grid>
           </Grid>
         </Grid>
       </Grid>

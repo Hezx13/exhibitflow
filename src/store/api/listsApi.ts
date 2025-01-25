@@ -24,7 +24,7 @@ interface DebitParams {
 export const listsApi = createApi({
   reducerPath: 'listsApi',
   baseQuery,
-  tagTypes: ['Lists', 'Reports'],
+  tagTypes: ['Lists', 'Reports', 'SingleList'],
   endpoints: (builder) => ({
     save: builder.mutation<number, { payload: AppState; old: AppState }>({
       query: ({ payload }) => {
@@ -55,20 +55,28 @@ export const listsApi = createApi({
       providesTags: ['Lists'],
     }),
 
+    loadSingleList: builder.query<any, string>({
+      query: (listId) => ({
+        url: `/lists/${listId}`,
+      }),
+      providesTags: (result, error, listId) => [{ type: 'SingleList', id: listId }, 'SingleList'],
+    }),
+
     patchTask: builder.mutation<any, { listId: string; taskId: string; payload: any }>({
       query: ({ listId, taskId, payload }) => ({
-        url: `/lists/${listId}/task/${taskId}`,
+        url: `/lists/${listId}/tasks/${taskId}`,
         method: 'PATCH',
         body: {
-          taskData: payload
+          taskData: payload,
         },
       }),
       async onQueryStarted({ listId, taskId, payload }, { dispatch, queryFulfilled, getState }) {
         const patchResult = dispatch(
           listsApi.util.updateQueryData('loadSingleList', listId, (draft) => {
-            const task = draft.tasks.find(t => t._id === taskId);
+            const task = draft.tasks.find((t) => t._id === taskId);
             if (task) {
               Object.assign(task, payload);
+              draft.tasks.sort((a, b) => a.positionKey.localeCompare(b.positionKey));
             }
           })
         );
@@ -78,7 +86,10 @@ export const listsApi = createApi({
           patchResult.undo();
         }
       },
-      invalidatesTags: ['Lists'],
+      invalidatesTags: (result, error, { listId }) => [
+        { type: 'SingleList', id: listId },
+        'SingleList',
+      ],
     }),
 
     patchList: builder.mutation<any, { listId: string; payload: any }>({
@@ -99,13 +110,6 @@ export const listsApi = createApi({
       invalidatesTags: ['Lists'],
     }),
 
-    loadSingleList: builder.query<any, string>({
-      query: (listId) => ({
-        url: `/lists/${listId}`,
-      }),
-      providesTags: ['Lists'],
-    }),
-
     getProjectsList: builder.query<any[], void>({
       query: () => '/projectsList',
       providesTags: ['Lists'],
@@ -119,7 +123,13 @@ export const listsApi = createApi({
       }),
       invalidatesTags: ['Lists'],
     }),
-
+    deleteList: builder.mutation<number, string>({
+      query: (listId) => ({
+        url: `/lists/${listId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Lists'],
+    }),
     deleteAll: builder.mutation<number, string>({
       query: (toDelete) => ({
         url: '/deleteAll',
@@ -147,13 +157,13 @@ export const listsApi = createApi({
       }),
     }),
 
-    upload: builder.mutation<void, File>({
-      query: (file) => {
+    upload: builder.mutation<void, { file: File }>({
+      query: ({ file }) => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('department', localStorage.getItem('selectedDepartment') || '');
         return {
-          url: '/lists/upload',
+          url: '/upload',
           method: 'POST',
           body: formData,
         };
@@ -167,7 +177,7 @@ export const listsApi = createApi({
         formData.append('file', file);
         formData.append('department', localStorage.getItem('selectedDepartment') || '');
         return {
-          url: `/lists/upload/preview`,
+          url: `/upload/preview`,
           method: 'POST',
           body: formData,
         };
@@ -279,6 +289,7 @@ export const {
   usePatchListPositionMutation,
   useGenerateReportMutation,
   useLoadReportsQuery,
+  useDeleteListMutation,
   useAddDebitMutation,
   useRemoveDebitMutation,
   useLazyDownloadReportQuery,

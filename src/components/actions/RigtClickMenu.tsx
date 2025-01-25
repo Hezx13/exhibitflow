@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Popper, Paper, MenuItem, SxProps, Theme } from '@mui/material';
-import { usePopupState, bindPopper } from 'material-ui-popup-state/hooks';
+import { usePopupState, bindPopper, PopupState } from 'material-ui-popup-state/hooks';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -16,11 +16,19 @@ interface RightClickMenuProps {
   sxContainer?: SxProps;
 }
 
-export const RightClickMenu: React.FC<RightClickMenuProps> = ({ children, options, sxContainer }) => {
-  const popupState = usePopupState({ variant: 'popper', popupId: 'context-menu' });
+export const RightClickMenu: React.FC<RightClickMenuProps> = ({
+  children,
+  options,
+  sxContainer,
+}) => {
+  const popupState = usePopupState({ variant: 'popper', popupId: 'shared-context-menu' });
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
+    // Close any other open menus first
+    if (popupState.isOpen) {
+      popupState.close();
+    }
     // Set the anchor position to the cursor coordinates
     popupState.setAnchorEl({
       getBoundingClientRect: () => ({
@@ -44,7 +52,13 @@ export const RightClickMenu: React.FC<RightClickMenuProps> = ({ children, option
 
   return (
     <>
-      <Box onContextMenu={handleContextMenu} width="100%" height="100%" sx={sxContainer}>
+      <Box 
+        onContextMenu={handleContextMenu} 
+        width="100%" 
+        height="100%" 
+        sx={sxContainer}
+        data-rightclick-container="true"
+      >
         {children}
       </Box>
       <Popper {...bindPopper(popupState)} placement="right-start" style={{ zIndex: 1300 }}>
@@ -57,7 +71,7 @@ export const RightClickMenu: React.FC<RightClickMenuProps> = ({ children, option
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.15, ease: 'easeOut' }}
               >
-                <Paper onContextMenu={(e) => e.preventDefault()} sx={{p: 0.5}}>
+                <Paper onContextMenu={(e) => e.preventDefault()} sx={{ p: 0.5 }}>
                   {options.map((option, index) => (
                     <motion.div
                       key={index}
@@ -65,7 +79,15 @@ export const RightClickMenu: React.FC<RightClickMenuProps> = ({ children, option
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.03 }}
                     >
-                      <MenuItem onClick={(e) => {e.stopPropagation(); handleClick(option.action)}} disabled={option.disabled}>{option.name}</MenuItem>
+                      <MenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClick(option.action);
+                        }}
+                        disabled={option.disabled}
+                      >
+                        {option.name}
+                      </MenuItem>
                     </motion.div>
                   ))}
                 </Paper>

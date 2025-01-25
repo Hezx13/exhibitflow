@@ -68,6 +68,9 @@ importers:
       excel-date-to-js:
         specifier: ^1.1.5
         version: 1.1.5
+      fractional-indexing-jittered:
+        specifier: ^1.0.0
+        version: 1.0.0
       immer:
         specifier: ^9.0.21
         version: 9.0.21
@@ -1617,6 +1620,9 @@ packages:
   form-data@4.0.1:
     resolution: {integrity: sha512-tzN8e4TX8+kkxGPK8D5u0FNmjPUjw3lwC9lSLxxoB/+GtsJG91CO8bSWy73APlgAZzZbXEYZJuxjkHH2w+Ezhw==}
     engines: {node: '>= 6'}
+
+  fractional-indexing-jittered@1.0.0:
+    resolution: {integrity: sha512-0tLU0FOedVY7lrvN4LK0DVj6FTuYM0pWDpN97/8UTZE2lx1+OwX8+2uL7IOWc2PmktYTHQjMT6FvZZ3SGCdZdg==}
 
   framer-motion@11.18.1:
     resolution: {integrity: sha512-EQa8c9lWVOm4zlz14MsBJWr8woq87HsNmsBnQNvcS0hs8uzw6HtGAxZyIU7EGTVpHD1C1n01ufxRyarXcNzpPg==}
@@ -4008,6 +4014,8 @@ snapshots:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
+
+  fractional-indexing-jittered@1.0.0: {}
 
   framer-motion@11.18.1(@emotion/is-prop-valid@1.3.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:

@@ -1,9 +1,17 @@
-import { Divider, List, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
+import {
+  Divider,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+} from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CreateNewFolderRoundedIcon from '@mui/icons-material/CreateNewFolderRounded';
 import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
 import { useRef, useState } from 'react';
-import { useUploadPreviewMutation } from '../../../store/api/listsApi';
+import { useUploadMutation, useUploadPreviewMutation } from '../../../store/api/listsApi';
 import { UploadPreviewTable } from '../../data-display/UploadPreviewTable';
 
 export default function SidebarActionsList() {
@@ -11,6 +19,7 @@ export default function SidebarActionsList() {
   const materialFileInputRef = useRef<HTMLInputElement>(null);
   const [previewData, setPreviewData] = useState<any>(null);
   const [uploadPreview] = useUploadPreviewMutation();
+  const [upload] = useUploadMutation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -20,6 +29,13 @@ export default function SidebarActionsList() {
 
   const handleClose = () => {
     setAnchorEl(null);
+    setPreviewData(null);
+    if (projectFileInputRef.current) {
+      projectFileInputRef.current.files = null;
+    }
+    if (materialFileInputRef.current) {
+      materialFileInputRef.current.files = null;
+    }
   };
 
   const handleProjectClick = () => {
@@ -32,6 +48,13 @@ export default function SidebarActionsList() {
     if (materialFileInputRef.current) {
       materialFileInputRef.current.click();
     }
+  };
+
+  const handleUpload = async () => {
+    console.log(projectFileInputRef.current?.files);
+    await upload({ file: projectFileInputRef.current?.files?.[0] as File });
+    window.location.reload();
+    handleClose();
   };
 
   const handleProjectFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,13 +75,14 @@ export default function SidebarActionsList() {
 
   return (
     <>
-      <UploadPreviewTable open={!!previewData} onClose={() => setPreviewData(null)} data={previewData} />
+      <UploadPreviewTable
+        open={!!previewData}
+        onClose={handleClose}
+        onUpload={handleUpload}
+        data={previewData}
+      />
       <List dense>
-        <ListItemButton 
-          disableGutters 
-          sx={{ px: 0.5 }}
-          onClick={handleClick}
-        >
+        <ListItemButton disableGutters sx={{ px: 0.5 }} onClick={handleClick}>
           <ListItemIcon>
             <AddRoundedIcon fontSize="small" />
           </ListItemIcon>
@@ -66,11 +90,7 @@ export default function SidebarActionsList() {
         </ListItemButton>
       </List>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-      >
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <AddRoundedIcon fontSize="small" />
@@ -91,9 +111,18 @@ export default function SidebarActionsList() {
           <ListItemText>Import Materials from File</ListItemText>
         </MenuItem>
       </Menu>
-      <input ref={projectFileInputRef} type="file" style={{ display: 'none' }} onChange={handleProjectFileChange}/>
-      <input ref={materialFileInputRef} type="file" style={{ display: 'none' }} onChange={handleMaterialFileChange}/>
-
+      <input
+        ref={projectFileInputRef}
+        type="file"
+        style={{ display: 'none' }}
+        onChange={handleProjectFileChange}
+      />
+      <input
+        ref={materialFileInputRef}
+        type="file"
+        style={{ display: 'none' }}
+        onChange={handleMaterialFileChange}
+      />
     </>
   );
 }

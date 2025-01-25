@@ -27,9 +27,18 @@ import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { TreeItem2DragAndDropOverlay } from '@mui/x-tree-view/TreeItem2DragAndDropOverlay';
 import { useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { useLoadListsQuery, usePatchListPositionMutation } from '../../../store/api/listsApi';
+import { useDeleteListMutation, useLoadListsQuery, usePatchListPositionMutation } from '../../../store/api/listsApi';
 import { useNavigate, useParams } from 'react-router-dom';
-import { forwardRef, ReactNode, Ref, SyntheticEvent, useEffect, useMemo, Component, ErrorInfo } from 'react';
+import {
+  forwardRef,
+  ReactNode,
+  Ref,
+  SyntheticEvent,
+  useEffect,
+  useMemo,
+  Component,
+  ErrorInfo,
+} from 'react';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import SidebarActionsList from './SidebarActionsList';
 import { RightClickMenu } from '../../actions/RigtClickMenu';
@@ -41,7 +50,7 @@ interface CustomTreeItemProps {
   disabled?: boolean;
   children?: ReactNode;
 }
-
+let contextMenuId: string;
 const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIElement>) => {
   const { id, itemId, label, disabled, children, ...other } = props;
   const {
@@ -63,48 +72,23 @@ const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIEl
     event.dataTransfer.setDragImage((event.target as HTMLElement).parentElement!, 0, 0);
   };
   return (
-   
     <TreeItem2Provider itemId={itemId}>
-      <TreeItem2Root {...otherRootProps}>
+      <TreeItem2Root {...otherRootProps} onContextMenu={() => {contextMenuId = itemId}}>
         <TreeItem2Content {...getContentProps()}>
-        <RightClickMenu options={[{
-      name: 'Edit',
-      action: () => {
-        console.log(itemId);
-      }
-      
-    },
-    {
-      name: 'Delete',
-      action: () => {
-        console.log(itemId);
-      }
-    },
-    {
-      name: 'Get Statistics',
-      action: () => {
-        console.log(itemId);
-      }
-    }
-    ]} sxContainer={{display: 'flex', flexDirection: 'row'}}>
-          <TreeItem2IconContainer {...getIconContainerProps()}>
-            <TreeItem2Icon status={status} />
-          </TreeItem2IconContainer>
-          <TreeItem2IconContainer
-            draggable={draggable}
-            onDragStart={handleDragStart}
-            onDragOver={onDragOver}
-            onDragEnd={onDragEnd}
-          >
-            <DragIndicatorIcon />
-          </TreeItem2IconContainer>
-          <TreeItem2Checkbox {...getCheckboxProps()} />
-          <Typography noWrap>
-            {label}
-          </Typography>
-          <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
-      </RightClickMenu>
-
+            <TreeItem2IconContainer {...getIconContainerProps()}>
+              <TreeItem2Icon status={status} />
+            </TreeItem2IconContainer>
+            <TreeItem2IconContainer
+              draggable={draggable}
+              onDragStart={handleDragStart}
+              onDragOver={onDragOver}
+              onDragEnd={onDragEnd}
+            >
+              <DragIndicatorIcon />
+            </TreeItem2IconContainer>
+            <TreeItem2Checkbox {...getCheckboxProps()} />
+            <Typography noWrap>{label}</Typography>
+            <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
         </TreeItem2Content>
         {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
       </TreeItem2Root>
@@ -133,6 +117,7 @@ class TreeViewErrorBoundary extends Component<{ children: ReactNode }> {
 export const Sidebar = ({ open, onToggle }: SidebarProps) => {
   const { data: projects } = useLoadListsQuery();
   const [patchListPosition] = usePatchListPositionMutation();
+  const [deleteList] = useDeleteListMutation();
   const navigate = useNavigate();
 
   const handleNodeSelect = (nodeId: string) => {
@@ -152,7 +137,7 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
   }, []);
 
   const handleItemPositionChange = (data: any) => {
-    console.log('data', data)
+    console.log('data', data);
     patchListPosition({ listId: data.itemId, payload: data });
   };
 
@@ -170,7 +155,7 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
         maxHeight: '100%',
         overflowY: 'hidden',
         pl: 0.5,
-        pt: 0.75
+        pt: 0.75,
       }}
     >
       <Box sx={{ p: 1 }}>
@@ -181,13 +166,35 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
       </Box>
       {/* workaround to supress errors */}
       <TreeViewErrorBoundary>
+      <RightClickMenu
+            options={[
+              {
+                name: 'Edit',
+                action: () => {
+                  console.log(contextMenuId);
+                },
+              },
+              {
+                name: 'Delete',
+                action: () => {
+                  deleteList(contextMenuId);
+                },
+              },
+              {
+                name: 'Get Statistics',
+                action: () => {
+                  console.log(contextMenuId);
+                },
+              },
+            ]}
+            sxContainer={{ display: 'flex', flexDirection: 'row' }}
+          >
         <RichTreeViewPro
           sx={{
             '& > div:last-child': {
-              display: 'none'
+              display: 'none',
             },
-            height: '100%',
-            overflowY: 'auto'
+            overflowY: 'auto',
           }}
           items={projects}
           onItemPositionChange={handleItemPositionChange}
@@ -199,10 +206,11 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
           slots={{ item: CustomTreeItem as any }}
           experimentalFeatures={{
             indentationAtItemLevel: true,
-            itemsReordering: true
+            itemsReordering: true,
           }}
           itemsReordering
         />
+      </RightClickMenu>
       </TreeViewErrorBoundary>
     </Box>
   );

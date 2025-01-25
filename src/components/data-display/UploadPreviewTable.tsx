@@ -42,9 +42,15 @@ interface TasksDialogProps {
   open: boolean;
   onClose: () => void;
   data: TaskGroup[];
+  onUpload: () => void;
 }
 
-export const UploadPreviewTable: React.FC<TasksDialogProps> = ({ open, onClose, data }) => {
+export const UploadPreviewTable: React.FC<TasksDialogProps> = ({
+  open,
+  onClose,
+  data,
+  onUpload,
+}) => {
   const [selectedPage, setSelectedPage] = useState<number>(0);
 
   const columnDefs = [
@@ -53,19 +59,20 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({ open, onClose, 
     { field: 'price', headerName: 'Price' },
     { field: 'quantity', headerName: 'Quantity' },
     { field: 'unit', headerName: 'Unit' },
-    { 
-      field: 'date', 
+    {
+      field: 'date',
       headerName: 'Date',
-      valueFormatter: (params: any) => dayjs(params.value).format('DD-MM-YYYY')
+      valueFormatter: (params: any) => dayjs(params.value).format('DD-MM-YYYY'),
     },
-    { 
-      field: 'deliveryDate', 
+    {
+      field: 'deliveryDate',
       headerName: 'Delivery Date',
-      valueFormatter: (params: any) => params.value ? dayjs(params.value).format('DD-MM-YYYY') : '-'
+      valueFormatter: (params: any) =>
+        params.value ? dayjs(params.value).format('DD-MM-YYYY') : '-',
     },
     { field: 'comment', headerName: 'Comment' },
     { field: 'status', headerName: 'Status' },
-    { field: 'payment', headerName: 'Payment' }
+    { field: 'payment', headerName: 'Payment' },
   ];
 
   return (
@@ -75,14 +82,14 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({ open, onClose, 
       maxWidth="xl"
       fullWidth
       PaperProps={{
-        sx: { height: '90vh' }
+        sx: { height: '90vh' },
       }}
     >
       <DialogTitle>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="h5">Tasks Overview</Typography>
           <Stack direction="row" gap={1}>
-            <IconButton>
+            <IconButton onClick={onUpload}>
               <SaveAsRoundedIcon />
             </IconButton>
             <IconButton onClick={onClose}>
@@ -95,7 +102,7 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({ open, onClose, 
         {/* Sidebar */}
         <Paper
           variant="outlined"
-          sx={{ 
+          sx={{
             width: '25%',
             overflow: 'auto',
             flexShrink: 0,
@@ -109,21 +116,18 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({ open, onClose, 
                   selected={selectedPage === index}
                   onClick={() => setSelectedPage(index)}
                 >
-                  <ListItemText 
-                    primary={group.text}
-                    secondary={`${group.tasks.length} items`}
-                  />
+                  <ListItemText primary={group.text} secondary={`${group.tasks.length} items`} />
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
         </Paper>
 
-        <div 
-          style={{ 
+        <div
+          style={{
             flexGrow: 1,
             height: '100%',
-            minWidth: 0
+            minWidth: 0,
           }}
         >
           <AgGridReact

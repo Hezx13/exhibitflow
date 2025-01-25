@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
-import FullFeaturedCrudGrid from './DataGridComponent';
+import FullFeaturedCrudGrid from './data-display/DataGridComponent';
 import { useUser } from '../state/userContext';
 import { useLocation } from 'react-router-dom';
 

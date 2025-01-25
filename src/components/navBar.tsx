@@ -109,17 +109,20 @@ export const NavBar = ({
         py: 0.5,
       }}
     >
-        {!isSidebarOpen ? (
-          <motion.div
-           {...opacityZoomIn}
-          >
-            <IconButton onClick={() => setSidebarOpen(!isSidebarOpen)}>
-              <ViewSidebarRoundedIcon />
-            </IconButton>
-          </motion.div>
-        ) : <motion.img 
+      {!isSidebarOpen ? (
+        <motion.div {...opacityZoomIn}>
+          <IconButton onClick={() => setSidebarOpen(!isSidebarOpen)}>
+            <ViewSidebarRoundedIcon />
+          </IconButton>
+        </motion.div>
+      ) : (
+        <motion.img
           {...opacityZoomIn}
-        src={logo} alt="logo" style={{ width: 34, height: 34, padding: 4 }} />}
+          src={logo}
+          alt="logo"
+          style={{ width: 34, height: 34, padding: 4 }}
+        />
+      )}
       <Stack direction="row" gap={1}>
         <NavbarItems
           location={location}
