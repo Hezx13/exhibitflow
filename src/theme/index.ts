@@ -29,7 +29,7 @@ const theme = createTheme({
     borderRadius: 8,
   },
   typography: {
-    fontFamily: 'Archivo',
+    fontFamily: 'Roboto',
     fontSize: 14,
     h1: {
       fontSize: '2.5rem',

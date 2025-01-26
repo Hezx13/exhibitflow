@@ -26,6 +26,7 @@ export const searchApi = createApi({
         url: `/search`,
         params: {
           query,
+          department: localStorage.getItem('selectedDepartment'),
         },
       }),
     }),

@@ -1,24 +1,59 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './baseQuery';
 
-interface AppState {
-  listsToAdd?: any[];
-  archiveToAdd?: any[];
-  listsToRemove?: any[];
-  archiveToRemove?: any[];
-  listsToUpdate?: any[];
-  archiveToUpdate?: any[];
-}
 
 interface ReportParams {
   period: { start: string; end: string };
   payment: string;
 }
 
+export interface ListStats {
+  listInfo: {
+    id: string;
+    text: string;
+    department: string;
+    isActive: boolean;
+    positionKey: string;
+  };
+  taskStats: {
+    total: number;
+    byStatus: {
+      pending: number;
+      'in process': number;
+      'waiting for approval': number;
+      'waiting for payment': number;
+      done: number;
+    };
+    totalValue: number;
+    averagePrice: number;
+    pendingDeliveries: number;
+    overdueTasks: number;
+  };
+  uniqueValues: {
+    orderedBy: (string | null)[];
+    units: (string | null)[];
+    paymentMethods: (string | null)[];
+  };
+  hierarchyInfo: {
+    depth: number;
+    pathNames: string[];
+    parentName: string | null;
+  };
+  lastUpdated: string;
+}
+
 interface DebitParams {
   period: string;
   debit: number;
   payment: string;
+}
+
+export enum Status {
+  PENDING = 'pending',
+  IN_PROCESS = 'in process',
+  WAITING_FOR_APPROVAL = 'waiting for approval',
+  WAITING_FOR_PAYMENT = 'waiting for payment',
+  DONE = 'done',
 }
 
 export const listsApi = createApi({
@@ -120,13 +155,22 @@ export const listsApi = createApi({
       invalidatesTags: ['Lists'],
     }),
 
-    addList: builder.mutation<any, { listData: Omit<List, '_id' | 'positionKey'> }>({
+    addProject: builder.mutation<any, { listData?: Omit<List, '_id' | 'positionKey'> }>({
       query: ({ listData }) => ({
         url: '/lists',
         method: 'POST',
-        body: listData,
+        body: {
+          ...listData,
+          department: localStorage.getItem('selectedDepartment'),
+        },
       }),
       invalidatesTags: ['Lists'],
+    }),
+
+    getStats: builder.query<any, { listId: string }>({
+      query: ({listId}) => ({
+        url: `/lists/${listId}/stats`,
+      }),
     }),
 
     patchListPosition: builder.mutation<any, { listId: string; payload: any }>({
@@ -271,6 +315,8 @@ export const {
   useArchiveListMutation,
   useDeleteAllMutation,
   useLazyDownloadExcelQuery,
+  useGetStatsQuery,
+  useLazyGetStatsQuery,
   usePatchListPositionMutation,
   useGenerateReportMutation,
   useLoadReportsQuery,
@@ -280,6 +326,6 @@ export const {
   useLazyDownloadReportQuery,
   usePatchTaskMutation,
   useAddTaskMutation,
-  useAddListMutation,
+  useAddProjectMutation,
   usePatchListMutation,
 } = listsApi;
