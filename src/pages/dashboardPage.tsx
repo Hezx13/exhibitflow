@@ -45,16 +45,12 @@ export const DashboardPage = () => {
   const { data: lists } = useLoadListsQuery();
   const [notDoneTasksCount, setNotDoneTasksCount] = useState(0);
   const [isLoggedIn] = useState(!!localStorage.getItem('token'));
-  const [searchQuery, setSearchQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [materialsCount, setMaterialsCount] = useState(0);
   const [inputDate, setInputDate] = useState('');
   const [inputCheck, setInputCheck] = useState('');
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
-  const { data: searchResults } = useSearchQuery(searchQuery, {
-    skip: !searchQuery,
-  });
   const navigate = useNavigate();
   const [[addBalance], [removeBalance], [generateCashOrder]] = [
     useAddBalanceMutation(),

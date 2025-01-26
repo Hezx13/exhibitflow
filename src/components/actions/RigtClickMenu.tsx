@@ -14,17 +14,24 @@ interface RightClickMenuProps {
   children: React.ReactNode;
   options: RightClickMenuOption[];
   sxContainer?: SxProps;
+  onContextElement?: (element: HTMLElement) => void;
 }
 
 export const RightClickMenu: React.FC<RightClickMenuProps> = ({
   children,
   options,
   sxContainer,
+  onContextElement,
 }) => {
   const popupState = usePopupState({ variant: 'popper', popupId: 'shared-context-menu' });
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // Get the actual element that was right-clicked
+    const target = e.target as HTMLElement;
+    console.log(e);
+
     // Close any other open menus first
     if (popupState.isOpen) {
       popupState.close();

@@ -12,9 +12,9 @@ const myTheme = themeQuartz.withParams({
   },
   columnBorder: true,
   fontFamily: {
-    googleFont: 'Archivo',
+    googleFont: 'Roboto',
   },
-  fontSize: 15,
+  fontSize: 14,
   foregroundColor: '#CECECE',
   headerBackgroundColor: '#141414',
   headerFontFamily: 'inherit',

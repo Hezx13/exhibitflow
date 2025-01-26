@@ -16,14 +16,17 @@ import { useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
   useDeleteListMutation,
+  useGetStatsQuery,
+  useLazyGetStatsQuery,
   useLoadListsQuery,
   usePatchListPositionMutation,
 } from '../../../store/api/listsApi';
-import { useNavigate } from 'react-router-dom';
-import { forwardRef, ReactNode, Ref, useEffect, Component, ErrorInfo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { forwardRef, ReactNode, Ref, useEffect, Component, ErrorInfo, useState } from 'react';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import SidebarActionsList from './SidebarActionsList';
 import { RightClickMenu } from '../../actions/RigtClickMenu';
+import { StatsDialog } from '../../dialogs/StatsDialog';
 
 interface CustomTreeItemProps {
   id: string;
@@ -71,7 +74,7 @@ const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIEl
             <DragIndicatorIcon />
           </TreeItem2IconContainer>
           <TreeItem2Checkbox {...getCheckboxProps()} />
-          <Typography noWrap>{label}</Typography>
+          <Typography noWrap>{label || 'Untitled project'}</Typography>
           <TreeItem2IconContainer {...getIconContainerProps()}>
             <TreeItem2Icon status={status} />
           </TreeItem2IconContainer>
@@ -104,8 +107,11 @@ class TreeViewErrorBoundary extends Component<{ children: ReactNode }> {
 export const Sidebar = ({ open, onToggle }: SidebarProps) => {
   const { data: projects } = useLoadListsQuery();
   const [patchListPosition] = usePatchListPositionMutation();
+  const [getStats, { data: statsData, isLoading: statsLoading }] = useLazyGetStatsQuery();
   const [deleteList] = useDeleteListMutation();
   const navigate = useNavigate();
+  const { id: currentProjectId } = useParams();
+  const [statsDialogOpen, setStatsDialogOpen] = useState(false);
 
   const handleNodeSelect = (nodeId: string) => {
     navigate(`/projects/${nodeId}`);
@@ -170,18 +176,20 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
             {
               name: 'Get Statistics',
               action: () => {
-                console.log(contextMenuId);
+                getStats({ listId: contextMenuId });
+                setStatsDialogOpen(true);
               },
             },
           ]}
-          sxContainer={{ display: 'flex', flexDirection: 'row', height: 'auto' }}
+          sxContainer={{ display: 'flex', flexDirection: 'row', height: 'auto', overflowY: 'auto', width: '100%' }}
         >
-          <RichTreeViewPro
+            <RichTreeViewPro
             sx={{
-              '& > div:last-child': {
-                display: 'none',
-              },
+                '& > div:last-child': {
+                  display: 'none',
+                },
               overflowY: 'auto',
+              width: '100%',
             }}
             items={projects}
             onItemPositionChange={handleItemPositionChange}
@@ -190,15 +198,23 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
                 handleNodeSelect(itemIds);
               }
             }}
+            expansionTrigger="iconContainer"
             slots={{ item: CustomTreeItem as any }}
             experimentalFeatures={{
               indentationAtItemLevel: true,
               itemsReordering: true,
             }}
             itemsReordering
-          />
+              selectedItems={currentProjectId}
+            />
         </RightClickMenu>
       </TreeViewErrorBoundary>
+      <StatsDialog
+        open={statsDialogOpen}
+        onClose={() => setStatsDialogOpen(false)}
+        data={statsData}
+        loading={statsLoading}
+      />
     </Box>
   );
 };

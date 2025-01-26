@@ -1,7 +1,7 @@
 import { RowDragEndEvent, RowDragLeaveEvent, CellEditRequestEvent } from 'ag-grid-community';
 import { generateJitteredKeyBetween } from 'fractional-indexing-jittered';
 import { useMemo, useState } from 'react';
-import { useLoadSingleListQuery, usePatchTaskMutation } from '../../../store/api/listsApi';
+import { Status, useLoadSingleListQuery, usePatchTaskMutation } from '../../../store/api/listsApi';
 
 const useDatagrid = (tableId: string) => {
   const [patchTask] = usePatchTaskMutation();
@@ -101,9 +101,12 @@ const useDatagrid = (tableId: string) => {
         cellEditor: 'agSelectCellEditor',
         editable: true,
         flex: 1,
+        valueFormatter: (params) => {
+          return params.value ? params.value.charAt(0).toUpperCase() + params.value.slice(1) : '';
+        },
         resizable: false,
         cellEditorParams: {
-          values: ['Pending', 'In Progress', 'Completed', 'Cancelled'],
+          values: Object.values(Status),
         },
       },
     ],

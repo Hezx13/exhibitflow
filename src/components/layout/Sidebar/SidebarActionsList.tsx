@@ -14,10 +14,12 @@ import CreateNewFolderRoundedIcon from '@mui/icons-material/CreateNewFolderRound
 import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
 import { useRef, useState } from 'react';
 import { useUploadListMutation, useUploadPreviewMutation } from '../../../store/api/uploadApi';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import { UploadPreviewTable } from '../../data-display/UploadPreviewTable';
 import SearchBarButton from '../../actions/buttons/SearchBarButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useAddProjectMutation } from '../../../store/api/listsApi';
 
 export default function SidebarActionsList() {
   const projectFileInputRef = useRef<HTMLInputElement>(null);
@@ -25,15 +27,13 @@ export default function SidebarActionsList() {
   const [previewData, setPreviewData] = useState<any>(null);
   const [uploadPreview] = useUploadPreviewMutation();
   const [uploadLists] = useUploadListMutation();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [addProject] = useAddProjectMutation();
+  const navigate = useNavigate();
+  const pathname = useLocation().pathname;
   const popupState = usePopupState({ variant: 'popover', popupId: 'sidebar-actions-list' });
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    popupState.close();
     setPreviewData(null);
     if (projectFileInputRef.current) {
       projectFileInputRef.current.files = null;
@@ -59,6 +59,12 @@ export default function SidebarActionsList() {
     console.log(projectFileInputRef.current?.files);
     await uploadLists({ file: projectFileInputRef.current?.files?.[0] as File });
     window.location.reload();
+    handleClose();
+  };
+
+  const handleAddProject = async () => {
+    const result = await addProject({}).unwrap();
+    navigate(`/projects/${result._id}`);
     handleClose();
   };
 
@@ -90,8 +96,8 @@ export default function SidebarActionsList() {
         <SearchBarButton />
         <ToggleButton
           {...bindTrigger(popupState)}
-          value={open}
-          selected={open}
+          value={popupState.isOpen}
+          selected={popupState.isOpen}
           size="small"
           // eslint-disable-next-line no-restricted-syntax
           sx={{
@@ -107,7 +113,7 @@ export default function SidebarActionsList() {
       </Stack>
 
       <Menu {...bindMenu(popupState)}>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleAddProject}>
           <ListItemIcon>
             <AddRoundedIcon fontSize="small" />
           </ListItemIcon>
@@ -120,7 +126,7 @@ export default function SidebarActionsList() {
           </ListItemIcon>
           <ListItemText>Import Projects from File</ListItemText>
         </MenuItem>
-        <MenuItem onClick={handleMaterialClick}>
+        <MenuItem onClick={handleMaterialClick} disabled={!pathname.includes('projects')}>
           <ListItemIcon>
             <PlaylistAddRoundedIcon fontSize="small" />
           </ListItemIcon>
