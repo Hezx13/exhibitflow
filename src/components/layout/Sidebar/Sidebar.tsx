@@ -1,18 +1,5 @@
-import {
-  Box,
-  IconButton,
-  Typography,
-  styled,
-  alpha,
-  ListItemButton,
-  ListItemText,
-  List,
-  ListItemIcon,
-} from '@mui/material';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Box, IconButton, Typography } from '@mui/material';
 import { RichTreeViewPro } from '@mui/x-tree-view-pro/RichTreeViewPro';
-import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 import {
   TreeItem2Content,
@@ -27,18 +14,13 @@ import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { TreeItem2DragAndDropOverlay } from '@mui/x-tree-view/TreeItem2DragAndDropOverlay';
 import { useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { useDeleteListMutation, useLoadListsQuery, usePatchListPositionMutation } from '../../../store/api/listsApi';
-import { useNavigate, useParams } from 'react-router-dom';
 import {
-  forwardRef,
-  ReactNode,
-  Ref,
-  SyntheticEvent,
-  useEffect,
-  useMemo,
-  Component,
-  ErrorInfo,
-} from 'react';
+  useDeleteListMutation,
+  useLoadListsQuery,
+  usePatchListPositionMutation,
+} from '../../../store/api/listsApi';
+import { useNavigate } from 'react-router-dom';
+import { forwardRef, ReactNode, Ref, useEffect, Component, ErrorInfo } from 'react';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import SidebarActionsList from './SidebarActionsList';
 import { RightClickMenu } from '../../actions/RigtClickMenu';
@@ -73,22 +55,27 @@ const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIEl
   };
   return (
     <TreeItem2Provider itemId={itemId}>
-      <TreeItem2Root {...otherRootProps} onContextMenu={() => {contextMenuId = itemId}}>
+      <TreeItem2Root
+        {...otherRootProps}
+        onContextMenu={() => {
+          contextMenuId = itemId;
+        }}
+      >
         <TreeItem2Content {...getContentProps()}>
-            <TreeItem2IconContainer {...getIconContainerProps()}>
-              <TreeItem2Icon status={status} />
-            </TreeItem2IconContainer>
-            <TreeItem2IconContainer
-              draggable={draggable}
-              onDragStart={handleDragStart}
-              onDragOver={onDragOver}
-              onDragEnd={onDragEnd}
-            >
-              <DragIndicatorIcon />
-            </TreeItem2IconContainer>
-            <TreeItem2Checkbox {...getCheckboxProps()} />
-            <Typography noWrap>{label}</Typography>
-            <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
+          <TreeItem2IconContainer
+            draggable={draggable}
+            onDragStart={handleDragStart}
+            onDragOver={onDragOver}
+            onDragEnd={onDragEnd}
+          >
+            <DragIndicatorIcon />
+          </TreeItem2IconContainer>
+          <TreeItem2Checkbox {...getCheckboxProps()} />
+          <Typography noWrap>{label}</Typography>
+          <TreeItem2IconContainer {...getIconContainerProps()}>
+            <TreeItem2Icon status={status} />
+          </TreeItem2IconContainer>
+          <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
         </TreeItem2Content>
         {children && <TreeItem2GroupTransition {...getGroupTransitionProps()} />}
       </TreeItem2Root>
@@ -166,51 +153,51 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
       </Box>
       {/* workaround to supress errors */}
       <TreeViewErrorBoundary>
-      <RightClickMenu
-            options={[
-              {
-                name: 'Edit',
-                action: () => {
-                  console.log(contextMenuId);
-                },
+        <RightClickMenu
+          options={[
+            {
+              name: 'Edit',
+              action: () => {
+                console.log(contextMenuId);
               },
-              {
-                name: 'Delete',
-                action: () => {
-                  deleteList(contextMenuId);
-                },
-              },
-              {
-                name: 'Get Statistics',
-                action: () => {
-                  console.log(contextMenuId);
-                },
-              },
-            ]}
-            sxContainer={{ display: 'flex', flexDirection: 'row' }}
-          >
-        <RichTreeViewPro
-          sx={{
-            '& > div:last-child': {
-              display: 'none',
             },
-            overflowY: 'auto',
-          }}
-          items={projects}
-          onItemPositionChange={handleItemPositionChange}
-          onSelectedItemsChange={(_, itemIds) => {
-            if (itemIds) {
-              handleNodeSelect(itemIds);
-            }
-          }}
-          slots={{ item: CustomTreeItem as any }}
-          experimentalFeatures={{
-            indentationAtItemLevel: true,
-            itemsReordering: true,
-          }}
-          itemsReordering
-        />
-      </RightClickMenu>
+            {
+              name: 'Delete',
+              action: () => {
+                deleteList(contextMenuId);
+              },
+            },
+            {
+              name: 'Get Statistics',
+              action: () => {
+                console.log(contextMenuId);
+              },
+            },
+          ]}
+          sxContainer={{ display: 'flex', flexDirection: 'row', height: 'auto' }}
+        >
+          <RichTreeViewPro
+            sx={{
+              '& > div:last-child': {
+                display: 'none',
+              },
+              overflowY: 'auto',
+            }}
+            items={projects}
+            onItemPositionChange={handleItemPositionChange}
+            onSelectedItemsChange={(_, itemIds) => {
+              if (itemIds) {
+                handleNodeSelect(itemIds);
+              }
+            }}
+            slots={{ item: CustomTreeItem as any }}
+            experimentalFeatures={{
+              indentationAtItemLevel: true,
+              itemsReordering: true,
+            }}
+            itemsReordering
+          />
+        </RightClickMenu>
       </TreeViewErrorBoundary>
     </Box>
   );

@@ -26,25 +26,6 @@ export const listsApi = createApi({
   baseQuery,
   tagTypes: ['Lists', 'Reports', 'SingleList'],
   endpoints: (builder) => ({
-    save: builder.mutation<number, { payload: AppState; old: AppState }>({
-      query: ({ payload }) => {
-        const processedPayload = {
-          listsToAdd: payload.listsToAdd,
-          archiveToAdd: payload.archiveToAdd,
-          listsToRemove: payload.listsToRemove,
-          archiveToRemove: payload.archiveToRemove,
-          listsToUpdate: payload.listsToUpdate,
-          archiveToUpdate: payload.archiveToUpdate,
-        };
-        return {
-          url: '/save',
-          method: 'POST',
-          body: processedPayload,
-        };
-      },
-      invalidatesTags: ['Lists'],
-    }),
-
     loadLists: builder.query<any, void>({
       query: () => ({
         url: '/lists',
@@ -59,7 +40,24 @@ export const listsApi = createApi({
       query: (listId) => ({
         url: `/lists/${listId}`,
       }),
-      providesTags: (result, error, listId) => [{ type: 'SingleList', id: listId }, 'SingleList'],
+      providesTags: (_result, _error, listId) => [{ type: 'SingleList', id: listId }, 'SingleList'],
+    }),
+
+    addTask: builder.mutation<
+      any,
+      { listId: string; taskData?: Omit<Task, '_id' | 'positionKey'> }
+    >({
+      query: ({ listId, taskData }) => ({
+        url: `/lists/${listId}/tasks`,
+        method: 'POST',
+        body: {
+          taskData,
+        },
+      }),
+      invalidatesTags: (result, error, { listId }) => [
+        { type: 'SingleList', id: listId },
+        'SingleList',
+      ],
     }),
 
     patchTask: builder.mutation<any, { listId: string; taskId: string; payload: any }>({
@@ -92,11 +90,41 @@ export const listsApi = createApi({
       ],
     }),
 
-    patchList: builder.mutation<any, { listId: string; payload: any }>({
+    patchList: builder.mutation<any, { listId: string; payload: Partial<List> }>({
       query: ({ listId, payload }) => ({
         url: `/lists/${listId}`,
         method: 'PATCH',
         body: payload,
+      }),
+      async onQueryStarted({ listId, payload }, { dispatch, queryFulfilled, getState }) {
+        const patchResult = dispatch(
+          listsApi.util.updateQueryData('loadSingleList', listId, (draft) => {
+            Object.assign(draft, payload);
+          })
+        );
+        const patchLists = dispatch(
+          listsApi.util.updateQueryData('loadLists', undefined, (draft) => {
+            const list = draft.find((l) => l._id === listId);
+            if (list) {
+              Object.assign(list, payload);
+            }
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+          patchLists.undo();
+        }
+      },
+      invalidatesTags: ['Lists'],
+    }),
+
+    addList: builder.mutation<any, { listData: Omit<List, '_id' | 'positionKey'> }>({
+      query: ({ listData }) => ({
+        url: '/lists',
+        method: 'POST',
+        body: listData,
       }),
       invalidatesTags: ['Lists'],
     }),
@@ -155,46 +183,6 @@ export const listsApi = createApi({
           return blob;
         },
       }),
-    }),
-
-    upload: builder.mutation<void, { file: File }>({
-      query: ({ file }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('department', localStorage.getItem('selectedDepartment') || '');
-        return {
-          url: '/upload',
-          method: 'POST',
-          body: formData,
-        };
-      },
-      invalidatesTags: ['Lists'],
-    }),
-
-    uploadPreview: builder.mutation<void, { file: File }>({
-      query: ({ file }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('department', localStorage.getItem('selectedDepartment') || '');
-        return {
-          url: `/upload/preview`,
-          method: 'POST',
-          body: formData,
-        };
-      },
-    }),
-
-    uploadSingle: builder.mutation<void, { file: File; listId: string }>({
-      query: ({ file, listId }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        return {
-          url: `/upload/${listId}`,
-          method: 'POST',
-          body: formData,
-        };
-      },
-      invalidatesTags: ['Lists'],
     }),
 
     generateReport: builder.mutation<number, ReportParams>({
@@ -277,15 +265,12 @@ export const listsApi = createApi({
 });
 
 export const {
-  useSaveMutation,
   useLoadListsQuery,
   useLoadSingleListQuery,
   useGetProjectsListQuery,
   useArchiveListMutation,
   useDeleteAllMutation,
   useLazyDownloadExcelQuery,
-  useUploadMutation,
-  useUploadSingleMutation,
   usePatchListPositionMutation,
   useGenerateReportMutation,
   useLoadReportsQuery,
@@ -293,6 +278,8 @@ export const {
   useAddDebitMutation,
   useRemoveDebitMutation,
   useLazyDownloadReportQuery,
-  useUploadPreviewMutation,
   usePatchTaskMutation,
+  useAddTaskMutation,
+  useAddListMutation,
+  usePatchListMutation,
 } = listsApi;

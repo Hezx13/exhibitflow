@@ -6,6 +6,8 @@ const MuiPaper: Components<Theme>['MuiPaper'] = {
       '--Paper-overlay':
         'linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.065)) !important',
       borderRadius: theme.shape.borderRadius,
+      backgroundImage: 'none',
+      backgroundColor: theme.palette.background.default,
     }),
   },
 };

@@ -119,17 +119,17 @@ const useDatagrid = (tableId: string) => {
     if (event.overIndex === -1) {
       newPos = generateJitteredKeyBetween(rows[rows.length - 1].positionKey as string, null);
     } else if (event.overIndex === 0) {
-      newPos = generateJitteredKeyBetween(null, null);
+      newPos = generateJitteredKeyBetween(null, rows[0].positionKey as string);
     } else if (event.overIndex > rows.findIndex((row) => row._id === event.node.data._id)) {
       newPos = generateJitteredKeyBetween(
         rows[event.overIndex].positionKey as string,
         event.overIndex + 1 < rows.length ? (rows[event.overIndex + 1].positionKey as string) : null
       );
     } else {
-      newPos = generateJitteredKeyBetween(
-        rows[event.overIndex - 1].positionKey as string,
-        rows[event.overIndex].positionKey as string
-      );
+      const pos1 = rows[event.overIndex - 1].positionKey as string;
+      const pos2 = rows[event.overIndex].positionKey as string;
+      // Ensure pos1 is less than pos2 by swapping if necessary
+      newPos = generateJitteredKeyBetween(pos1 < pos2 ? pos1 : pos2, pos1 < pos2 ? pos2 : pos1);
     }
     console.log(newPos);
     await patchTask({
@@ -151,8 +151,10 @@ const useDatagrid = (tableId: string) => {
     });
   };
 
+  const rows = useMemo(() => list?.tasks || [], [list?.tasks]);
+
   return {
-    rows: list?.tasks || [],
+    rows,
     isLoading,
     isFetching,
     columnDefs,

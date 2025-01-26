@@ -5,14 +5,13 @@ import { Action, resetRequests } from './actions';
 import { withInitialState } from '../utils/withInitialState';
 import { debounce } from 'throttle-debounce-ts';
 import { DragItem } from '../components/DragItem';
-import { useSaveMutation } from '../store/api/listsApi';
 
 const AppStateContext = createContext<AppStateContextProps>({} as AppStateContextProps);
 
 export const AppStateProvider = withInitialState<AppStateProviderProps>(
   ({ children, initialState }) => {
     const [state, dispatch] = useImmerReducer(appStateReducer, initialState);
-    const [save] = useSaveMutation();
+    const save = async (payload: any) => {};
     // useRef to keep track of the previous state
     const prevStateRef = useRef(initialState);
     const debouncedSave = useCallback(

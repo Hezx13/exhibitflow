@@ -6,6 +6,7 @@ import { useUser } from '../state/userContext';
 import { useState, useEffect } from 'react';
 import { useLoadListsQuery } from '../store/api/listsApi';
 import { useNavigate, useParams } from 'react-router-dom';
+import { TopBar } from '../components/data-display/TopBar';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -14,32 +15,8 @@ interface TabPanelProps {
 }
 
 export default function ProjectsPage() {
-  const { getTasksByListId, getTasksByArchiveId, dispatch } = useAppState();
-  const navigate = useNavigate();
-  const { data: lists, isLoading } = useLoadListsQuery();
   const { id } = useParams();
   const matches = useMediaQuery('(max-width:1280px)');
-  const [value, setValue] = useState<number>(0);
-  const [selected, setSelected] = useState<string | null>(null);
-  const { currentUser, users } = useUser();
-
-  useEffect(() => {
-    try {
-      if (selected && lists) {
-        setValue(lists.findIndex((list) => list.text === selected));
-      } else {
-        setSelected(lists?.[0]?.text ?? null);
-        setValue(0);
-      }
-    } catch (err) {
-      setSelected(lists?.[0]?.text ?? null);
-      setValue(0);
-    }
-  }, [lists, selected]);
-
-  const handleChange = (event: any, newValue: number) => {
-    navigate(`/projects/${lists?.[newValue]._id}`);
-  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
@@ -54,7 +31,8 @@ export default function ProjectsPage() {
           }}
         >
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-            <FullFeaturedCrudGrid userData={currentUser} users={users} tableId={id} />
+            <TopBar listId={id as string} />
+            <FullFeaturedCrudGrid tableId={id as string} />
           </Box>
         </Box>
       )}

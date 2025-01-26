@@ -52,10 +52,10 @@ export const RightClickMenu: React.FC<RightClickMenuProps> = ({
 
   return (
     <>
-      <Box 
-        onContextMenu={handleContextMenu} 
-        width="100%" 
-        height="100%" 
+      <Box
+        onContextMenu={handleContextMenu}
+        width="100%"
+        height="100%"
         sx={sxContainer}
         data-rightclick-container="true"
       >

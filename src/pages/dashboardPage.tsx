@@ -1,5 +1,5 @@
 import { useState, memo } from 'react';
-import { Grid, CircularProgress } from '@mui/material';
+import { Grid, CircularProgress, TextField } from '@mui/material';
 import CardComponent from '../components/cardComponent';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -9,7 +9,6 @@ import AddCardIcon from '@mui/icons-material/AddCard';
 import dayjs from 'dayjs';
 import BalanceHistoryDialog from '../components/BalanceHistoryDialog';
 import { StyledGenerateCashOrderButton } from '../styles/styles';
-import { getMaterialCount, getSavedMaterials } from '../api/materials-api';
 import {
   useAddBalanceMutation,
   useGetCurrentBalanceQuery,
@@ -18,7 +17,8 @@ import {
   useLoadBalanceQuery,
   useRemoveBalanceMutation,
 } from '../store/api/balanceApi';
-import { useLoadListsQuery, useUploadMutation } from '../store/api/listsApi';
+import { useLoadListsQuery } from '../store/api/listsApi';
+import { useSearchQuery } from '../store/api/searchApi';
 
 const BalanceCardContent = ({ balance, action, historyAction }) => {
   return (
@@ -45,12 +45,16 @@ export const DashboardPage = () => {
   const { data: lists } = useLoadListsQuery();
   const [notDoneTasksCount, setNotDoneTasksCount] = useState(0);
   const [isLoggedIn] = useState(!!localStorage.getItem('token'));
+  const [searchQuery, setSearchQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [materialsCount, setMaterialsCount] = useState(0);
   const [inputDate, setInputDate] = useState('');
   const [inputCheck, setInputCheck] = useState('');
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const { data: searchResults } = useSearchQuery(searchQuery, {
+    skip: !searchQuery,
+  });
   const navigate = useNavigate();
   const [[addBalance], [removeBalance], [generateCashOrder]] = [
     useAddBalanceMutation(),
@@ -186,11 +190,7 @@ export const DashboardPage = () => {
         </Grid>
         <Grid item xs={12}>
           <Grid container>
-            <Grid item xs={12} sx={{ margin: '25px auto 10px auto' }}>
-              <Typography textAlign="center" color="#ffffff" variant="h4">
-                Projects in work
-              </Typography>
-            </Grid>
+            <Grid item xs={12} sx={{ margin: '25px auto 10px auto' }}></Grid>
             <Grid item xs={10} sx={{ margin: '10px auto' }}></Grid>
           </Grid>
         </Grid>

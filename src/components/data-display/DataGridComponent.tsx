@@ -6,43 +6,23 @@ import { RightClickMenu } from '../actions/RigtClickMenu';
 import myTheme from '../../theme/grid';
 import { Skeleton } from '@mui/material';
 import useDatagrid from './hooks/useDatagrid';
-
+import { useAddTaskMutation } from '../../store/api/listsApi';
 // to use myTheme in an application, pass it to the theme grid option
 
-function FullFeaturedCrudGrid({ tableId }) {
-  const socket = useSocket();
-  const { rows, columnDefs, onCellValueChanged, processRowDrag } = useDatagrid(tableId);
+function FullFeaturedCrudGrid({ tableId }: { tableId: string }) {
+  const { rows, columnDefs, onCellValueChanged, processRowDrag, isLoading } = useDatagrid(tableId);
+  const [addTask] = useAddTaskMutation();
 
-  // const handleUserInProject = useCallback((data) => {
-  //     const list = data;
-  //     console.log(list)
-  //     Object.keys(list).forEach(key => {
-  //       if (key === userData._id){
-  //         delete list[key];
-  //       }
-  //     })
-  //     console.log(list)
-  //     // setIsOccupied(Object.values(list).includes(tableId));
-  //   }, [])
-
-  useEffect(() => {
-    if (socket) {
-      socket?.emit('selected_project', {
-        id: tableId,
-        user: localStorage.getItem('token'),
-      });
-      socket?.emit('send_users_in_project');
-      // socket.on('user_in_project', handleUserInProject);
-
-      // Return a cleanup function
-      return () => {
-        // socket.off('user_in_project', handleUserInProject);
-      };
-    }
-
-    // If no socket is provided, return an empty cleanup function
-    return () => {};
-  }, [socket]);
+  if (isLoading) {
+    return (
+      <Box sx={{ width: '100%', height: 400 }}>
+        <Skeleton variant="rectangular" height={50} sx={{ mb: 1 }} /> {/* Header */}
+        {[...Array(8)].map((_, i) => (
+          <Skeleton key={i} variant="rectangular" height={40} sx={{ mb: 0.5 }} /> /* Rows */
+        ))}
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -59,40 +39,33 @@ function FullFeaturedCrudGrid({ tableId }) {
           {
             name: 'Add new material',
             action: () => {
-              console.log('add new material');
+              addTask({ listId: tableId });
             },
           },
         ]}
       >
-        {rows.length > 0 ? (
-          <AgGridReact
-            singleClickEdit
-            rowData={rows}
-            theme={myTheme}
-            rowDragManaged={true}
-            columnDefs={columnDefs as any}
-            defaultColDef={{
-              sortable: true,
-              filter: true,
-            }}
-            onCellEditRequest={onCellValueChanged}
-            onRowDragEnd={processRowDrag}
-            onRowDragLeave={processRowDrag}
-            animateRows={true}
-            rowSelection={{
-              mode: 'multiRow',
-              headerCheckbox: true,
-            }}
-            readOnlyEdit={true}
-          />
-        ) : (
-          <Box sx={{ width: '100%', height: 400 }}>
-            <Skeleton variant="rectangular" height={50} sx={{ mb: 1 }} /> {/* Header */}
-            {[...Array(8)].map((_, i) => (
-              <Skeleton key={i} variant="rectangular" height={40} sx={{ mb: 0.5 }} /> /* Rows */
-            ))}
-          </Box>
-        )}
+        {' '}
+        <AgGridReact
+          singleClickEdit
+          rowData={rows}
+          theme={myTheme}
+          rowDragManaged={true}
+          columnDefs={columnDefs as any}
+          getRowId={(params) => params.data._id}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+          }}
+          onCellEditRequest={onCellValueChanged}
+          onRowDragEnd={processRowDrag}
+          onRowDragLeave={processRowDrag}
+          animateRows={true}
+          rowSelection={{
+            mode: 'multiRow',
+            headerCheckbox: true,
+          }}
+          readOnlyEdit={true}
+        />
       </RightClickMenu>
     </Box>
   );
