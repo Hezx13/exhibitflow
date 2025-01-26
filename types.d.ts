@@ -28,6 +28,7 @@ type Material = {
   orderedBy?: string;
   status?: string;
   payment?: string;
+  positionKey?: string;
 }
 
 

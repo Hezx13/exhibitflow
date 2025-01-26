@@ -5,6 +5,8 @@ import { departmentsApi } from './api/departmentsApi';
 import { materialsApi } from './api/materialsApi';
 import { projectsApi } from './api/projectsApi';
 import { userApi } from './api/userApi';
+import { uploadApi } from './api/uploadApi';
+import { searchApi } from './api/searchApi';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [departmentsApi.reducerPath]: departmentsApi.reducer,
     [materialsApi.reducerPath]: materialsApi.reducer,
+    [uploadApi.reducerPath]: uploadApi.reducer,
+    [searchApi.reducerPath]: searchApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -22,7 +26,9 @@ export const store = configureStore({
       projectsApi.middleware,
       userApi.middleware,
       departmentsApi.middleware,
-      materialsApi.middleware
+      materialsApi.middleware,
+      uploadApi.middleware,
+      searchApi.middleware
     ),
 });
 

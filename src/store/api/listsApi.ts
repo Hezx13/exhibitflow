@@ -24,27 +24,8 @@ interface DebitParams {
 export const listsApi = createApi({
   reducerPath: 'listsApi',
   baseQuery,
-  tagTypes: ['Lists', 'Reports'],
+  tagTypes: ['Lists', 'Reports', 'SingleList'],
   endpoints: (builder) => ({
-    save: builder.mutation<number, { payload: AppState; old: AppState }>({
-      query: ({ payload }) => {
-        const processedPayload = {
-          listsToAdd: payload.listsToAdd,
-          archiveToAdd: payload.archiveToAdd,
-          listsToRemove: payload.listsToRemove,
-          archiveToRemove: payload.archiveToRemove,
-          listsToUpdate: payload.listsToUpdate,
-          archiveToUpdate: payload.archiveToUpdate,
-        };
-        return {
-          url: '/save',
-          method: 'POST',
-          body: processedPayload,
-        };
-      },
-      invalidatesTags: ['Lists'],
-    }),
-
     loadLists: builder.query<any, void>({
       query: () => ({
         url: '/lists',
@@ -55,20 +36,45 @@ export const listsApi = createApi({
       providesTags: ['Lists'],
     }),
 
+    loadSingleList: builder.query<any, string>({
+      query: (listId) => ({
+        url: `/lists/${listId}`,
+      }),
+      providesTags: (_result, _error, listId) => [{ type: 'SingleList', id: listId }, 'SingleList'],
+    }),
+
+    addTask: builder.mutation<
+      any,
+      { listId: string; taskData?: Omit<Task, '_id' | 'positionKey'> }
+    >({
+      query: ({ listId, taskData }) => ({
+        url: `/lists/${listId}/tasks`,
+        method: 'POST',
+        body: {
+          taskData,
+        },
+      }),
+      invalidatesTags: (result, error, { listId }) => [
+        { type: 'SingleList', id: listId },
+        'SingleList',
+      ],
+    }),
+
     patchTask: builder.mutation<any, { listId: string; taskId: string; payload: any }>({
       query: ({ listId, taskId, payload }) => ({
-        url: `/lists/${listId}/task/${taskId}`,
+        url: `/lists/${listId}/tasks/${taskId}`,
         method: 'PATCH',
         body: {
-          taskData: payload
+          taskData: payload,
         },
       }),
       async onQueryStarted({ listId, taskId, payload }, { dispatch, queryFulfilled, getState }) {
         const patchResult = dispatch(
           listsApi.util.updateQueryData('loadSingleList', listId, (draft) => {
-            const task = draft.tasks.find(t => t._id === taskId);
+            const task = draft.tasks.find((t) => t._id === taskId);
             if (task) {
               Object.assign(task, payload);
+              draft.tasks.sort((a, b) => a.positionKey.localeCompare(b.positionKey));
             }
           })
         );
@@ -78,14 +84,47 @@ export const listsApi = createApi({
           patchResult.undo();
         }
       },
-      invalidatesTags: ['Lists'],
+      invalidatesTags: (result, error, { listId }) => [
+        { type: 'SingleList', id: listId },
+        'SingleList',
+      ],
     }),
 
-    patchList: builder.mutation<any, { listId: string; payload: any }>({
+    patchList: builder.mutation<any, { listId: string; payload: Partial<List> }>({
       query: ({ listId, payload }) => ({
         url: `/lists/${listId}`,
         method: 'PATCH',
         body: payload,
+      }),
+      async onQueryStarted({ listId, payload }, { dispatch, queryFulfilled, getState }) {
+        const patchResult = dispatch(
+          listsApi.util.updateQueryData('loadSingleList', listId, (draft) => {
+            Object.assign(draft, payload);
+          })
+        );
+        const patchLists = dispatch(
+          listsApi.util.updateQueryData('loadLists', undefined, (draft) => {
+            const list = draft.find((l) => l._id === listId);
+            if (list) {
+              Object.assign(list, payload);
+            }
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+          patchLists.undo();
+        }
+      },
+      invalidatesTags: ['Lists'],
+    }),
+
+    addList: builder.mutation<any, { listData: Omit<List, '_id' | 'positionKey'> }>({
+      query: ({ listData }) => ({
+        url: '/lists',
+        method: 'POST',
+        body: listData,
       }),
       invalidatesTags: ['Lists'],
     }),
@@ -97,13 +136,6 @@ export const listsApi = createApi({
         body: payload,
       }),
       invalidatesTags: ['Lists'],
-    }),
-
-    loadSingleList: builder.query<any, string>({
-      query: (listId) => ({
-        url: `/lists/${listId}`,
-      }),
-      providesTags: ['Lists'],
     }),
 
     getProjectsList: builder.query<any[], void>({
@@ -119,7 +151,13 @@ export const listsApi = createApi({
       }),
       invalidatesTags: ['Lists'],
     }),
-
+    deleteList: builder.mutation<number, string>({
+      query: (listId) => ({
+        url: `/lists/${listId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Lists'],
+    }),
     deleteAll: builder.mutation<number, string>({
       query: (toDelete) => ({
         url: '/deleteAll',
@@ -145,46 +183,6 @@ export const listsApi = createApi({
           return blob;
         },
       }),
-    }),
-
-    upload: builder.mutation<void, File>({
-      query: (file) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('department', localStorage.getItem('selectedDepartment') || '');
-        return {
-          url: '/lists/upload',
-          method: 'POST',
-          body: formData,
-        };
-      },
-      invalidatesTags: ['Lists'],
-    }),
-
-    uploadPreview: builder.mutation<void, { file: File }>({
-      query: ({ file }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('department', localStorage.getItem('selectedDepartment') || '');
-        return {
-          url: `/lists/upload/preview`,
-          method: 'POST',
-          body: formData,
-        };
-      },
-    }),
-
-    uploadSingle: builder.mutation<void, { file: File; listId: string }>({
-      query: ({ file, listId }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        return {
-          url: `/upload/${listId}`,
-          method: 'POST',
-          body: formData,
-        };
-      },
-      invalidatesTags: ['Lists'],
     }),
 
     generateReport: builder.mutation<number, ReportParams>({
@@ -267,21 +265,21 @@ export const listsApi = createApi({
 });
 
 export const {
-  useSaveMutation,
   useLoadListsQuery,
   useLoadSingleListQuery,
   useGetProjectsListQuery,
   useArchiveListMutation,
   useDeleteAllMutation,
   useLazyDownloadExcelQuery,
-  useUploadMutation,
-  useUploadSingleMutation,
   usePatchListPositionMutation,
   useGenerateReportMutation,
   useLoadReportsQuery,
+  useDeleteListMutation,
   useAddDebitMutation,
   useRemoveDebitMutation,
   useLazyDownloadReportQuery,
-  useUploadPreviewMutation,
   usePatchTaskMutation,
+  useAddTaskMutation,
+  useAddListMutation,
+  usePatchListMutation,
 } = listsApi;

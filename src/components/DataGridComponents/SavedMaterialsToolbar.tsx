@@ -39,7 +39,7 @@ function SavedMaterialsToolbar(props: EditToolbarProps) {
     const selectedMaterials: Map<GridRowId, GridValidRowModel> = apiRef.current.getSelectedRows();
     const arrayToAdd: string[] = [];
     let res: number | null = null;
-    selectedMaterials.forEach((material, key) => {
+    selectedMaterials?.forEach((material, key) => {
       arrayToAdd.push(key.toString());
     });
     if (arrayToAdd.length) {

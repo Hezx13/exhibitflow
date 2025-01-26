@@ -15,8 +15,8 @@ import { Provider } from 'react-redux';
 const App = () => {
   return (
     <SocketProvider>
-    <Provider store={store}>
-      <DndProvider backend={Backend}>
+      <Provider store={store}>
+        <DndProvider backend={Backend}>
           <AppStateProvider>
             <UserProvider>
               <ReportProvider>
@@ -29,9 +29,9 @@ const App = () => {
               </ReportProvider>
             </UserProvider>
           </AppStateProvider>
-      </DndProvider>
-    </Provider>
-        </SocketProvider>
+        </DndProvider>
+      </Provider>
+    </SocketProvider>
   );
 };
 
