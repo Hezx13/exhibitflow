@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import { Box, IconButton, InputBase, Stack, Avatar, AvatarGroup, Tooltip } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  InputBase,
+  Stack,
+  Avatar,
+  AvatarGroup,
+  Tooltip,
+  ToggleButton,
+} from '@mui/material';
 import { Edit, Save, Delete, Archive, MoreVert, Share } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'motion/react';
+import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import {
   useLoadSingleListQuery,
   usePatchListMutation,
@@ -56,10 +66,19 @@ export const TopBar = ({ listId }: TopBarProps) => {
   const MotionInputBase = useMemo(() => motion.create(InputBase), [listId]);
 
   const actions = [
-    { icon: <Delete />, onClick: handleDelete, label: 'Delete' },
-    { icon: <GetAppRoundedIcon />, onClick: () => console.log('Download'), label: 'Download' },
-    { icon: <Archive />, onClick: () => console.log('Archive'), label: 'Archive' },
-    { icon: <Share />, onClick: () => console.log('Share'), label: 'Share' },
+    { icon: <Delete fontSize="small" />, onClick: handleDelete, label: 'Delete' },
+    {
+      icon: <GetAppRoundedIcon fontSize="small" />,
+      onClick: () => console.log('Download'),
+      label: 'Download',
+    },
+    {
+      icon: <ViewSidebarRoundedIcon fontSize="small" />,
+      onClick: () => patchList({ listId, payload: { isActive: !list.isActive } }),
+      toggleActive: list?.isActive,
+      label: list?.isActive ? 'Hide' : 'Show',
+    },
+    { icon: <Share fontSize="small" />, onClick: () => console.log('Share'), label: 'Share' },
   ];
 
   return (
@@ -92,24 +111,24 @@ export const TopBar = ({ listId }: TopBarProps) => {
           initial={false}
           animate={{ width: isExpanded ? 'auto' : '40px' }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
-          style={{ 
+          style={{
             display: 'flex',
             overflow: 'hidden',
             backgroundColor: 'rgba(0, 0, 0, 0.04)',
             borderRadius: '20px',
-            padding: '4px'
+            padding: '4px',
           }}
         >
           <IconButton
             onClick={() => setIsExpanded(!isExpanded)}
-            sx={{ 
+            sx={{
               transition: 'transform 0.3s ease',
-              transform: isExpanded ? 'rotate(90deg)' : 'none'
+              transform: isExpanded ? 'rotate(90deg)' : 'none',
             }}
           >
             <MoreVert />
           </IconButton>
-          
+
           <AnimatePresence>
             {isExpanded && (
               <motion.div
@@ -125,24 +144,36 @@ export const TopBar = ({ listId }: TopBarProps) => {
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
-                    transition={{ 
+                    transition={{
                       duration: 0.2,
                       delay: index * 0.05,
-                      ease: 'easeOut'
+                      ease: 'easeOut',
                     }}
                   >
                     <Tooltip title={action.label}>
-                      <IconButton
-                        onClick={action.onClick}
-                        size="small"
-                      sx={{
-                        '&:hover': {
-                          backgroundColor: 'rgba(0, 0, 0, 0.08)'
-                        }
-                      }}
-                    >
-                        {action.icon}
-                      </IconButton>
+                      {action.toggleActive === undefined ? (
+                        <IconButton
+                          onClick={action.onClick}
+                          size="small"
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                            },
+                          }}
+                        >
+                          {action.icon}
+                        </IconButton>
+                      ) : (
+                        <ToggleButton
+                          color="primary"
+                          value={action.toggleActive}
+                          selected={action.toggleActive}
+                          onChange={action.onClick}
+                          size="small"
+                        >
+                          {action.icon}
+                        </ToggleButton>
+                      )}
                     </Tooltip>
                   </motion.div>
                 ))}

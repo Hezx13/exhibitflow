@@ -38,6 +38,7 @@ type Material = {
   text: string
   department: string,
   tasks: Task[]
+  isActive: boolean
 }
 
  type AppState = {

@@ -7,6 +7,9 @@ import MuiListItemText from './components/MuiListItemText';
 import MuiMenuItem from './components/MuiMenuItem';
 import MuiMenu from './components/MuiMenu';
 import MuiPaper from './components/MuiPaper';
+import MuiSvgIcon from './components/MuiSvgIcon';
+import MuiToggleButton from './components/MuiToggleButton';
+
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -88,6 +91,8 @@ const theme = createTheme({
     MuiMenuItem,
     MuiMenu,
     MuiPaper,
+    MuiSvgIcon,
+    MuiToggleButton,
   },
 });
 

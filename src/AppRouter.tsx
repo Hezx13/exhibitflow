@@ -43,8 +43,8 @@ const routes = [
   },
   // Protected routes
   {
-    path: '/archive',
-    element: <div>Archive</div>,
+    path: '/library',
+    element: <div>Library</div>,
     protected: true,
   },
   {

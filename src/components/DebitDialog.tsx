@@ -17,8 +17,7 @@ function DebitDialog(props) {
           autoFocus
           label="Amount"
           margin="dense"
-          size='small'
-
+          size="small"
           type="string"
           fullWidth
           value={props.inputValue}
@@ -29,7 +28,7 @@ function DebitDialog(props) {
             autoFocus
             margin="dense"
             type="date"
-            size='small'
+            size="small"
             fullWidth
             value={props.inputDate}
             onChange={(e) => props.setInputDate(e.target.value)}
@@ -47,7 +46,7 @@ function DebitDialog(props) {
           margin="dense"
           label="Cheque number / Note"
           type="text"
-          size='small'
+          size="small"
           fullWidth
           value={props.inputCheck}
           onChange={(e) => props.setInputCheck(e.target.value)}

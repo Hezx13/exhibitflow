@@ -181,13 +181,19 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
               },
             },
           ]}
-          sxContainer={{ display: 'flex', flexDirection: 'row', height: 'auto', overflowY: 'auto', width: '100%' }}
+          sxContainer={{
+            display: 'flex',
+            flexDirection: 'row',
+            height: 'auto',
+            overflowY: 'auto',
+            width: '100%',
+          }}
         >
-            <RichTreeViewPro
+          <RichTreeViewPro
             sx={{
-                '& > div:last-child': {
-                  display: 'none',
-                },
+              '& > div:last-child': {
+                display: 'none',
+              },
               overflowY: 'auto',
               width: '100%',
             }}
@@ -205,8 +211,8 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
               itemsReordering: true,
             }}
             itemsReordering
-              selectedItems={currentProjectId}
-            />
+            selectedItems={currentProjectId}
+          />
         </RightClickMenu>
       </TreeViewErrorBoundary>
       <StatsDialog

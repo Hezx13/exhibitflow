@@ -47,12 +47,12 @@ function NavbarItems(props) {
       </StyledNavBarItem>
       <StyledNavBarItem>
         <StyledLink
-          to="/archive"
+          to="/library"
           onClick={props.validateLogin}
           color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/archive'}
+          isActive={props.location.pathname === '/library'}
         >
-          Archive
+          Library
         </StyledLink>
       </StyledNavBarItem>
     </>

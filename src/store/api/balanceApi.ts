@@ -47,7 +47,7 @@ export const balanceApi = createApi({
       providesTags: ['Balance'],
     }),
 
-    getCurrentBalance: builder.query<BalanceResponse, void>({
+    getCurrentBalance: builder.query<number, void>({
       query: () => ({
         url: '/balance/currentBalance',
         params: {
