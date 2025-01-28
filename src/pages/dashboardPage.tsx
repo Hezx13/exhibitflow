@@ -1,5 +1,5 @@
 import { useState, memo } from 'react';
-import { Grid2 as Grid, CircularProgress, TextField, Stack } from '@mui/material';
+import { Grid2 as Grid, CircularProgress, TextField, Stack, Skeleton } from '@mui/material';
 import CardComponent from '../components/cardComponent';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -26,6 +26,7 @@ import PaymentRoundedIcon from '@mui/icons-material/PaymentRounded';
 import RequestQuoteRoundedIcon from '@mui/icons-material/RequestQuoteRounded';
 import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
+import { PurchaseStatsChart } from '../components/PurchaseStatsChart';
 
 interface CardData {
   id: string;
@@ -134,7 +135,7 @@ export const DashboardPage = () => {
     },
     {
       id: 'current-balance',
-      textColor: 'success',
+      textColor: current && current > 0 ? 'success' : 'error',
       secondaryText: 'AED',
       amount: current ? current.toFixed(2) : 0,
       text: 'Current balance',
@@ -169,10 +170,8 @@ export const DashboardPage = () => {
     },
   ];
 
-  if (totalsLoading) return <CircularProgress />;
-
   return (
-    <>
+    <Stack direction="column" gap={2}>
       <DebitDialog
         open={open}
         inputValue={inputValue}
@@ -194,19 +193,24 @@ export const DashboardPage = () => {
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         {cardData.map((card) => (
           <Grid key={card.id} size={{ xs: 12, sm: 6, md: 4 }}>
-            <CardComponent
-              textColor={card.textColor}
-              text={card.text}
-              secondaryText={card.secondaryText}
-              icon={card.icon}
-              amount={card.getAmount?.(totals) ?? card.amount}
-              //@ts-ignore
-              button={card.button}
-            />
+            {totalsLoading ? (
+              <Skeleton variant="rectangular" height={94} />
+            ) : (
+              <CardComponent
+                textColor={card.textColor}
+                text={card.text}
+                secondaryText={card.secondaryText}
+                icon={card.icon}
+                amount={card.getAmount?.(totals) ?? card.amount}
+                //@ts-ignore
+                button={card.button}
+              />
+            )}
           </Grid>
         ))}
       </Grid>
-    </>
+      <PurchaseStatsChart />
+    </Stack>
   );
 };
 

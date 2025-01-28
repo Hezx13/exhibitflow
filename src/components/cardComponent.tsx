@@ -7,6 +7,8 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { StyledComponent } from 'styled-components';
 import { Paper, Stack } from '@mui/material';
+import { motion, AnimatePresence } from 'motion/react';
+
 type CardComponentProps = {
   text: string;
   amount?: number | string;
@@ -38,16 +40,41 @@ export default function CardComponent({
                 {icon}
                 <Typography>{text}</Typography>
               </Stack>
-              {button}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              >
+                {button}
+              </motion.div>
             </Stack>
             <Stack direction="row" gap={0.5} justifyContent="space-between" alignItems="center">
               <Stack direction="row" gap={0.5}>
-                <Typography variant="h6" color={textColor || 'primary'}>
-                  {amount}
-                </Typography>
-                <Typography variant="h6" color={`${textColor ? textColor : 'primary'}.dark`}>
-                  {secondaryText}
-                </Typography>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                >
+                  <Typography variant="h6" color={textColor || 'primary'}>
+                    <motion.span
+                      key={amount}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      {amount}
+                    </motion.span>
+                  </Typography>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
+                >
+                  <Typography variant="h6" color={`${textColor ? textColor : 'primary'}.dark`}>
+                    {secondaryText}
+                  </Typography>
+                </motion.div>
               </Stack>
             </Stack>
           </Stack>

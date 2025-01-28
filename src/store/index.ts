@@ -7,7 +7,7 @@ import { projectsApi } from './api/projectsApi';
 import { userApi } from './api/userApi';
 import { uploadApi } from './api/uploadApi';
 import { searchApi } from './api/searchApi';
-
+import { statisticsApi } from './api/statisticsApi';
 export const store = configureStore({
   reducer: {
     [balanceApi.reducerPath]: balanceApi.reducer,
@@ -18,6 +18,7 @@ export const store = configureStore({
     [materialsApi.reducerPath]: materialsApi.reducer,
     [uploadApi.reducerPath]: uploadApi.reducer,
     [searchApi.reducerPath]: searchApi.reducer,
+    [statisticsApi.reducerPath]: statisticsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -28,7 +29,8 @@ export const store = configureStore({
       departmentsApi.middleware,
       materialsApi.middleware,
       uploadApi.middleware,
-      searchApi.middleware
+      searchApi.middleware,
+      statisticsApi.middleware
     ),
 });
 
