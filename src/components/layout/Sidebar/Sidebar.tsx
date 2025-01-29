@@ -91,15 +91,24 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
-class TreeViewErrorBoundary extends Component<{ children: ReactNode }> {
+class TreeViewErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Only log the error if it's not the specific DOM insertion error
     if (!error.message.includes('insertBefore')) {
       console.error('TreeView Error:', error, errorInfo);
     }
+    // Set error state to trigger remount
+    this.setState({ hasError: true });
   }
 
   render() {
+    if (this.state.hasError) {
+      // Reset error state and remount children
+      this.state.hasError = false;
+      return <>{this.props.children}</>;
+    }
     return this.props.children;
   }
 }

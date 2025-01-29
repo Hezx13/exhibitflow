@@ -18,7 +18,7 @@ export const appStateReducer = (draft: AppState, action: Action): AppState | voi
         tasks: [],
       };
 
-      draft.lists.unshift(newList);
+      // draft.lists.unshift(newList);
 
       if (processSave) {
         eventEmitter.emit('added_list', newList);
