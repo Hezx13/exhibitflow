@@ -17,8 +17,8 @@ import {
   usePatchListMutation,
   useDeleteListMutation,
 } from '../../store/api/listsApi';
-import debounce from 'lodash/debounce';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
+import debounce from '../../utils/debounce';
 interface TopBarProps {
   listId: string;
 }
