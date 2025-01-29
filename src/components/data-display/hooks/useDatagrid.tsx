@@ -63,7 +63,23 @@ const useDatagrid = (tableId: string) => {
         cellEditor: 'agDateCellEditor',
         cellEditorPopup: true,
         valueFormatter: (params) => {
-          return params.value ? new Date(params.value).toLocaleDateString() : '';
+          if (!params.value) return '';
+          const date = new Date(params.value);
+          // Format as DD.MM.YYYY
+          return date.toLocaleDateString('de-DE', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          });
+        },
+        valueSetter: (params) => {
+          if (params.newValue) {
+            const date = new Date(params.newValue);
+            date.setHours(12, 0, 0, 0);
+            params.data[params.column.getColId()] = date.toISOString();
+            return true;
+          }
+          return false;
         },
         filter: 'agDateColumnFilter',
         filterParams: {

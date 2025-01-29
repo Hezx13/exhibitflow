@@ -25,7 +25,9 @@ export const StatsDialog = ({ open, onClose, data, loading }: StatsDialogProps) 
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <DialogTitle
+        sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+      >
         <Typography variant="h6">Project Statistics</Typography>
         <IconButton onClick={onClose}>
           <CloseIcon />
@@ -64,7 +66,9 @@ export const StatsDialog = ({ open, onClose, data, loading }: StatsDialogProps) 
                   <Typography>Total Value: ${data.taskStats.totalValue}</Typography>
                   <Typography>Average Price: ${data.taskStats.averagePrice.toFixed(2)}</Typography>
                   <Typography>Pending Deliveries: {data.taskStats.pendingDeliveries}</Typography>
-                  <Typography color="error">Overdue Tasks: {data.taskStats.overdueTasks}</Typography>
+                  <Typography color="error">
+                    Overdue Tasks: {data.taskStats.overdueTasks}
+                  </Typography>
                 </Box>
               </Grid>
 
@@ -143,4 +147,4 @@ export const StatsDialog = ({ open, onClose, data, loading }: StatsDialogProps) 
       </DialogContent>
     </Dialog>
   );
-}; 
+};

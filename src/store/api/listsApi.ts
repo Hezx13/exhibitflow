@@ -1,7 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './baseQuery';
 
-
 interface ReportParams {
   period: { start: string; end: string };
   payment: string;
@@ -168,7 +167,7 @@ export const listsApi = createApi({
     }),
 
     getStats: builder.query<any, { listId: string }>({
-      query: ({listId}) => ({
+      query: ({ listId }) => ({
         url: `/lists/${listId}/stats`,
       }),
     }),

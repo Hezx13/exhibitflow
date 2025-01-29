@@ -117,7 +117,9 @@ export default function SearchBarButton({ labelVisible = true }: SearchBarButton
         {...bindDialog(popupState)}
         fullWidth
         maxWidth="sm"
-        PaperProps={{ sx: { backgroundColor: 'transparent', borderColor: 'transparent', boxShadow: 'none' } }}
+        PaperProps={{
+          sx: { backgroundColor: 'transparent', borderColor: 'transparent', boxShadow: 'none' },
+        }}
       >
         <GlobalSearch closeSearch={() => popupState.close()} />
       </Dialog>

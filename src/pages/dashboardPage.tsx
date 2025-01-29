@@ -1,5 +1,5 @@
 import { useState, memo } from 'react';
-import { Grid, CircularProgress, TextField } from '@mui/material';
+import { Grid2 as Grid, CircularProgress, TextField, Stack, Skeleton } from '@mui/material';
 import CardComponent from '../components/cardComponent';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -18,28 +18,26 @@ import {
   useRemoveBalanceMutation,
 } from '../store/api/balanceApi';
 import { useLoadListsQuery } from '../store/api/listsApi';
-import { useSearchQuery } from '../store/api/searchApi';
+import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
+import EngineeringRoundedIcon from '@mui/icons-material/EngineeringRounded';
+import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded';
+import ReceiptRoundedIcon from '@mui/icons-material/ReceiptRounded';
+import PaymentRoundedIcon from '@mui/icons-material/PaymentRounded';
+import RequestQuoteRoundedIcon from '@mui/icons-material/RequestQuoteRounded';
+import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
+import { PurchaseStatsChart } from '../components/PurchaseStatsChart';
 
-const BalanceCardContent = ({ balance, action, historyAction }) => {
-  return (
-    <span
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-      }}
-    >
-      <span
-        style={{ color: balance > 0 ? 'green' : 'red', cursor: 'pointer' }}
-        onClick={historyAction}
-      >
-        {balance ? balance.toFixed(2) + ' AED' : <CircularProgress color="primary" />}
-      </span>
-      <IconButton sx={{ padding: '0 5px' }} onClick={action}>
-        <AddCardIcon htmlColor="green" />
-      </IconButton>
-    </span>
-  );
-};
+interface CardData {
+  id: string;
+  textColor?: string;
+  text: string;
+  secondaryText?: string;
+  amount?: number | string;
+  icon?: React.ReactNode;
+  button?: React.ReactNode;
+  getAmount?: (data: any) => string | number;
+}
 
 export const DashboardPage = () => {
   const { data: lists } = useLoadListsQuery();
@@ -107,10 +105,73 @@ export const DashboardPage = () => {
     }
   };
 
-  if (totalsLoading) return <CircularProgress />;
+  const cardData: CardData[] = [
+    {
+      id: 'waiting-payment',
+      textColor: 'success',
+      text: 'Waiting for payment',
+      secondaryText: 'AED',
+      icon: <PaymentRoundedIcon />,
+      getAmount: (data) => data?.total.toLocaleString('en-US').replace(/,/g, ' '),
+      button: (
+        <IconButton onClick={handleDownloadCashOrder}>
+          <RequestQuoteRoundedIcon />
+        </IconButton>
+      ),
+    },
+    {
+      id: 'cash-order',
+      textColor: 'error',
+      text: 'Cash order(Rough)',
+      secondaryText: 'AED',
+      getAmount: (data) => data?.totalRough?.toLocaleString('en-US').replace(/,/g, ' '),
+      icon: <ReceiptRoundedIcon />,
+    },
+    {
+      id: 'projects',
+      text: 'Projects in work',
+      icon: <EngineeringRoundedIcon />,
+      getAmount: () => lists?.length,
+    },
+    {
+      id: 'current-balance',
+      textColor: current && current > 0 ? 'success' : 'error',
+      secondaryText: 'AED',
+      amount: current ? current.toFixed(2) : 0,
+      text: 'Current balance',
+      icon: <AccountBalanceRoundedIcon />,
+      button: (
+        <Stack direction="row" gap={0.5}>
+          <IconButton onClick={() => setHistoryDialogOpen(true)}>
+            <ReceiptLongRoundedIcon />
+          </IconButton>
+          <IconButton color="success" onClick={handleClickOpen}>
+            <AddCardIcon />
+          </IconButton>
+        </Stack>
+      ),
+    },
+    {
+      id: 'materials-work',
+      text: 'Materials in work',
+      getAmount: () => notDoneTasksCount,
+    },
+    {
+      id: 'saved-materials',
+      icon: <SaveRoundedIcon />,
+      amount: materialsCount,
+      text: 'Saved materials',
+      getAmount: () => materialsCount,
+      button: (
+        <IconButton onClick={handleViewSavedMaterials}>
+          <ArrowForwardRoundedIcon />
+        </IconButton>
+      ),
+    },
+  ];
 
   return (
-    <>
+    <Stack direction="column" gap={2}>
       <DebitDialog
         open={open}
         inputValue={inputValue}
@@ -128,70 +189,28 @@ export const DashboardPage = () => {
         onClose={() => setHistoryDialogOpen(false)}
         onRemove={handleRemoveDebitClick}
       />
-      <Grid container>
-        {!isLoggedIn && <Navigate to="/login" />}
-        <Grid item xs={12}>
-          <Grid container justifyContent="center" spacing={8}>
-            <Grid item xl={2}>
+      {!isLoggedIn && <Navigate to="/login" />}
+      <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+        {cardData.map((card) => (
+          <Grid key={card.id} size={{ xs: 12, sm: 6, md: 4 }}>
+            {totalsLoading ? (
+              <Skeleton variant="rectangular" height={94} />
+            ) : (
               <CardComponent
-                textColor="green"
-                text="Waiting for payment"
-                amount={totals?.total.toLocaleString('en-US').replace(/,/g, ' ') + ' AED'}
+                textColor={card.textColor}
+                text={card.text}
+                secondaryText={card.secondaryText}
+                icon={card.icon}
+                amount={card.getAmount?.(totals) ?? card.amount}
                 //@ts-ignore
-                button={
-                  <StyledGenerateCashOrderButton onClick={handleDownloadCashOrder}>
-                    Generate cash order
-                  </StyledGenerateCashOrderButton>
-                }
+                button={card.button}
               />
-              <CardComponent
-                textColor="red"
-                text="Cash order(Rough)"
-                amount={totals?.totalRough?.toLocaleString('en-US').replace(/,/g, ' ') + ' AED'}
-              />
-            </Grid>
-            <Grid item xl={2}>
-              <CardComponent textColor="orange" text="Projects in work" amount={lists.length} />
-              <CardComponent
-                textColor="green"
-                text="Current balance"
-                amount={
-                  <BalanceCardContent
-                    historyAction={() => setHistoryDialogOpen(true)}
-                    balance={current}
-                    action={handleClickOpen}
-                  />
-                }
-              />
-            </Grid>
-            <Grid item xl={2}>
-              <CardComponent
-                textColor="orange"
-                text="Materials in work"
-                amount={notDoneTasksCount}
-              />
-              <CardComponent
-                textColor="orange"
-                text="Saved materials"
-                amount={materialsCount}
-                //@ts-ignore
-                button={
-                  <StyledGenerateCashOrderButton onClick={handleViewSavedMaterials}>
-                    View materials
-                  </StyledGenerateCashOrderButton>
-                }
-              />
-            </Grid>
+            )}
           </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Grid container>
-            <Grid item xs={12} sx={{ margin: '25px auto 10px auto' }}></Grid>
-            <Grid item xs={10} sx={{ margin: '10px auto' }}></Grid>
-          </Grid>
-        </Grid>
+        ))}
       </Grid>
-    </>
+      <PurchaseStatsChart />
+    </Stack>
   );
 };
 

@@ -27,7 +27,7 @@ export const RightClickMenu: React.FC<RightClickMenuProps> = ({
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     // Get the actual element that was right-clicked
     const target = e.target as HTMLElement;
     console.log(e);
