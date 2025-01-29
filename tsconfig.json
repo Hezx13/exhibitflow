@@ -20,11 +20,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true,
-    "types": ["bun-types"]
-
   },
   "include": [
-    "src"
-, "types.d.ts"  ],
+    "src", "types.d.ts"  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
