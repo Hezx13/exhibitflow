@@ -8,43 +8,40 @@ import LocalLibraryRoundedIcon from '@mui/icons-material/LocalLibraryRounded';
 export const StaticLinksList = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isLoggedIn = !!localStorage.getItem('token');
 
-  const links = isLoggedIn ? [
+  const links = [
     {
       path: '/management',
       label: 'Management',
-      icon: <ManageAccountsRoundedIcon fontSize="small" />
+      icon: <ManageAccountsRoundedIcon fontSize="small" />,
     },
     {
       path: '/',
       label: 'Dashboard',
-      icon: <DashboardRoundedIcon fontSize="small" />
+      icon: <DashboardRoundedIcon fontSize="small" />,
     },
     {
       path: '/reports',
       label: 'Reports',
-      icon: <AssessmentRoundedIcon fontSize="small" />
+      icon: <AssessmentRoundedIcon fontSize="small" />,
     },
     {
       path: '/library',
       label: 'Library',
-      icon: <LocalLibraryRoundedIcon fontSize="small" />
-    }
-  ] : [];
+      icon: <LocalLibraryRoundedIcon fontSize="small" />,
+    },
+  ];
 
   return (
     <List component="nav" sx={{ width: '100%' }}>
       {links.map(({ path, label, icon }) => (
-        <ListItemButton 
+        <ListItemButton
           key={path}
-          dense 
+          dense
           selected={location.pathname === path}
           onClick={() => navigate(path)}
         >
-          <ListItemIcon>
-            {icon}
-          </ListItemIcon>
+          <ListItemIcon>{icon}</ListItemIcon>
           <ListItemText primary={label} />
         </ListItemButton>
       ))}

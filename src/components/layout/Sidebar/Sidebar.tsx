@@ -119,7 +119,6 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
   const navigate = useNavigate();
   const { id: currentProjectId } = useParams();
   const [statsDialogOpen, setStatsDialogOpen] = useState(false);
-  console.log(currentProjectId);
   const handleNodeSelect = (nodeId: string) => {
     navigate(`/projects/${nodeId}`);
   };
@@ -167,12 +166,12 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
       <TreeViewErrorBoundary>
         <RightClickMenu
           options={[
-            {
-              name: 'Edit',
-              action: () => {
-                console.log(contextMenuId);
-              },
-            },
+            // {
+            //   name: 'Edit',
+            //   action: () => {
+            //     console.log(contextMenuId);
+            //   },
+            // },
             {
               name: 'Delete',
               action: () => {

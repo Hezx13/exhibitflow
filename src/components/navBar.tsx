@@ -11,7 +11,8 @@ import DepartmentSelector from './DepartmentSelector';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import { motion } from 'motion/react';
 import { opacityZoomIn } from '../animations/opacityZoomIn';
-
+import { useAppDispatch, useAppSelector } from '../store';
+import { clearCredentials } from '../store/slices/authSlice';
 
 export const NavBar = ({
   isSidebarOpen,
@@ -21,7 +22,8 @@ export const NavBar = ({
   setSidebarOpen: (open: boolean) => void;
 }) => {
   const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const { token } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   const [menuAnchor, setMenuAnchor] = useState(null);
   document.title =
     'ExhibitFlow - ' +
@@ -38,13 +40,12 @@ export const NavBar = ({
 
   const handleLogOut = async () => {
     await logout();
-    setIsLoggedIn(!!localStorage.getItem('token'));
+    dispatch(clearCredentials());
     closeMenu();
   };
 
   const validateLogin = (event) => {
-    setIsLoggedIn(!!localStorage.getItem('token'));
-    if (!isLoggedIn) event?.preventDefault();
+    if (!token) event?.preventDefault();
   };
 
   return (
@@ -77,13 +78,11 @@ export const NavBar = ({
           style={{ width: 34, height: 34, padding: 4 }}
         />
       )}
-      <Stack direction="row" gap={1}>
-      
-      </Stack>
+      <Stack direction="row" gap={1}></Stack>
       <span>
         <StyledNavBarItem>
           <IconButton aria-label="account" onClick={openMenu}>
-            {isLoggedIn ? (
+            {token ? (
               <>
                 <PersonIcon />
               </>
@@ -92,7 +91,7 @@ export const NavBar = ({
             )}
           </IconButton>
           <Menu anchorEl={menuAnchor} keepMounted open={Boolean(menuAnchor)} onClose={closeMenu}>
-            {isLoggedIn ? (
+            {token ? (
               <div>
                 <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
               </div>
@@ -106,7 +105,7 @@ export const NavBar = ({
                 </StyledLink>
               </div>
             )}
-            {isLoggedIn && menuAnchor && <DepartmentSelector />}
+            {token && menuAnchor && <DepartmentSelector />}
           </Menu>
         </StyledNavBarItem>
       </span>

@@ -11,18 +11,30 @@ import MainLayout from './components/layout/MainLayout';
 import { useGetUserDataQuery } from './store/api/userApi';
 import { CircularProgress } from '@mui/material';
 import Library from './pages/Library';
+import UnauthorizedLayout from './components/layout/UnauthorizedLayout';
+import { RootState, useAppSelector } from './store';
 
 const PrivateRoute = ({ children, roles }) => {
   const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();
-
+  const { token } = useAppSelector((state) => state.auth);
   if (userDataLoading) return <CircularProgress />;
+  if (!token) return <Navigate to="/login" />;
   if (!userData?.role || !roles.includes(userData.role)) {
     return <Navigate to="/" />;
   }
 
   return children;
 };
-
+const guestRoutes = [
+  {
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/register',
+    element: <Register />,
+  },
+];
 // Routes configuration
 const routes = [
   {
@@ -33,14 +45,6 @@ const routes = [
     path: '/projects/:id',
     element: <ProjectsPage />,
     protected: true,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/register',
-    element: <Register />,
   },
   // Protected routes
   {
@@ -79,6 +83,11 @@ const AppRouter = () => {
   return (
     <Router>
       <Routes>
+        <Route element={<UnauthorizedLayout />}>
+          {guestRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
         <Route element={<MainLayout />}>
           {routes.map((route) => (
             <Route

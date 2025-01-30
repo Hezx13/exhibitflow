@@ -28,7 +28,6 @@ import {
   useGetSuppliersQuery,
 } from '../store/api/materialsApi';
 export default function SavedMaterialsPage() {
-  const [isLoggedIn] = useState(!!localStorage.getItem('token'));
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [value, setValue] = useState<any>(null);
   const [open, setOpen] = useState(false);
@@ -186,7 +185,6 @@ export default function SavedMaterialsPage() {
 
   return (
     <Grid container>
-      {!isLoggedIn && <Navigate to="/login" />}
       {materials.length && (
         <DataGrid
           onCellEditStart={handlePopoverClose}

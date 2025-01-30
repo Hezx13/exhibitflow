@@ -1,6 +1,8 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './baseQuery';
 import { eventEmitter } from '../../state/EventEmitter';
+import { clearCredentials, setCredentials } from '../slices/authSlice';
+import { useAppDispatch } from '..';
 
 interface LoginCredentials {
   username: string;
@@ -24,26 +26,25 @@ export const userApi = createApi({
   baseQuery,
   tagTypes: ['User', 'Users'],
   endpoints: (builder) => ({
-    login: builder.mutation<number, LoginCredentials>({
+    login: builder.mutation<LoginResponse, LoginCredentials>({
       query: (credentials) => ({
-        url: '/authn/login',
+        url: '/auth/login',
         method: 'POST',
         body: credentials,
       }),
-      async onQueryStarted(_, { queryFulfilled }) {
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
-          const { data } = await queryFulfilled;
-          if (data === 200) {
-            const response = await fetch('/auth/login', {
-              method: 'POST',
-              body: JSON.stringify(_),
-              headers: { 'Content-Type': 'application/json' },
-            });
-            const loginData: LoginResponse = await response.json();
-            localStorage.setItem('token', loginData.token);
-            localStorage.setItem('role', loginData.role);
-            eventEmitter.emit('login');
-          }
+          const { data: loginData } = await queryFulfilled;
+
+          // Dispatch to Redux store
+          dispatch(
+            setCredentials({
+              token: loginData.token,
+              role: loginData.role,
+            })
+          );
+
+          eventEmitter.emit('login');
         } catch (err) {
           // Handle error if needed
         }
@@ -146,6 +147,6 @@ export const {
 
 // Export logout function (since it doesn't require an API call)
 export const logout = () => {
-  localStorage.removeItem('token');
-  window.location.reload();
+  const dispatch = useAppDispatch();
+  dispatch(clearCredentials());
 };

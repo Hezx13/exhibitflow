@@ -5,12 +5,10 @@ import UserManagementTable from '../components/UserManagementTable';
 import DepartmentsTable from '../components/DepartmentsTable';
 
 const ManagementPage = () => {
-  const [isLoggedIn] = React.useState(!!localStorage.getItem('token'));
   const [alert, setAlert] = React.useState<string | null>(null);
 
   return (
     <Grid container justifyContent="center">
-      {!isLoggedIn && <Navigate to="/login" />}
       {alert && (
         <Grid size={12}>
           <Alert

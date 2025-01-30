@@ -55,6 +55,13 @@ export enum Status {
   DONE = 'done',
 }
 
+export enum Payment {
+  BANK_TRANSFER = 'bank transfer',
+  CASH = 'cash',
+  PEMO_CARD = 'pemo card',
+  CREDIT = 'credit',
+}
+
 export const listsApi = createApi({
   reducerPath: 'listsApi',
   baseQuery,

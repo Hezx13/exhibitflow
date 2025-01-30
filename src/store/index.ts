@@ -1,4 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import { balanceApi } from './api/balanceApi';
 import { listsApi } from './api/listsApi';
 import { departmentsApi } from './api/departmentsApi';
@@ -8,8 +10,14 @@ import { userApi } from './api/userApi';
 import { uploadApi } from './api/uploadApi';
 import { searchApi } from './api/searchApi';
 import { statisticsApi } from './api/statisticsApi';
+import authReducer from './slices/authSlice';
+import { TypedUseSelectorHook } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     [balanceApi.reducerPath]: balanceApi.reducer,
     [listsApi.reducerPath]: listsApi.reducer,
     [projectsApi.reducerPath]: projectsApi.reducer,
@@ -21,7 +29,9 @@ export const store = configureStore({
     [statisticsApi.reducerPath]: statisticsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }).concat(
       balanceApi.middleware,
       listsApi.middleware,
       projectsApi.middleware,
@@ -34,5 +44,8 @@ export const store = configureStore({
     ),
 });
 
+export const persistor = persistStore(store);
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

@@ -9,7 +9,7 @@ const DepartmentsTable = () => {
   // Process users data to get department statistics
   const getDepartmentStats = () => {
     if (!users) return [];
-    
+
     const stats = users.reduce((acc: any, user: any) => {
       if (!acc[user.department]) {
         acc[user.department] = { department: user.department, count: 0 };

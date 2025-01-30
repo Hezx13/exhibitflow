@@ -1,7 +1,7 @@
 /**
  * Creates a debounced function that delays invoking `func` until after `wait` milliseconds
  * have elapsed since the last time the debounced function was invoked.
- * 
+ *
  * @param func The function to debounce
  * @param wait The number of milliseconds to delay
  * @param options The options object
@@ -36,7 +36,7 @@ export default function debounce<T extends (...args: any[]) => any>(
 
   // Validate wait and convert to number
   wait = Number(wait) || 0;
-  
+
   if (options) {
     leading = !!options.leading;
     maxing = 'maxWait' in options;
@@ -75,9 +75,7 @@ export default function debounce<T extends (...args: any[]) => any>(
     const timeSinceLastInvoke = time - lastInvokeTime;
     const timeWaiting = wait - timeSinceLastCall;
 
-    return maxing
-      ? Math.min(timeWaiting, (maxWait as number) - timeSinceLastInvoke)
-      : timeWaiting;
+    return maxing ? Math.min(timeWaiting, (maxWait as number) - timeSinceLastInvoke) : timeWaiting;
   }
 
   function shouldInvoke(time: number) {
@@ -150,4 +148,3 @@ export default function debounce<T extends (...args: any[]) => any>(
 
   return debounced;
 }
-

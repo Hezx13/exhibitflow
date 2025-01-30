@@ -1,6 +1,11 @@
 import React from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { useGetUsersQuery, useDeleteUserMutation, usePromoteUserMutation, useDemoteUserMutation } from '../store/api/userApi';
+import {
+  useGetUsersQuery,
+  useDeleteUserMutation,
+  usePromoteUserMutation,
+  useDemoteUserMutation,
+} from '../store/api/userApi';
 import { Button, Box, Typography } from '@mui/material';
 import myTheme from '../theme/grid';
 interface UserManagementTableProps {
@@ -37,11 +42,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
           >
             Demote
           </Button>
-          <Button
-            size="small"
-            color="error"
-            onClick={() => handleDelete(params.data.username)}
-          >
+          <Button size="small" color="error" onClick={() => handleDelete(params.data.username)}>
             Delete
           </Button>
         </Box>
@@ -79,11 +80,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
         User Management
       </Typography>
       <div className="ag-theme-material" style={{ height: 400, width: '100%' }}>
-        <AgGridReact
-          rowData={users}
-          columnDefs={columnDefs as any}
-          theme={myTheme}
-        />
+        <AgGridReact rowData={users} columnDefs={columnDefs as any} theme={myTheme} />
       </div>
     </Box>
   );

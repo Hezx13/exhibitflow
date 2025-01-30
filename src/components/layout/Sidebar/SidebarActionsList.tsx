@@ -94,23 +94,23 @@ export default function SidebarActionsList() {
         data={previewData}
       />
       <Stack direction="column" gap={1}>
-      <Stack direction="row" gap={1} alignItems="center">
-        <SearchBarButton />
-        <ToggleButton
-          {...bindTrigger(popupState)}
-          value={popupState.isOpen}
-          selected={popupState.isOpen}
-          size="small"
-          // eslint-disable-next-line no-restricted-syntax
-          sx={{
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-            backgroundColor: (theme) => theme.palette.background.paper,
-            padding: (theme) => theme.spacing(0.625),
-            filter: (theme) =>
-              theme.palette.mode === 'dark' ? 'brightness(0.85)' : 'brightness(0.95)',
-          }}
-        >
-          <AddRoundedIcon fontSize="small" />
+        <Stack direction="row" gap={1} alignItems="center">
+          <SearchBarButton />
+          <ToggleButton
+            {...bindTrigger(popupState)}
+            value={popupState.isOpen}
+            selected={popupState.isOpen}
+            size="small"
+            // eslint-disable-next-line no-restricted-syntax
+            sx={{
+              border: (theme) => `1px solid ${theme.palette.divider}`,
+              backgroundColor: (theme) => theme.palette.background.paper,
+              padding: (theme) => theme.spacing(0.625),
+              filter: (theme) =>
+                theme.palette.mode === 'dark' ? 'brightness(0.85)' : 'brightness(0.95)',
+            }}
+          >
+            <AddRoundedIcon fontSize="small" />
           </ToggleButton>
         </Stack>
         <StaticLinksList />
