@@ -26,7 +26,7 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation<number, LoginCredentials>({
       query: (credentials) => ({
-        url: '/auth/login',
+        url: '/authn/login',
         method: 'POST',
         body: credentials,
       }),
@@ -52,25 +52,25 @@ export const userApi = createApi({
 
     register: builder.mutation<any, RegisterCredentials>({
       query: (credentials) => ({
-        url: '/auth/register',
+        url: '/authn/register',
         method: 'POST',
         body: credentials,
       }),
     }),
 
     getUserData: builder.query<any, void>({
-      query: () => '/user/user',
+      query: () => '/authn/user',
       providesTags: ['User'],
     }),
 
     getUsers: builder.query<any, void>({
-      query: () => '/user/users',
+      query: () => '/authz/users',
       providesTags: ['Users'],
     }),
 
     approveUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/auth/approveUser',
+        url: '/authz/approveUser',
         method: 'POST',
         body: { userToApprove: username },
       }),
@@ -79,7 +79,7 @@ export const userApi = createApi({
 
     disapproveUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/auth/disapproveUser',
+        url: '/authz/disapproveUser',
         method: 'POST',
         body: { userToApprove: username },
       }),
@@ -88,7 +88,7 @@ export const userApi = createApi({
 
     deleteUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/user/removeUser',
+        url: '/authz/removeUser',
         method: 'POST',
         body: { userToRemove: username },
       }),
@@ -97,7 +97,7 @@ export const userApi = createApi({
 
     demoteUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/user/demoteUser',
+        url: '/authz/demoteUser',
         method: 'POST',
         body: { userToDemote: username },
       }),
@@ -106,7 +106,7 @@ export const userApi = createApi({
 
     promoteUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/user/promoteUser',
+        url: '/authz/promoteUser',
         method: 'POST',
         body: { userToPromote: username },
       }),
@@ -115,9 +115,16 @@ export const userApi = createApi({
 
     resetUserPassword: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/user/resetUserPassword',
+        url: '/authn/resetUserPassword',
         method: 'POST',
         body: { userToReset: username },
+      }),
+    }),
+    patchUser: builder.mutation<number, { userData: Partial<User> }>({
+      query: ({ userData }) => ({
+        url: '/authz/user',
+        method: 'PATCH',
+        body: { userData },
       }),
     }),
   }),
@@ -134,6 +141,7 @@ export const {
   useDemoteUserMutation,
   usePromoteUserMutation,
   useResetUserPasswordMutation,
+  usePatchUserMutation,
 } = userApi;
 
 // Export logout function (since it doesn't require an API call)

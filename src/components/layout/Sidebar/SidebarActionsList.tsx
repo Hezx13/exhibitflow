@@ -20,7 +20,8 @@ import { UploadPreviewTable } from '../../data-display/UploadPreviewTable';
 import SearchBarButton from '../../actions/buttons/SearchBarButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useAddProjectMutation } from '../../../store/api/listsApi';
-
+import ManageAccountsRoundedIcon from '@mui/icons-material/ManageAccountsRounded';
+import StaticLinksList from './StaticLinksList';
 export default function SidebarActionsList() {
   const projectFileInputRef = useRef<HTMLInputElement>(null);
   const materialFileInputRef = useRef<HTMLInputElement>(null);
@@ -92,6 +93,7 @@ export default function SidebarActionsList() {
         onUpload={handleUpload}
         data={previewData}
       />
+      <Stack direction="column" gap={1}>
       <Stack direction="row" gap={1} alignItems="center">
         <SearchBarButton />
         <ToggleButton
@@ -109,9 +111,10 @@ export default function SidebarActionsList() {
           }}
         >
           <AddRoundedIcon fontSize="small" />
-        </ToggleButton>
+          </ToggleButton>
+        </Stack>
+        <StaticLinksList />
       </Stack>
-
       <Menu {...bindMenu(popupState)}>
         <MenuItem onClick={handleAddProject}>
           <ListItemIcon>

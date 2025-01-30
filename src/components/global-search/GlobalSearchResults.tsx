@@ -72,7 +72,7 @@ export default function GlobalSearchResults({
   return (
     <AnimatePresence mode="wait">
       <Box
-        sx={{ backgroundColor: '#101010', px: 0.5 }}
+        sx={{ px: 0.5 }}
         overflow="auto"
         height="100%"
         maxHeight={500}

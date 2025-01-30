@@ -1,11 +1,7 @@
 import Box from '@mui/material/Box';
-import { useAppState } from '../state/AppStateContext';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import FullFeaturedCrudGrid from '../components/data-display/DataGridComponent';
-import { useUser } from '../state/userContext';
-import { useState, useEffect } from 'react';
-import { useLoadListsQuery } from '../store/api/listsApi';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { TopBar } from '../components/data-display/TopBar';
 
 interface TabPanelProps {

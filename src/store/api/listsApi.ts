@@ -69,6 +69,15 @@ export const listsApi = createApi({
       }),
       providesTags: ['Lists'],
     }),
+    sidebarLists: builder.query<any, void>({
+      query: () => ({
+        url: '/lists/sidebar',
+        params: {
+          department: localStorage.getItem('selectedDepartment'),
+        },
+      }),
+      providesTags: ['Lists'],
+    }),
 
     loadSingleList: builder.query<any, string>({
       query: (listId) => ({
@@ -319,6 +328,7 @@ export const {
   usePatchListPositionMutation,
   useGenerateReportMutation,
   useLoadReportsQuery,
+  useSidebarListsQuery,
   useDeleteListMutation,
   useAddDebitMutation,
   useRemoveDebitMutation,

@@ -118,7 +118,7 @@ export default function SearchBarButton({ labelVisible = true }: SearchBarButton
         fullWidth
         maxWidth="sm"
         PaperProps={{
-          sx: { backgroundColor: 'transparent', borderColor: 'transparent', boxShadow: 'none' },
+          sx: { backgroundColor: 'transparent', borderColor: 'transparent', boxShadow: 'none', backgroundImage: 'none' },
         }}
       >
         <GlobalSearch closeSearch={() => popupState.close()} />

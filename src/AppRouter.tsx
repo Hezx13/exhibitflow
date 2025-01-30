@@ -10,12 +10,12 @@ import SavedMaterialsPage from './pages/SavedMaterialsPage';
 import MainLayout from './components/layout/MainLayout';
 import { useGetUserDataQuery } from './store/api/userApi';
 import { CircularProgress } from '@mui/material';
+import Library from './pages/Library';
 
 const PrivateRoute = ({ children, roles }) => {
   const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();
 
   if (userDataLoading) return <CircularProgress />;
-
   if (!userData?.role || !roles.includes(userData.role)) {
     return <Navigate to="/" />;
   }
@@ -32,6 +32,7 @@ const routes = [
   {
     path: '/projects/:id',
     element: <ProjectsPage />,
+    protected: true,
   },
   {
     path: '/login',
@@ -44,7 +45,7 @@ const routes = [
   // Protected routes
   {
     path: '/library',
-    element: <div>Library</div>,
+    element: <Library />,
     protected: true,
   },
   {

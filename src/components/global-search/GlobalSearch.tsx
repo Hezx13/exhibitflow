@@ -69,7 +69,10 @@ export default function GlobalSearch({ closeSearch }: { closeSearch: () => void 
   return (
     <Box width="100%" position="relative" overflow="hidden" height={500}>
       <Box
-        sx={{ backgroundColor: '#101010' }}
+        sx={{
+          backgroundColor: '#101010',
+          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.5), 0px 8px 30px rgba(0, 0, 0, 0.3)'
+        }}
         borderRadius={1}
         height="auto"
         maxHeight="100%"

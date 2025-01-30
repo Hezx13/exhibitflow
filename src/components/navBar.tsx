@@ -1,63 +1,17 @@
 import { memo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { StyledNavBar, StyledNavBarItem, StyledLink } from '../styles/styles';
+import { useLocation } from 'react-router-dom';
+import { StyledNavBarItem, StyledLink } from '../styles/styles';
 import { Menu, MenuItem, IconButton, Drawer, Box, Stack } from '@mui/material';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import PersonIcon from '@mui/icons-material/Person';
-import { logout } from '../api/user-api';
+import { logout } from '../store/api/userApi';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import MenuIcon from '@mui/icons-material/Menu';
 import logo from '../assets/logo192.png';
 import DepartmentSelector from './DepartmentSelector';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { opacityZoomIn } from '../animations/opacityZoomIn';
-function NavbarItems(props) {
-  return (
-    <>
-      <StyledNavBarItem>
-        <StyledLink
-          to="/management"
-          onClick={props.validateLogin}
-          color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/management'}
-        >
-          Management
-        </StyledLink>
-      </StyledNavBarItem>
-      <StyledNavBarItem>
-        <StyledLink
-          to="/"
-          onClick={props.validateLogin}
-          color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/dashboard'}
-        >
-          Dashboard
-        </StyledLink>
-      </StyledNavBarItem>
-      <StyledNavBarItem>
-        <StyledLink
-          to="/reports"
-          onClick={props.validateLogin}
-          color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/reports'}
-        >
-          Reports
-        </StyledLink>
-      </StyledNavBarItem>
-      <StyledNavBarItem>
-        <StyledLink
-          to="/library"
-          onClick={props.validateLogin}
-          color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/library'}
-        >
-          Library
-        </StyledLink>
-      </StyledNavBarItem>
-    </>
-  );
-}
+
 
 export const NavBar = ({
   isSidebarOpen,
@@ -124,11 +78,7 @@ export const NavBar = ({
         />
       )}
       <Stack direction="row" gap={1}>
-        <NavbarItems
-          location={location}
-          isLoggedIn={isLoggedIn}
-          validateLogin={validateLogin}
-        ></NavbarItems>
+      
       </Stack>
       <span>
         <StyledNavBarItem>

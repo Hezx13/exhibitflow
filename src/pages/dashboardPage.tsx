@@ -40,7 +40,7 @@ interface CardData {
 }
 
 export const DashboardPage = () => {
-  const { data: lists } = useLoadListsQuery();
+  const { data: lists = [] } = useLoadListsQuery();
   const [notDoneTasksCount, setNotDoneTasksCount] = useState(0);
   const [isLoggedIn] = useState(!!localStorage.getItem('token'));
   const [open, setOpen] = useState(false);
