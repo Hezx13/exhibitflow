@@ -27,7 +27,7 @@ export default function SidebarActionsList() {
   const materialFileInputRef = useRef<HTMLInputElement>(null);
   const [previewData, setPreviewData] = useState<any>(null);
   const [uploadPreview] = useUploadPreviewMutation();
-  const [uploadLists] = useUploadListMutation();
+  const [uploadLists, { isLoading: uploadListsLoading }] = useUploadListMutation();
   const [addProject] = useAddProjectMutation();
   const navigate = useNavigate();
   const pathname = useLocation().pathname;
@@ -92,6 +92,7 @@ export default function SidebarActionsList() {
         onClose={handleClose}
         onUpload={handleUpload}
         data={previewData}
+        isLoading={uploadListsLoading}
       />
       <Stack direction="column" gap={1}>
         <Stack direction="row" gap={1} alignItems="center">
