@@ -51,7 +51,7 @@ export const NavBar = ({
   return (
     <Box
       sx={{
-        height: '40px',
+        height: '32px',
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
@@ -61,7 +61,6 @@ export const NavBar = ({
         margin: '10px auto',
         borderBottom: 1,
         borderColor: 'divider',
-        py: 0.5,
       }}
     >
       {!isSidebarOpen ? (

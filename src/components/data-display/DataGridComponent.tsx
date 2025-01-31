@@ -6,10 +6,12 @@ import { Skeleton } from '@mui/material';
 import useDatagrid from './hooks/useDatagrid';
 import { useAddTaskMutation } from '../../store/api/listsApi';
 import { motion } from 'motion/react';
+import { useSelection } from './GridSelection.context';
 
 function FullFeaturedCrudGrid({ tableId }: { tableId: string }) {
   const { rows, columnDefs, onCellValueChanged, processRowDrag, isLoading } = useDatagrid(tableId);
   const [addTask] = useAddTaskMutation();
+  const { setSelectedIds } = useSelection();
 
   if (isLoading) {
     return (
@@ -21,6 +23,11 @@ function FullFeaturedCrudGrid({ tableId }: { tableId: string }) {
       </Box>
     );
   }
+
+  const onSelectionChanged = (event: any) => {
+    const selectedRows = event.api.getSelectedRows();
+    setSelectedIds(selectedRows.map((row: any) => row._id));
+  };
 
   return (
     <Box
@@ -68,6 +75,7 @@ function FullFeaturedCrudGrid({ tableId }: { tableId: string }) {
               headerCheckbox: true,
             }}
             readOnlyEdit={true}
+            onSelectionChanged={onSelectionChanged}
           />
         </motion.div>
       </RightClickMenu>

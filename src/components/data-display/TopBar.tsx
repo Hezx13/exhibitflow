@@ -8,17 +8,22 @@ import {
   AvatarGroup,
   Tooltip,
   ToggleButton,
+  Divider,
 } from '@mui/material';
-import { Edit, Save, Delete, Archive, MoreVert, Share } from '@mui/icons-material';
+import { Delete, MoreVert, Share, ContentCopy } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'motion/react';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import {
   useLoadSingleListQuery,
   usePatchListMutation,
   useDeleteListMutation,
+  useDeleteTasksMutation,
+  useDuplicateTasksMutation,
 } from '../../store/api/listsApi';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import debounce from '../../utils/debounce';
+import { useSelection } from './GridSelection.context';
+
 interface TopBarProps {
   listId: string;
 }
@@ -27,9 +32,12 @@ export const TopBar = ({ listId }: TopBarProps) => {
   const { data: list } = useLoadSingleListQuery(listId);
   const [patchList] = usePatchListMutation();
   const [deleteList] = useDeleteListMutation();
+  const [deleteTasks] = useDeleteTasksMutation();
+  const [duplicateTasks] = useDuplicateTasksMutation();
   const [title, setTitle] = useState(list?.title || '');
   const [isUserEditing, setIsUserEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { selectedIds } = useSelection();
 
   // Debounced save function
   const debouncedSave = useCallback(
@@ -65,6 +73,19 @@ export const TopBar = ({ listId }: TopBarProps) => {
 
   const MotionInputBase = useMemo(() => motion.create(InputBase), [listId]);
 
+  const selectionActions = [
+    { 
+      icon: <Delete fontSize="small" />, 
+      onClick: () => deleteTasks({ listId, taskIds: selectedIds }), 
+      label: 'Delete Selected' 
+    },
+    { 
+      icon: <ContentCopy fontSize="small" />, 
+      onClick: () => duplicateTasks({ listId, taskIds: selectedIds }), 
+      label: 'Duplicate Selected' 
+    },
+  ];
+
   const actions = [
     { icon: <Delete fontSize="small" />, onClick: handleDelete, label: 'Delete' },
     {
@@ -87,6 +108,7 @@ export const TopBar = ({ listId }: TopBarProps) => {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
+        pb: 0.5
       }}
     >
       <Stack direction="row" gap={1} alignItems="center" flexGrow={1}>
@@ -107,6 +129,55 @@ export const TopBar = ({ listId }: TopBarProps) => {
       </Stack>
 
       <Stack direction="row" spacing={1} alignItems="center">
+        <AnimatePresence mode="wait">
+          {selectedIds.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, x: 20, width: 0 }}
+              animate={{ opacity: 1, x: 0, width: 'auto' }}
+              exit={{ opacity: 0, x: 20, width: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ 
+                display: 'flex', 
+                gap: '4px', 
+                marginRight: '8px',
+                overflow: 'hidden'
+              }}
+            >
+
+              <AnimatePresence mode="sync">
+                {selectionActions.map((action, index) => (
+                  <motion.div
+                    key={action.label}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={{
+                      duration: 0.15,
+                      delay: index * 0.05,
+                      ease: 'easeOut',
+                    }}
+                  >
+                    <Tooltip title={action.label}>
+                      <IconButton
+                        onClick={action.onClick}
+                        size="small"
+                        sx={{
+                          '&:hover': {
+                            backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                          },
+                        }}
+                      >
+                        {action.icon}
+                      </IconButton>
+                    </Tooltip>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <Divider orientation="vertical" flexItem />
         <motion.div
           initial={false}
           animate={{ width: isExpanded ? 'auto' : '40px' }}

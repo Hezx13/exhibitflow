@@ -140,6 +140,42 @@ export const listsApi = createApi({
       ],
     }),
 
+    deleteTasks: builder.mutation<any, { listId: string; taskIds: string[] | string }>({
+      query: ({ listId, taskIds }) => ({
+        url: `/lists/${listId}/tasks`,
+        method: 'DELETE',
+        body: { taskIds },
+      }),
+      async onQueryStarted({ listId, taskIds }, { dispatch, queryFulfilled, getState }) {
+        const deleteResult = dispatch(
+          listsApi.util.updateQueryData('loadSingleList', listId, (draft) => {
+            draft.tasks = draft.tasks.filter((t) => !taskIds.includes(t._id));
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          deleteResult.undo();
+        }
+      },
+      invalidatesTags: (result, error, { listId }) => [
+        { type: 'SingleList', id: listId },
+        'SingleList',
+      ],
+    }),
+
+    duplicateTasks: builder.mutation<any, { listId: string; taskIds: string[] }>({
+      query: ({ listId, taskIds }) => ({
+        url: `/lists/${listId}/tasks/duplicate`,
+        method: 'POST',
+        body: { taskIds },
+      }),
+      invalidatesTags: (result, error, { listId }) => [
+        { type: 'SingleList', id: listId },
+        'SingleList',
+      ],
+    }),
+
     patchList: builder.mutation<any, { listId: string; payload: Partial<List> }>({
       query: ({ listId, payload }) => ({
         url: `/lists/${listId}`,
@@ -342,6 +378,8 @@ export const {
   useLazyDownloadReportQuery,
   usePatchTaskMutation,
   useAddTaskMutation,
+  useDeleteTasksMutation,
+  useDuplicateTasksMutation,
   useAddProjectMutation,
   usePatchListMutation,
 } = listsApi;

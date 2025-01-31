@@ -19,7 +19,7 @@ const useDatagrid = (tableId: string) => {
         field: 'text' as keyof Task,
         headerName: 'Material',
         editable: true,
-        flex: 1,
+        flex: 2,
       },
       {
         field: 'article',

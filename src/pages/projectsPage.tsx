@@ -3,6 +3,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import FullFeaturedCrudGrid from '../components/data-display/DataGridComponent';
 import { useParams } from 'react-router-dom';
 import { TopBar } from '../components/data-display/TopBar';
+import { SelectionProvider } from '../components/data-display/GridSelection.context';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -26,10 +27,12 @@ export default function ProjectsPage() {
             width: '100%',
           }}
         >
-          <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-            <TopBar listId={id as string} />
-            <FullFeaturedCrudGrid tableId={id as string} />
-          </Box>
+          <SelectionProvider>
+            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+              <TopBar listId={id as string} />
+              <FullFeaturedCrudGrid tableId={id as string} />
+            </Box>
+          </SelectionProvider>
         </Box>
       )}
     </Box>
