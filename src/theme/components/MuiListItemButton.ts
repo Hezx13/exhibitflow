@@ -7,6 +7,7 @@ const MuiListItemButton: Components<Theme>['MuiListItemButton'] = {
   styleOverrides: {
     root: ({ theme }) => ({
       borderRadius: theme.shape.borderRadius,
+      padding: theme.spacing(0.5),
     }),
   },
 };

@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { register } from '../api/user-api';
-import NavBar from '../components/navBar';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -9,7 +7,8 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { Navigate } from 'react-router-dom';
+import { useRegisterMutation } from '../store/api/userApi';
+
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,8 +17,7 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
-
+  const [register] = useRegisterMutation();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
@@ -47,7 +45,6 @@ const Register = () => {
 
   return (
     <Grid container>
-      {isLoggedIn && <Navigate to="/" />}
       <Grid item xs={12} sx={{ marginBottom: '15px' }}>
         <Container component="main" maxWidth="xs">
           <Box

@@ -1,6 +1,8 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './baseQuery';
 import { eventEmitter } from '../../state/EventEmitter';
+import { clearCredentials, setCredentials } from '../slices/authSlice';
+import { useAppDispatch } from '..';
 
 interface LoginCredentials {
   username: string;
@@ -24,26 +26,25 @@ export const userApi = createApi({
   baseQuery,
   tagTypes: ['User', 'Users'],
   endpoints: (builder) => ({
-    login: builder.mutation<number, LoginCredentials>({
+    login: builder.mutation<LoginResponse, LoginCredentials>({
       query: (credentials) => ({
         url: '/auth/login',
         method: 'POST',
         body: credentials,
       }),
-      async onQueryStarted(_, { queryFulfilled }) {
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
-          const { data } = await queryFulfilled;
-          if (data === 200) {
-            const response = await fetch('/auth/login', {
-              method: 'POST',
-              body: JSON.stringify(_),
-              headers: { 'Content-Type': 'application/json' },
-            });
-            const loginData: LoginResponse = await response.json();
-            localStorage.setItem('token', loginData.token);
-            localStorage.setItem('role', loginData.role);
-            eventEmitter.emit('login');
-          }
+          const { data: loginData } = await queryFulfilled;
+
+          // Dispatch to Redux store
+          dispatch(
+            setCredentials({
+              token: loginData.token,
+              role: loginData.role,
+            })
+          );
+
+          eventEmitter.emit('login');
         } catch (err) {
           // Handle error if needed
         }
@@ -52,25 +53,25 @@ export const userApi = createApi({
 
     register: builder.mutation<any, RegisterCredentials>({
       query: (credentials) => ({
-        url: '/auth/register',
+        url: '/authn/register',
         method: 'POST',
         body: credentials,
       }),
     }),
 
     getUserData: builder.query<any, void>({
-      query: () => '/user/user',
+      query: () => '/authn/user',
       providesTags: ['User'],
     }),
 
     getUsers: builder.query<any, void>({
-      query: () => '/user/users',
+      query: () => '/authz/users',
       providesTags: ['Users'],
     }),
 
     approveUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/auth/approveUser',
+        url: '/authz/approveUser',
         method: 'POST',
         body: { userToApprove: username },
       }),
@@ -79,7 +80,7 @@ export const userApi = createApi({
 
     disapproveUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/auth/disapproveUser',
+        url: '/authz/disapproveUser',
         method: 'POST',
         body: { userToApprove: username },
       }),
@@ -88,7 +89,7 @@ export const userApi = createApi({
 
     deleteUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/user/removeUser',
+        url: '/authz/removeUser',
         method: 'POST',
         body: { userToRemove: username },
       }),
@@ -97,7 +98,7 @@ export const userApi = createApi({
 
     demoteUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/user/demoteUser',
+        url: '/authz/demoteUser',
         method: 'POST',
         body: { userToDemote: username },
       }),
@@ -106,7 +107,7 @@ export const userApi = createApi({
 
     promoteUser: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/user/promoteUser',
+        url: '/authz/promoteUser',
         method: 'POST',
         body: { userToPromote: username },
       }),
@@ -115,9 +116,16 @@ export const userApi = createApi({
 
     resetUserPassword: builder.mutation<number, string>({
       query: (username) => ({
-        url: '/user/resetUserPassword',
+        url: '/authn/resetUserPassword',
         method: 'POST',
         body: { userToReset: username },
+      }),
+    }),
+    patchUser: builder.mutation<number, { userData: Partial<User> }>({
+      query: ({ userData }) => ({
+        url: '/authz/user',
+        method: 'PATCH',
+        body: { userData },
       }),
     }),
   }),
@@ -134,10 +142,11 @@ export const {
   useDemoteUserMutation,
   usePromoteUserMutation,
   useResetUserPasswordMutation,
+  usePatchUserMutation,
 } = userApi;
 
 // Export logout function (since it doesn't require an API call)
 export const logout = () => {
-  localStorage.removeItem('token');
-  window.location.reload();
+  const dispatch = useAppDispatch();
+  dispatch(clearCredentials());
 };

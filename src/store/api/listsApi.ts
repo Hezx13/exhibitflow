@@ -55,6 +55,13 @@ export enum Status {
   DONE = 'done',
 }
 
+export enum Payment {
+  BANK_TRANSFER = 'bank transfer',
+  CASH = 'cash',
+  PEMO_CARD = 'pemo card',
+  CREDIT = 'credit',
+}
+
 export const listsApi = createApi({
   reducerPath: 'listsApi',
   baseQuery,
@@ -63,6 +70,15 @@ export const listsApi = createApi({
     loadLists: builder.query<any, void>({
       query: () => ({
         url: '/lists',
+        params: {
+          department: localStorage.getItem('selectedDepartment'),
+        },
+      }),
+      providesTags: ['Lists'],
+    }),
+    sidebarLists: builder.query<any, void>({
+      query: () => ({
+        url: '/lists/sidebar',
         params: {
           department: localStorage.getItem('selectedDepartment'),
         },
@@ -118,6 +134,42 @@ export const listsApi = createApi({
           patchResult.undo();
         }
       },
+      invalidatesTags: (result, error, { listId }) => [
+        { type: 'SingleList', id: listId },
+        'SingleList',
+      ],
+    }),
+
+    deleteTasks: builder.mutation<any, { listId: string; taskIds: string[] | string }>({
+      query: ({ listId, taskIds }) => ({
+        url: `/lists/${listId}/tasks`,
+        method: 'DELETE',
+        body: { taskIds },
+      }),
+      async onQueryStarted({ listId, taskIds }, { dispatch, queryFulfilled, getState }) {
+        const deleteResult = dispatch(
+          listsApi.util.updateQueryData('loadSingleList', listId, (draft) => {
+            draft.tasks = draft.tasks.filter((t) => !taskIds.includes(t._id));
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          deleteResult.undo();
+        }
+      },
+      invalidatesTags: (result, error, { listId }) => [
+        { type: 'SingleList', id: listId },
+        'SingleList',
+      ],
+    }),
+
+    duplicateTasks: builder.mutation<any, { listId: string; taskIds: string[] }>({
+      query: ({ listId, taskIds }) => ({
+        url: `/lists/${listId}/tasks/duplicate`,
+        method: 'POST',
+        body: { taskIds },
+      }),
       invalidatesTags: (result, error, { listId }) => [
         { type: 'SingleList', id: listId },
         'SingleList',
@@ -319,12 +371,15 @@ export const {
   usePatchListPositionMutation,
   useGenerateReportMutation,
   useLoadReportsQuery,
+  useSidebarListsQuery,
   useDeleteListMutation,
   useAddDebitMutation,
   useRemoveDebitMutation,
   useLazyDownloadReportQuery,
   usePatchTaskMutation,
   useAddTaskMutation,
+  useDeleteTasksMutation,
+  useDuplicateTasksMutation,
   useAddProjectMutation,
   usePatchListMutation,
 } = listsApi;

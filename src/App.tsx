@@ -6,7 +6,6 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import AppRouter from './AppRouter';
 import { HTML5Backend as Backend } from 'react-dnd-html5-backend';
 import { SocketProvider } from './state/socketContext';
-import { UserProvider } from './state/userContext';
 import { DndProvider } from 'react-dnd';
 import theme from './theme';
 import { store } from './store';
@@ -18,16 +17,14 @@ const App = () => {
       <Provider store={store}>
         <DndProvider backend={Backend}>
           <AppStateProvider>
-            <UserProvider>
-              <ReportProvider>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <AppRouter />
-                  </ThemeProvider>
-                </LocalizationProvider>
-              </ReportProvider>
-            </UserProvider>
+            <ReportProvider>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <ThemeProvider theme={theme}>
+                  <CssBaseline />
+                  <AppRouter />
+                </ThemeProvider>
+              </LocalizationProvider>
+            </ReportProvider>
           </AppStateProvider>
         </DndProvider>
       </Provider>

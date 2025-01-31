@@ -12,14 +12,12 @@ import {
 import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
 import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
 import { TreeItem2DragAndDropOverlay } from '@mui/x-tree-view/TreeItem2DragAndDropOverlay';
-import { useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
   useDeleteListMutation,
-  useGetStatsQuery,
   useLazyGetStatsQuery,
-  useLoadListsQuery,
   usePatchListPositionMutation,
+  useSidebarListsQuery,
 } from '../../../store/api/listsApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { forwardRef, ReactNode, Ref, useEffect, Component, ErrorInfo, useState } from 'react';
@@ -114,14 +112,13 @@ class TreeViewErrorBoundary extends Component<{ children: ReactNode }, { hasErro
 }
 
 export const Sidebar = ({ open, onToggle }: SidebarProps) => {
-  const { data: projects } = useLoadListsQuery();
+  const { data: projects = [] } = useSidebarListsQuery();
   const [patchListPosition] = usePatchListPositionMutation();
   const [getStats, { data: statsData, isLoading: statsLoading }] = useLazyGetStatsQuery();
   const [deleteList] = useDeleteListMutation();
   const navigate = useNavigate();
   const { id: currentProjectId } = useParams();
   const [statsDialogOpen, setStatsDialogOpen] = useState(false);
-
   const handleNodeSelect = (nodeId: string) => {
     navigate(`/projects/${nodeId}`);
   };
@@ -139,7 +136,6 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
   }, []);
 
   const handleItemPositionChange = (data: any) => {
-    console.log('data', data);
     patchListPosition({ listId: data.itemId, payload: data });
   };
 
@@ -170,12 +166,12 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
       <TreeViewErrorBoundary>
         <RightClickMenu
           options={[
-            {
-              name: 'Edit',
-              action: () => {
-                console.log(contextMenuId);
-              },
-            },
+            // {
+            //   name: 'Edit',
+            //   action: () => {
+            //     console.log(contextMenuId);
+            //   },
+            // },
             {
               name: 'Delete',
               action: () => {
@@ -220,7 +216,7 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
               itemsReordering: true,
             }}
             itemsReordering
-            selectedItems={currentProjectId}
+            selectedItems={currentProjectId ?? ''}
           />
         </RightClickMenu>
       </TreeViewErrorBoundary>

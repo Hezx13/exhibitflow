@@ -1,7 +1,12 @@
 import { RowDragEndEvent, RowDragLeaveEvent, CellEditRequestEvent } from 'ag-grid-community';
 import { generateJitteredKeyBetween } from 'fractional-indexing-jittered';
 import { useMemo, useState } from 'react';
-import { Status, useLoadSingleListQuery, usePatchTaskMutation } from '../../../store/api/listsApi';
+import {
+  Payment,
+  Status,
+  useLoadSingleListQuery,
+  usePatchTaskMutation,
+} from '../../../store/api/listsApi';
 
 const useDatagrid = (tableId: string) => {
   const [patchTask] = usePatchTaskMutation();
@@ -14,7 +19,7 @@ const useDatagrid = (tableId: string) => {
         field: 'text' as keyof Task,
         headerName: 'Material',
         editable: true,
-        flex: 1,
+        flex: 2,
       },
       {
         field: 'article',
@@ -69,7 +74,7 @@ const useDatagrid = (tableId: string) => {
           return date.toLocaleDateString('de-DE', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric'
+            year: 'numeric',
           });
         },
         valueSetter: (params) => {
@@ -123,6 +128,19 @@ const useDatagrid = (tableId: string) => {
         resizable: false,
         cellEditorParams: {
           values: Object.values(Status),
+        },
+      },
+      {
+        field: 'payment',
+        headerName: 'Payment',
+        editable: true,
+        flex: 1,
+        valueFormatter: (params) => {
+          return params.value ? params.value.charAt(0).toUpperCase() + params.value.slice(1) : '';
+        },
+        cellEditor: 'agSelectCellEditor',
+        cellEditorParams: {
+          values: Object.values(Payment),
         },
       },
     ],

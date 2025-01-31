@@ -40,9 +40,8 @@ interface CardData {
 }
 
 export const DashboardPage = () => {
-  const { data: lists } = useLoadListsQuery();
+  const { data: lists = [] } = useLoadListsQuery();
   const [notDoneTasksCount, setNotDoneTasksCount] = useState(0);
-  const [isLoggedIn] = useState(!!localStorage.getItem('token'));
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [materialsCount, setMaterialsCount] = useState(0);
@@ -189,7 +188,6 @@ export const DashboardPage = () => {
         onClose={() => setHistoryDialogOpen(false)}
         onRemove={handleRemoveDebitClick}
       />
-      {!isLoggedIn && <Navigate to="/login" />}
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         {cardData.map((card) => (
           <Grid key={card.id} size={{ xs: 12, sm: 6, md: 4 }}>

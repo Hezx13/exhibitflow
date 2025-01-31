@@ -21,7 +21,6 @@ const ReportsPage = () => {
   const { reports, fetchReports, updateReports } = useReport();
   const [reportsUpdated, setRepotsUpdated] = useState(false);
   const [balance, setBalance] = useState(0);
-  const [isLoggedIn] = useState(!!localStorage.getItem('token'));
 
   useEffect(() => {
     calculateTotalReports(reports);
@@ -41,7 +40,6 @@ const ReportsPage = () => {
   return (
     <>
       <Grid container>
-        {!isLoggedIn && <Navigate to="/login" />}
         <Grid item xs={12} sx={{ marginBottom: '15px' }}>
           <Grid container justifyContent="center" spacing={8}>
             <Grid item xl={2}>

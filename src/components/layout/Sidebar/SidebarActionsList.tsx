@@ -20,7 +20,8 @@ import { UploadPreviewTable } from '../../data-display/UploadPreviewTable';
 import SearchBarButton from '../../actions/buttons/SearchBarButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useAddProjectMutation } from '../../../store/api/listsApi';
-
+import ManageAccountsRoundedIcon from '@mui/icons-material/ManageAccountsRounded';
+import StaticLinksList from './StaticLinksList';
 export default function SidebarActionsList() {
   const projectFileInputRef = useRef<HTMLInputElement>(null);
   const materialFileInputRef = useRef<HTMLInputElement>(null);
@@ -92,26 +93,28 @@ export default function SidebarActionsList() {
         onUpload={handleUpload}
         data={previewData}
       />
-      <Stack direction="row" gap={1} alignItems="center">
-        <SearchBarButton />
-        <ToggleButton
-          {...bindTrigger(popupState)}
-          value={popupState.isOpen}
-          selected={popupState.isOpen}
-          size="small"
-          // eslint-disable-next-line no-restricted-syntax
-          sx={{
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-            backgroundColor: (theme) => theme.palette.background.paper,
-            padding: (theme) => theme.spacing(0.625),
-            filter: (theme) =>
-              theme.palette.mode === 'dark' ? 'brightness(0.85)' : 'brightness(0.95)',
-          }}
-        >
-          <AddRoundedIcon fontSize="small" />
-        </ToggleButton>
+      <Stack direction="column" gap={1}>
+        <Stack direction="row" gap={1} alignItems="center">
+          <SearchBarButton />
+          <ToggleButton
+            {...bindTrigger(popupState)}
+            value={popupState.isOpen}
+            selected={popupState.isOpen}
+            size="small"
+            // eslint-disable-next-line no-restricted-syntax
+            sx={{
+              border: (theme) => `1px solid ${theme.palette.divider}`,
+              backgroundColor: (theme) => theme.palette.background.paper,
+              padding: (theme) => theme.spacing(0.625),
+              filter: (theme) =>
+                theme.palette.mode === 'dark' ? 'brightness(0.85)' : 'brightness(0.95)',
+            }}
+          >
+            <AddRoundedIcon fontSize="small" />
+          </ToggleButton>
+        </Stack>
+        <StaticLinksList />
       </Stack>
-
       <Menu {...bindMenu(popupState)}>
         <MenuItem onClick={handleAddProject}>
           <ListItemIcon>

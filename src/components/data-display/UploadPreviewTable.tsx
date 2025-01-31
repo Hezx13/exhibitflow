@@ -43,6 +43,7 @@ interface TasksDialogProps {
   onClose: () => void;
   data: TaskGroup[];
   onUpload: () => void;
+  isLoading: boolean;
 }
 
 export const UploadPreviewTable: React.FC<TasksDialogProps> = ({
@@ -50,6 +51,7 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({
   onClose,
   data,
   onUpload,
+  isLoading,
 }) => {
   const [selectedPage, setSelectedPage] = useState<number>(0);
 

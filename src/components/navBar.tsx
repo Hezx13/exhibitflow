@@ -1,63 +1,18 @@
 import { memo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { StyledNavBar, StyledNavBarItem, StyledLink } from '../styles/styles';
+import { useLocation } from 'react-router-dom';
+import { StyledNavBarItem, StyledLink } from '../styles/styles';
 import { Menu, MenuItem, IconButton, Drawer, Box, Stack } from '@mui/material';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import PersonIcon from '@mui/icons-material/Person';
-import { logout } from '../api/user-api';
+import { logout } from '../store/api/userApi';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import MenuIcon from '@mui/icons-material/Menu';
 import logo from '../assets/logo192.png';
 import DepartmentSelector from './DepartmentSelector';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { opacityZoomIn } from '../animations/opacityZoomIn';
-function NavbarItems(props) {
-  return (
-    <>
-      <StyledNavBarItem>
-        <StyledLink
-          to="/management"
-          onClick={props.validateLogin}
-          color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/management'}
-        >
-          Management
-        </StyledLink>
-      </StyledNavBarItem>
-      <StyledNavBarItem>
-        <StyledLink
-          to="/"
-          onClick={props.validateLogin}
-          color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/dashboard'}
-        >
-          Dashboard
-        </StyledLink>
-      </StyledNavBarItem>
-      <StyledNavBarItem>
-        <StyledLink
-          to="/reports"
-          onClick={props.validateLogin}
-          color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/reports'}
-        >
-          Reports
-        </StyledLink>
-      </StyledNavBarItem>
-      <StyledNavBarItem>
-        <StyledLink
-          to="/library"
-          onClick={props.validateLogin}
-          color={!props.isLoggedIn ? 'grey' : '#ffffff'}
-          isActive={props.location.pathname === '/library'}
-        >
-          Library
-        </StyledLink>
-      </StyledNavBarItem>
-    </>
-  );
-}
+import { useAppDispatch, useAppSelector } from '../store';
+import { clearCredentials } from '../store/slices/authSlice';
 
 export const NavBar = ({
   isSidebarOpen,
@@ -67,7 +22,8 @@ export const NavBar = ({
   setSidebarOpen: (open: boolean) => void;
 }) => {
   const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const { token } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   const [menuAnchor, setMenuAnchor] = useState(null);
   document.title =
     'ExhibitFlow - ' +
@@ -84,19 +40,18 @@ export const NavBar = ({
 
   const handleLogOut = async () => {
     await logout();
-    setIsLoggedIn(!!localStorage.getItem('token'));
+    dispatch(clearCredentials());
     closeMenu();
   };
 
   const validateLogin = (event) => {
-    setIsLoggedIn(!!localStorage.getItem('token'));
-    if (!isLoggedIn) event?.preventDefault();
+    if (!token) event?.preventDefault();
   };
 
   return (
     <Box
       sx={{
-        height: '40px',
+        height: '32px',
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
@@ -106,7 +61,6 @@ export const NavBar = ({
         margin: '10px auto',
         borderBottom: 1,
         borderColor: 'divider',
-        py: 0.5,
       }}
     >
       {!isSidebarOpen ? (
@@ -123,17 +77,11 @@ export const NavBar = ({
           style={{ width: 34, height: 34, padding: 4 }}
         />
       )}
-      <Stack direction="row" gap={1}>
-        <NavbarItems
-          location={location}
-          isLoggedIn={isLoggedIn}
-          validateLogin={validateLogin}
-        ></NavbarItems>
-      </Stack>
+      <Stack direction="row" gap={1}></Stack>
       <span>
         <StyledNavBarItem>
           <IconButton aria-label="account" onClick={openMenu}>
-            {isLoggedIn ? (
+            {token ? (
               <>
                 <PersonIcon />
               </>
@@ -142,7 +90,7 @@ export const NavBar = ({
             )}
           </IconButton>
           <Menu anchorEl={menuAnchor} keepMounted open={Boolean(menuAnchor)} onClose={closeMenu}>
-            {isLoggedIn ? (
+            {token ? (
               <div>
                 <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
               </div>
@@ -156,7 +104,7 @@ export const NavBar = ({
                 </StyledLink>
               </div>
             )}
-            {isLoggedIn && menuAnchor && <DepartmentSelector />}
+            {token && menuAnchor && <DepartmentSelector />}
           </Menu>
         </StyledNavBarItem>
       </span>

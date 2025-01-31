@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { login } from '../api/user-api';
-import NavBar from '../components/navBar';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -11,43 +9,26 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { Navigate } from 'react-router-dom';
 import { LinearProgress } from '@mui/material';
+import { useAppSelector } from '../store';
+import { useLoginMutation } from '../store/api/userApi';
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setLoading] = useState(false);
+  const { token } = useAppSelector((state) => state.auth);
+  const [login, { isLoading }] = useLoginMutation();
   const [error, setError] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
   const handleLogin = async (event) => {
     event.preventDefault();
-    setLoading(true);
-    const response = await login({ username, password });
-    switch (response) {
-      case 200: {
-        setIsLoggedIn(!!localStorage.getItem('token'));
-        break;
-      }
-      case 401: {
-        setError('Invalid credentials');
-        break;
-      }
-      case 403: {
-        setError('Not approved');
-        break;
-      }
-      case 404: {
-        setError("User doesn't exist");
-        break;
-      }
-      default: {
-        setError('Unknown error');
-      }
+    try {
+      await login({ username, password }).unwrap();
+    } catch (error: any) {
+      setError(error.data);
     }
-    setLoading(false);
   };
 
   return (
     <Grid container>
-      {isLoggedIn && <Navigate to="/" />}
+      {token && <Navigate to="/" />}
       <Grid item xs={12} sx={{ marginBottom: '15px' }}>
         <Container component="main" maxWidth="xs">
           <Box
