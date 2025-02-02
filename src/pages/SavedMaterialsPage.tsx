@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import { Navigate } from 'react-router-dom';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import SavedMaterialsToolbar from '../components/DataGridComponents/SavedMaterialsToolbar';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import PhoneEnabledOutlinedIcon from '@mui/icons-material/PhoneEnabledOutlined';
 import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlined';
@@ -196,9 +195,6 @@ export default function SavedMaterialsPage() {
           disableRowSelectionOnClick
           processRowUpdate={handleProcessRowUpdate}
           onProcessRowUpdateError={(error) => console.error(error)}
-          slots={{
-            toolbar: SavedMaterialsToolbar,
-          }}
           slotProps={{
             cell: {
               onClick: handlePopoverOpen,
