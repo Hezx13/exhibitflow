@@ -13,8 +13,8 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CreateNewFolderRoundedIcon from '@mui/icons-material/CreateNewFolderRounded';
 import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
 import { useRef, useState } from 'react';
-import { useUploadListMutation, useUploadPreviewMutation } from '../../../store/api/uploadApi';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useUploadListMutation, useUploadPreviewMutation, useUploadSingleMutation } from '../../../store/api/uploadApi';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import { UploadPreviewTable } from '../../data-display/UploadPreviewTable';
 import SearchBarButton from '../../actions/buttons/SearchBarButton';
@@ -28,9 +28,11 @@ export default function SidebarActionsList() {
   const [previewData, setPreviewData] = useState<any>(null);
   const [uploadPreview] = useUploadPreviewMutation();
   const [uploadLists, { isLoading: uploadListsLoading }] = useUploadListMutation();
+  const [uploadSingle, { isLoading: uploadSingleLoading }] = useUploadSingleMutation();
   const [addProject] = useAddProjectMutation();
   const navigate = useNavigate();
   const pathname = useLocation().pathname;
+  const { id } = useParams();
   const popupState = usePopupState({ variant: 'popover', popupId: 'sidebar-actions-list' });
 
   const handleClose = () => {
@@ -59,7 +61,7 @@ export default function SidebarActionsList() {
   const handleUpload = async () => {
     console.log(projectFileInputRef.current?.files);
     await uploadLists({ file: projectFileInputRef.current?.files?.[0] as File });
-    window.location.reload();
+    // window.location.reload();
     handleClose();
   };
 
@@ -80,8 +82,8 @@ export default function SidebarActionsList() {
 
   const handleMaterialFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      console.log(file);
+    if (file && id) {
+      await uploadSingle({ file, listId: id as string, department: localStorage.getItem('selectedDepartment') || '' });
     }
   };
 

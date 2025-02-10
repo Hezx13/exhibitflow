@@ -5,8 +5,12 @@ import {
   useDeleteUserMutation,
   usePromoteUserMutation,
   useDemoteUserMutation,
+  useApproveUserMutation,
+  useDisapproveUserMutation,
+  usePatchUserMutation,
+  Roles,
 } from '../store/api/userApi';
-import { Button, Box, Typography } from '@mui/material';
+import { Button, Box, Typography, Checkbox } from '@mui/material';
 import myTheme from '../theme/grid';
 interface UserManagementTableProps {
   onAlert: (message: string) => void;
@@ -17,12 +21,35 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
   const [deleteUser] = useDeleteUserMutation();
   const [promoteUser] = usePromoteUserMutation();
   const [demoteUser] = useDemoteUserMutation();
-
+  const [patchUser] = usePatchUserMutation();
+  const [approveUser] = useApproveUserMutation();
+  const [disapproveUser] = useDisapproveUserMutation();
   const columnDefs = [
     { field: 'username', headerName: 'Username', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1 },
     { field: 'department', headerName: 'Department', flex: 1 },
-    { field: 'role', headerName: 'Role', flex: 1 },
+    {
+      field: 'isApproved',
+      headerName: 'Approved',
+      flex: 1,
+      editable: true,
+      onCellValueChanged: (params: any) => {
+        console.log(params);
+      },
+    },
+    {
+      field: 'role',
+      headerName: 'Role',
+      flex: 1,
+      editable: true,
+      onCellValueChanged: (params: any) => {
+        console.log(params);
+      },
+      cellEditor: 'agRichSelectCellEditor',
+      cellEditorParams: {
+        values: Object.values(Roles),
+      },
+    },
     {
       headerName: 'Actions',
       flex: 1,
