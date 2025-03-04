@@ -25,11 +25,13 @@ export const balanceApi = createApi({
       invalidatesTags: ['Balance'],
     }),
 
-    removeBalance: builder.mutation<number, Debit>({
-      query: (debit) => ({
-        url: '/balance/remove',
+    removeBalance: builder.mutation<number, string>({
+      query: (id) => ({
+        url: `/balance/remove`,
         method: 'POST',
-        body: debit,
+        params: {
+          id,
+        },
       }),
       invalidatesTags: ['Balance'],
     }),
@@ -57,6 +59,9 @@ export const balanceApi = createApi({
           Accept: 'application/json',
         },
       }),
+      transformResponse: (response: any) => {
+        return Number(response.balance);
+      },
       providesTags: ['Balance'],
     }),
 

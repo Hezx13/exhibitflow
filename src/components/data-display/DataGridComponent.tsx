@@ -70,6 +70,7 @@ function FullFeaturedCrudGrid({ tableId }: { tableId: string }) {
             onRowDragEnd={processRowDrag}
             onRowDragLeave={processRowDrag}
             animateRows={true}
+            cellSelection={true}
             rowSelection={{
               mode: 'multiRow',
               headerCheckbox: true,

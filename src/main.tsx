@@ -9,6 +9,7 @@ import {
   SetFilterModule,
   StatusBarModule,
   TreeDataModule,
+  CellSelectionModule
 } from 'ag-grid-enterprise';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { StrictMode } from 'react';
@@ -28,4 +29,5 @@ ModuleRegistry.registerModules([
   SetFilterModule,
   StatusBarModule,
   TreeDataModule,
+  CellSelectionModule
 ]);

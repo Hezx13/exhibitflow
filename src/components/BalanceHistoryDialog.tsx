@@ -1,36 +1,58 @@
-import { FC, useState, memo } from 'react';
-import { Dialog, DialogContent, DialogActions, Button, IconButton } from '@mui/material';
+import { Dialog, DialogContent, DialogActions, Button, IconButton, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import dayjs from 'dayjs';
-import { useRemoveBalanceMutation } from '../store/api/balanceApi';
+import { motion, AnimatePresence } from 'motion/react';
 
+// TODO ADD FILTERS AND PAGINATION
 const BalanceHistoryDialog = ({ open, onClose, debits, onRemove }) => {
-  const [removeBalance] = useRemoveBalanceMutation();
   return (
     <>
-      <Dialog open={open}>
-        <DialogContent>
-          {debits?.map((debit) => (
-            <div
-              key={debit._id}
-              style={{
-                display: 'flex',
-                padding: '5px 10px',
-                margin: '5px',
-                background: '#00000020',
-                borderRadius: '5px',
-                alignItems: 'center',
-                width: 'clamp(300px, 400px, 500px)',
-              }}
-            >
-              <span style={{ color: 'green', flex: 1 }}>{debit.amount} AED</span>
-              <span style={{ flex: 1 }}>{dayjs(debit.date).format('DD-MM-YYYY')}</span>
-              <span style={{ width: '100px' }}>{debit.check}</span>
-              <IconButton sx={{ marginLeft: 'auto' }} onClick={() => onRemove(debit)}>
-                <DeleteForeverIcon fontSize="small" htmlColor="Crimson" />
-              </IconButton>
-            </div>
-          ))}
+      <Dialog open={open} maxWidth="md">
+        <DialogContent sx={{maxHeight: theme=>theme.breakpoints.values.sm, overflow: 'auto' }}>
+          <List sx={{ width: '100%', minWidth: 400}}>
+            <AnimatePresence>
+              {debits?.map((debit) => (
+                <motion.div
+                  key={debit._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -100 }}
+                  transition={{ duration: 0.3 }}
+                  layout
+                >
+                  <Paper 
+                    variant='outlined'
+                    sx={{ 
+                      mb: 1.5, 
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <ListItem
+                      secondaryAction={
+                        <IconButton edge="end" onClick={() => onRemove(debit)}>
+                          <DeleteForeverIcon fontSize="small" htmlColor="Crimson" />
+                        </IconButton>
+                      }
+                    >
+                      <ListItemText 
+                        primary={
+                          <Typography variant="body1" component="span" sx={{ color: 'success.main', fontWeight: 'bold' }}>
+                            {debit.debit} AED
+                          </Typography>
+                        }
+                        secondary={
+                            <Typography variant="body2" component="span" sx={{ display: 'block' }} noWrap>
+                              {dayjs(debit.date).format('DD.MM.YYYY') + (debit.description ? ` •  ${debit.description}` : '')}
+                            </Typography>
+                        }
+                      />
+                    </ListItem>
+                  </Paper>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </List>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} color="primary">

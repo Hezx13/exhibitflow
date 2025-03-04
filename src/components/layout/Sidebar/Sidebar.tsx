@@ -156,7 +156,7 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
         pt: 0.75,
       }}
     >
-      <Box sx={{ p: 1 }}>
+      <Box sx={{ p: 1, pt: 0.5 }}>
         <IconButton onClick={onToggle}>
           <ViewSidebarRoundedIcon />
         </IconButton>
