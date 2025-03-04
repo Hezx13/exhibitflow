@@ -95,10 +95,10 @@ export const DashboardPage = () => {
   const handleViewSavedMaterials = () => {
     navigate('/saved');
   };
-
+  console.log(current);
   const handleRemoveDebitClick = async (debit) => {
     try {
-      await removeBalance(debit);
+      await removeBalance(debit._id);
     } catch (error) {
       console.error('Error in removeDebit:', error);
     }
@@ -136,7 +136,7 @@ export const DashboardPage = () => {
       id: 'current-balance',
       textColor: current && current > 0 ? 'success' : 'error',
       secondaryText: 'AED',
-      amount: current ? current.toFixed(2) : 0,
+      amount: Number(current) ? Number(current).toFixed(2) : 0,
       text: 'Current balance',
       icon: <AccountBalanceRoundedIcon />,
       button: (

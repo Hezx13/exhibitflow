@@ -15,7 +15,7 @@ export default function MainLayout() {
       </Grid>
       <Grid size="grow" container direction="column">
         <Grid size="auto">
-          <Box width="100%" px={2}>
+          <Box width="100%" px={1}>
             <NavBar isSidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
           </Box>
         </Grid>

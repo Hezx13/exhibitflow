@@ -18,25 +18,27 @@ export const balanceApi = createApi({
   endpoints: (builder) => ({
     addBalance: builder.mutation<number, Debit>({
       query: (debit) => ({
-        url: '/balance/add_balance',
+        url: '/balance/add',
         method: 'POST',
         body: debit,
       }),
       invalidatesTags: ['Balance'],
     }),
 
-    removeBalance: builder.mutation<number, Debit>({
-      query: (debit) => ({
-        url: '/balance/remove_balance',
+    removeBalance: builder.mutation<number, string>({
+      query: (id) => ({
+        url: `/balance/remove`,
         method: 'POST',
-        body: debit,
+        params: {
+          id,
+        },
       }),
       invalidatesTags: ['Balance'],
     }),
 
     loadBalance: builder.query<BalanceResponse, void>({
       query: () => ({
-        url: '/balance/balance',
+        url: '/balance',
         params: {
           department: localStorage.getItem('selectedDepartment'),
         },
@@ -49,7 +51,7 @@ export const balanceApi = createApi({
 
     getCurrentBalance: builder.query<number, void>({
       query: () => ({
-        url: '/balance/currentBalance',
+        url: '/balance/current',
         params: {
           department: localStorage.getItem('selectedDepartment'),
         },
@@ -57,6 +59,9 @@ export const balanceApi = createApi({
           Accept: 'application/json',
         },
       }),
+      transformResponse: (response: any) => {
+        return Number(response.balance);
+      },
       providesTags: ['Balance'],
     }),
 

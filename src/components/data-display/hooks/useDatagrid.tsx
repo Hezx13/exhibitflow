@@ -119,7 +119,7 @@ const useDatagrid = (tableId: string) => {
       {
         field: 'status',
         headerName: 'Status',
-        cellEditor: 'agSelectCellEditor',
+        cellEditor: 'agRichSelectCellEditor',
         editable: true,
         flex: 1,
         valueFormatter: (params) => {

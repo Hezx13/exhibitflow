@@ -17,9 +17,10 @@ export const uploadApi = createApi({
           body: formData,
         };
       },
-      onQueryStarted: async (args, { queryFulfilled }) => {
+      onQueryStarted: async (args, { queryFulfilled, dispatch }) => {
         await queryFulfilled;
-        listsApi.util.invalidateTags(['Lists']);
+        console.log('Invalidating Lists tag');
+        dispatch(listsApi.util.invalidateTags(['Lists']));
       },
     }),
     uploadPreview: builder.mutation<void, { file: File }>({
@@ -35,19 +36,23 @@ export const uploadApi = createApi({
       },
     }),
 
-    uploadSingle: builder.mutation<void, { file: File; listId: string }>({
-      query: ({ file, listId }) => {
+    uploadSingle: builder.mutation<any, { file: File; listId: string; department: string }>({
+      query: ({ file, listId, department }) => {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('department', department);
         return {
           url: `/upload/${listId}`,
           method: 'POST',
           body: formData,
         };
       },
-      onQueryStarted: async (args, { queryFulfilled }) => {
+      onQueryStarted: async (args, { queryFulfilled, dispatch }) => {
         await queryFulfilled;
-        listsApi.util.invalidateTags(['Lists']);
+        dispatch(listsApi.util.invalidateTags([
+          { type: 'SingleList', id: args.listId },
+          'SingleList'
+        ]));
       },
     }),
   }),

@@ -8,6 +8,11 @@ interface LoginCredentials {
   username: string;
   password: string;
 }
+export enum Roles {
+  ADMIN = 'Admin',
+  MANAGER = 'Manager',
+  USER = 'User',
+}
 
 interface RegisterCredentials {
   username: string;
@@ -28,7 +33,7 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginCredentials>({
       query: (credentials) => ({
-        url: '/auth/login',
+        url: '/authn/login',
         method: 'POST',
         body: credentials,
       }),

@@ -11,6 +11,7 @@ import {
   Typography,
   IconButton,
   Stack,
+  CircularProgress,
 } from '@mui/material';
 import dayjs from 'dayjs';
 import { AgGridReact } from 'ag-grid-react';
@@ -90,11 +91,12 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({
       <DialogTitle>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="h5">Tasks Overview</Typography>
+          {isLoading && <CircularProgress size={16} />}
           <Stack direction="row" gap={1}>
-            <IconButton onClick={onUpload}>
+            <IconButton onClick={onUpload} disabled={isLoading}>
               <SaveAsRoundedIcon />
             </IconButton>
-            <IconButton onClick={onClose}>
+            <IconButton onClick={onClose} disabled={isLoading}>
               <CloseRoundedIcon />
             </IconButton>
           </Stack>
