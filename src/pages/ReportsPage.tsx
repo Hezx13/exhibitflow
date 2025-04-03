@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
-import NavBar from '../components/navBar';
+import NavBar from '../components/NavBar';
 import CardComponent from '../components/cardComponent';
 import ReportGenerationDialog from '../components/ReportGenerationDialog';
 import ReportTable from '../components/ReportsTable';

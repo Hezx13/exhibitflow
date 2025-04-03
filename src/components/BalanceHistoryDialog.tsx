@@ -1,4 +1,15 @@
-import { Dialog, DialogContent, DialogActions, Button, IconButton, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Typography,
+} from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import dayjs from 'dayjs';
 import { motion, AnimatePresence } from 'motion/react';
@@ -8,8 +19,8 @@ const BalanceHistoryDialog = ({ open, onClose, debits, onRemove }) => {
   return (
     <>
       <Dialog open={open} maxWidth="md">
-        <DialogContent sx={{maxHeight: theme=>theme.breakpoints.values.sm, overflow: 'auto' }}>
-          <List sx={{ width: '100%', minWidth: 400}}>
+        <DialogContent sx={{ maxHeight: (theme) => theme.breakpoints.values.sm, overflow: 'auto' }}>
+          <List sx={{ width: '100%', minWidth: 400 }}>
             <AnimatePresence>
               {debits?.map((debit) => (
                 <motion.div
@@ -20,10 +31,10 @@ const BalanceHistoryDialog = ({ open, onClose, debits, onRemove }) => {
                   transition={{ duration: 0.3 }}
                   layout
                 >
-                  <Paper 
-                    variant='outlined'
-                    sx={{ 
-                      mb: 1.5, 
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      mb: 1.5,
                       borderRadius: 2,
                       overflow: 'hidden',
                     }}
@@ -35,16 +46,26 @@ const BalanceHistoryDialog = ({ open, onClose, debits, onRemove }) => {
                         </IconButton>
                       }
                     >
-                      <ListItemText 
+                      <ListItemText
                         primary={
-                          <Typography variant="body1" component="span" sx={{ color: 'success.main', fontWeight: 'bold' }}>
+                          <Typography
+                            variant="body1"
+                            component="span"
+                            sx={{ color: 'success.main', fontWeight: 'bold' }}
+                          >
                             {debit.debit} AED
                           </Typography>
                         }
                         secondary={
-                            <Typography variant="body2" component="span" sx={{ display: 'block' }} noWrap>
-                              {dayjs(debit.date).format('DD.MM.YYYY') + (debit.description ? ` •  ${debit.description}` : '')}
-                            </Typography>
+                          <Typography
+                            variant="body2"
+                            component="span"
+                            sx={{ display: 'block' }}
+                            noWrap
+                          >
+                            {dayjs(debit.date).format('DD.MM.YYYY') +
+                              (debit.description ? ` •  ${debit.description}` : '')}
+                          </Typography>
                         }
                       />
                     </ListItem>

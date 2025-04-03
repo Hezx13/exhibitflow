@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { Grid2 as Grid } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-import { NavBar } from '../navBar';
+import { NavBar } from '../NavBar';
 import { Sidebar } from './Sidebar/Sidebar';
 import { useState } from 'react';
 

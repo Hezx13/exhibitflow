@@ -13,6 +13,8 @@ import { CircularProgress } from '@mui/material';
 import Library from './pages/Library';
 import UnauthorizedLayout from './components/layout/UnauthorizedLayout';
 import { RootState, useAppSelector } from './store';
+import DocumentPage from './pages/DocumentPage';
+import { YDocProvider } from '@y-sweet/react';
 
 const PrivateRoute = ({ children, roles }) => {
   const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();
@@ -50,6 +52,11 @@ const routes = [
   {
     path: '/library',
     element: <Library />,
+    protected: true,
+  },
+  {
+    path: '/document/:id',
+    element: <DocumentPage />,
     protected: true,
   },
   {

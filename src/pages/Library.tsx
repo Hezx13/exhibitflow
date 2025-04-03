@@ -1,13 +1,20 @@
 import { AgGridReact } from 'ag-grid-react';
 import { useMemo, useState } from 'react';
-import { useLoadListsQuery } from '../store/api/listsApi';
+import { useLoadListsQuery, usePatchListMutation } from '../store/api/listsApi';
 import { Stack } from '@mui/material';
 import myTheme from '../theme/grid';
 import { useNavigate } from 'react-router-dom';
 
 export default function Library() {
-  const { data: lists = [] } = useLoadListsQuery();
+  const { data: listsData = [] } = useLoadListsQuery();
+  const [patchList] = usePatchListMutation();
   const navigate = useNavigate();
+
+  const lists = useMemo(() => {
+    return listsData.map((list) => {
+      return Object.assign({}, list);
+    });
+  }, [listsData]);
 
   const columnDefs = useMemo(
     () => [
@@ -21,9 +28,22 @@ export default function Library() {
       },
       { field: 'count', headerName: 'Materials', width: 100 },
       { field: 'newOrders', headerName: 'New Orders', width: 100 },
-      { field: 'isActive', headerName: 'Active', width: 65 },
+      {
+        field: 'isActive',
+        headerName: 'Active',
+        width: 65,
+        editable: true,
+        cellEditor: 'agCheckboxCellEditor',
+        onCellValueChanged: (event) => {
+          // Update the server with the new value
+          patchList({
+            listId: event.data._id,
+            payload: { isActive: event.newValue },
+          });
+        },
+      },
     ],
-    []
+    [navigate, patchList]
   );
 
   return (

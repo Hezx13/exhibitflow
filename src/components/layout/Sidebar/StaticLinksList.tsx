@@ -4,7 +4,7 @@ import ManageAccountsRoundedIcon from '@mui/icons-material/ManageAccountsRounded
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import AssessmentRoundedIcon from '@mui/icons-material/AssessmentRounded';
 import LocalLibraryRoundedIcon from '@mui/icons-material/LocalLibraryRounded';
-
+import DocumentScannerRoundedIcon from '@mui/icons-material/DocumentScannerRounded';
 export const StaticLinksList = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,6 +29,11 @@ export const StaticLinksList = () => {
       path: '/library',
       label: 'Library',
       icon: <LocalLibraryRoundedIcon fontSize="small" />,
+    },
+    {
+      path: '/document/:id',
+      label: 'Document',
+      icon: <DocumentScannerRoundedIcon fontSize="small" />,
     },
   ];
 

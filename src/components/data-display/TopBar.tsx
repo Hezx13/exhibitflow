@@ -74,15 +74,15 @@ export const TopBar = ({ listId }: TopBarProps) => {
   const MotionInputBase = useMemo(() => motion.create(InputBase), [listId]);
 
   const selectionActions = [
-    { 
-      icon: <Delete fontSize="small" />, 
-      onClick: () => deleteTasks({ listId, taskIds: selectedIds }), 
-      label: 'Delete Selected' 
+    {
+      icon: <Delete fontSize="small" />,
+      onClick: () => deleteTasks({ listId, taskIds: selectedIds }),
+      label: 'Delete Selected',
     },
-    { 
-      icon: <ContentCopy fontSize="small" />, 
-      onClick: () => duplicateTasks({ listId, taskIds: selectedIds }), 
-      label: 'Duplicate Selected' 
+    {
+      icon: <ContentCopy fontSize="small" />,
+      onClick: () => duplicateTasks({ listId, taskIds: selectedIds }),
+      label: 'Duplicate Selected',
     },
   ];
 
@@ -108,7 +108,7 @@ export const TopBar = ({ listId }: TopBarProps) => {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        pb: 0.5
+        pb: 0.5,
       }}
     >
       <Stack direction="row" gap={1} alignItems="center" flexGrow={1}>
@@ -136,14 +136,13 @@ export const TopBar = ({ listId }: TopBarProps) => {
               animate={{ opacity: 1, x: 0, width: 'auto' }}
               exit={{ opacity: 0, x: 20, width: 0 }}
               transition={{ duration: 0.2 }}
-              style={{ 
-                display: 'flex', 
-                gap: '4px', 
+              style={{
+                display: 'flex',
+                gap: '4px',
                 marginRight: '8px',
-                overflow: 'hidden'
+                overflow: 'hidden',
               }}
             >
-
               <AnimatePresence mode="sync">
                 {selectionActions.map((action, index) => (
                   <motion.div
@@ -173,7 +172,6 @@ export const TopBar = ({ listId }: TopBarProps) => {
                   </motion.div>
                 ))}
               </AnimatePresence>
-              
             </motion.div>
           )}
         </AnimatePresence>

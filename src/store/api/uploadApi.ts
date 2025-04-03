@@ -49,10 +49,9 @@ export const uploadApi = createApi({
       },
       onQueryStarted: async (args, { queryFulfilled, dispatch }) => {
         await queryFulfilled;
-        dispatch(listsApi.util.invalidateTags([
-          { type: 'SingleList', id: args.listId },
-          'SingleList'
-        ]));
+        dispatch(
+          listsApi.util.invalidateTags([{ type: 'SingleList', id: args.listId }, 'SingleList'])
+        );
       },
     }),
   }),
