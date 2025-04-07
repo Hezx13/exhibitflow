@@ -1,4 +1,12 @@
-import { Box, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  Divider,
+  IconButton,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material';
 import { RichTreeViewPro } from '@mui/x-tree-view-pro/RichTreeViewPro';
 import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2';
 import {
@@ -22,9 +30,12 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { forwardRef, ReactNode, Ref, useEffect, Component, ErrorInfo, useState } from 'react';
 import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
+import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
+import NotesRoundedIcon from '@mui/icons-material/NotesRounded';
 import SidebarActionsList from './SidebarActionsList';
 import { RightClickMenu } from '../../actions/RigtClickMenu';
 import { StatsDialog } from '../../dialogs/StatsDialog';
+import { useGetDocumentsSidebarQuery, usePatchDocumentPositionMutation } from '../../../store/api/documentsApi';
 
 interface CustomTreeItemProps {
   id: string;
@@ -73,7 +84,7 @@ const CustomTreeItem = forwardRef((props: CustomTreeItemProps, ref: Ref<HTMLLIEl
           </TreeItem2IconContainer>
           <TreeItem2Checkbox {...getCheckboxProps()} />
           <Typography noWrap>{label || 'Untitled project'}</Typography>
-          <TreeItem2IconContainer {...getIconContainerProps()}>
+          <TreeItem2IconContainer {...getIconContainerProps()} sx={{ ml: 'auto' }}>
             <TreeItem2Icon status={status} />
           </TreeItem2IconContainer>
           <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
@@ -113,14 +124,21 @@ class TreeViewErrorBoundary extends Component<{ children: ReactNode }, { hasErro
 
 export const Sidebar = ({ open, onToggle }: SidebarProps) => {
   const { data: projects = [] } = useSidebarListsQuery();
+  const [dataType, setDataType] = useState<'projects' | 'documents'>('projects');
   const [patchListPosition] = usePatchListPositionMutation();
+  const [patchDocumentPosition] = usePatchDocumentPositionMutation();
   const [getStats, { data: statsData, isLoading: statsLoading }] = useLazyGetStatsQuery();
   const [deleteList] = useDeleteListMutation();
+  const { data: documents = [] } = useGetDocumentsSidebarQuery();
   const navigate = useNavigate();
   const { id: currentProjectId } = useParams();
   const [statsDialogOpen, setStatsDialogOpen] = useState(false);
   const handleNodeSelect = (nodeId: string) => {
-    navigate(`/projects/${nodeId}`);
+    if (dataType === 'projects') {
+      navigate(`/projects/${nodeId}`);
+    } else {
+      navigate(`/documents/${nodeId}`);
+    }
   };
 
   useEffect(() => {
@@ -136,7 +154,11 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
   }, []);
 
   const handleItemPositionChange = (data: any) => {
-    patchListPosition({ listId: data.itemId, payload: data });
+    if (dataType === 'projects') {
+      patchListPosition({ listId: data.itemId, payload: data });
+    } else {
+      patchDocumentPosition({ documentId: data.itemId, payload: data });
+    }
   };
 
   return (
@@ -156,12 +178,31 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
         pt: 0.75,
       }}
     >
-      <Box sx={{ p: 1, pt: 0.5 }}>
+      <Stack direction="row" spacing={1} sx={{ p: 1, pt: 0.5 }}>
         <IconButton onClick={onToggle}>
           <ViewSidebarRoundedIcon />
         </IconButton>
-        <SidebarActionsList />
-      </Box>
+        <Divider orientation="vertical" flexItem />
+        <ToggleButtonGroup
+          size="small"
+        >
+          <ToggleButton
+            value="projects"
+            selected={dataType === 'projects'}
+            onClick={() => setDataType('projects')}
+          >
+            <NotesRoundedIcon />
+          </ToggleButton>
+          <ToggleButton
+            value="documents"
+            selected={dataType === 'documents'}
+            onClick={() => setDataType('documents')}
+          >
+            <DescriptionRoundedIcon />
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Stack>
+      <SidebarActionsList setDataType={setDataType} />
       {/* workaround to supress errors */}
       <TreeViewErrorBoundary>
         <RightClickMenu
@@ -202,7 +243,7 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
               overflowY: 'auto',
               width: '100%',
             }}
-            items={projects}
+            items={dataType === 'projects' ? projects : documents}
             onItemPositionChange={handleItemPositionChange}
             onSelectedItemsChange={(_, itemIds) => {
               if (itemIds) {

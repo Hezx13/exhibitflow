@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import { persistStore } from 'redux-persist';
 import { balanceApi } from './api/balanceApi';
 import { listsApi } from './api/listsApi';
 import { departmentsApi } from './api/departmentsApi';
@@ -14,7 +13,7 @@ import authReducer from './slices/authSlice';
 import { TypedUseSelectorHook } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-
+import { documentsApi } from './api/documentsApi';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -27,6 +26,7 @@ export const store = configureStore({
     [uploadApi.reducerPath]: uploadApi.reducer,
     [searchApi.reducerPath]: searchApi.reducer,
     [statisticsApi.reducerPath]: statisticsApi.reducer,
+    [documentsApi.reducerPath]: documentsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -40,7 +40,8 @@ export const store = configureStore({
       materialsApi.middleware,
       uploadApi.middleware,
       searchApi.middleware,
-      statisticsApi.middleware
+      statisticsApi.middleware,
+      documentsApi.middleware
     ),
 });
 

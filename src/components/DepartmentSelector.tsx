@@ -1,28 +1,26 @@
-import React, { useState, useEffect, memo } from 'react';
-import Cookies from 'js-cookie';
-import { getDepartments } from '../api/projects-api'; // Assuming you have an API utility to fetch departments
+import { useEffect, memo } from 'react';
 import { Select, MenuItem } from '@mui/material';
 import { eventEmitter } from '../state/EventEmitter';
 import { useGetDepartmentsQuery } from '../store/api/departmentsApi';
+import { useAppSelector, useAppDispatch } from '../store';
+import { setDepartment } from '../store/slices/authSlice';
 
 function DepartmentSelector() {
-  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const selectedDepartment = useAppSelector((state) => state.auth.department);
+  const dispatch = useAppDispatch();
   const { data: departments } = useGetDepartmentsQuery();
+  console.log(departments);
   useEffect(() => {
     if (departments) {
-      const departmentInCookies = localStorage.getItem('selectedDepartment');
-      if (departmentInCookies) {
-        setSelectedDepartment(departmentInCookies);
-      } else {
-        localStorage.setItem('selectedDepartment', departments[0].name);
-        setSelectedDepartment(departments[0].name);
+      if (!selectedDepartment) {
+        dispatch(setDepartment(departments[0].name));
       }
     }
   }, [departments]);
 
   const handleDepartmentChange = (event) => {
     const newDepartment = event.target.value;
-    setSelectedDepartment(newDepartment);
+    dispatch(setDepartment(newDepartment));
     localStorage.setItem('selectedDepartment', newDepartment);
     eventEmitter.emit('changedDepartment');
   };
