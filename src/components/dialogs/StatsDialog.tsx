@@ -43,7 +43,7 @@ export const StatsDialog = ({ open, onClose, data, loading }: StatsDialogProps) 
               {/* Project Info Section */}
               <Grid size={12}>
                 <Typography variant="h6" gutterBottom color="primary">
-                  {data.listInfo.text}
+                  {data.listInfo.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Department: {data.listInfo.department}

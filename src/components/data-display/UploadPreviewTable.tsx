@@ -20,7 +20,7 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SaveAsRoundedIcon from '@mui/icons-material/SaveAsRounded';
 
 interface Task {
-  text: string;
+  name: string;
   article: string | number;
   price: number | null;
   quantity: number;
@@ -35,7 +35,7 @@ interface Task {
 
 interface TaskGroup {
   department: string;
-  text: string;
+  name: string;
   tasks: Task[];
 }
 
@@ -57,7 +57,7 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({
   const [selectedPage, setSelectedPage] = useState<number>(0);
 
   const columnDefs = [
-    { field: 'text', headerName: 'Description' },
+    { field: 'name', headerName: 'Description' },
     { field: 'article', headerName: 'Article' },
     { field: 'price', headerName: 'Price' },
     { field: 'quantity', headerName: 'Quantity' },
@@ -120,7 +120,7 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({
                   selected={selectedPage === index}
                   onClick={() => setSelectedPage(index)}
                 >
-                  <ListItemText primary={group.text} secondary={`${group.tasks.length} items`} />
+                  <ListItemText primary={group.name} secondary={`${group.tasks.length} items`} />
                 </ListItemButton>
               </ListItem>
             ))}

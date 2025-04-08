@@ -3,7 +3,7 @@ import { baseQuery } from './baseQuery';
 
 export interface SearchResultItem {
   _id: string;
-  text: string;
+  name: string;
   score: number;
   type: 'list' | 'task';
   status?: string;
@@ -26,7 +26,6 @@ export const searchApi = createApi({
         url: `/search`,
         params: {
           query,
-          department: localStorage.getItem('selectedDepartment'),
         },
       }),
     }),

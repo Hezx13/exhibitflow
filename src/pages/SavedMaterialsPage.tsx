@@ -70,7 +70,7 @@ export default function SavedMaterialsPage() {
 
   let columns: GridColDef[] = [
     {
-      field: 'text',
+      field: 'name',
       headerName: 'Material',
       type: 'string',
       minWidth: 150,

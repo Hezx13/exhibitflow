@@ -3,7 +3,7 @@ import { baseQuery } from './baseQuery';
 
 // Types for the statistics response
 export interface PurchaseItem {
-  text: string;
+  name: string;
   price: number;
   quantity?: number;
   status: string;

@@ -52,14 +52,14 @@ export default function GlobalSearch({ closeSearch }: { closeSearch: () => void 
     };
     return (
       <MenuItem
-        data-cy={`search-result-${option.text}`}
+        data-cy={`search-result-${option.name}`}
         selected={option.selected}
         onClick={handleClick}
       >
         <Stack direction="row" color="text.secondary" maxWidth="100%" gap={1}>
           {option.type === 'list' ? <SourceRoundedIcon /> : <CategoryRoundedIcon />}
           <Typography variant="body1" color="text.secondary" noWrap>
-            {option.text}
+            {option.name}
           </Typography>
         </Stack>
       </MenuItem>

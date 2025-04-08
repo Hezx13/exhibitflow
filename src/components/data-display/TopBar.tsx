@@ -42,7 +42,7 @@ export const TopBar = ({ listId }: TopBarProps) => {
   // Debounced save function
   const debouncedSave = useCallback(
     debounce((newTitle: string) => {
-      patchList({ listId, payload: { text: newTitle } });
+      patchList({ listId, payload: { name: newTitle } });
     }, 300),
     [listId, patchList]
   );
@@ -56,16 +56,16 @@ export const TopBar = ({ listId }: TopBarProps) => {
 
   // Update title from backend only if user is not currently editing
   useEffect(() => {
-    if (!isUserEditing && list?.text) {
-      setTitle(list.text);
+    if (!isUserEditing && list?.name) {
+      setTitle(list.name);
     }
-  }, [list?.text, isUserEditing]);
+  }, [list?.name, isUserEditing]);
 
   // Reset user editing state when switching lists
   useEffect(() => {
     setIsUserEditing(false);
-    setTitle(list?.text || '');
-  }, [listId, list?.text]);
+    setTitle(list?.name || '');
+  }, [listId, list?.name]);
 
   const handleDelete = async () => {
     await deleteList(listId);

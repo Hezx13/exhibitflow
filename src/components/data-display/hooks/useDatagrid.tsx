@@ -16,7 +16,7 @@ const useDatagrid = (tableId: string) => {
     () => [
       {
         rowDrag: true,
-        field: 'text' as keyof Task,
+        field: 'name' as keyof Task,
         headerName: 'Material',
         editable: true,
         flex: 2,

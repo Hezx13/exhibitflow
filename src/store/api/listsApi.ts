@@ -9,7 +9,7 @@ interface ReportParams {
 export interface ListStats {
   listInfo: {
     id: string;
-    text: string;
+    name: string;
     department: string;
     isActive: boolean;
     positionKey: string;
@@ -70,18 +70,12 @@ export const listsApi = createApi({
     loadLists: builder.query<any, void>({
       query: () => ({
         url: '/lists',
-        params: {
-          department: localStorage.getItem('selectedDepartment'),
-        },
       }),
       providesTags: ['Lists'],
     }),
     sidebarLists: builder.query<any, void>({
       query: () => ({
         url: '/lists/sidebar',
-        params: {
-          department: localStorage.getItem('selectedDepartment'),
-        },
       }),
       providesTags: ['Lists'],
     }),
@@ -212,7 +206,6 @@ export const listsApi = createApi({
         method: 'POST',
         body: {
           ...listData,
-          department: localStorage.getItem('selectedDepartment'),
         },
       }),
       invalidatesTags: ['Lists'],

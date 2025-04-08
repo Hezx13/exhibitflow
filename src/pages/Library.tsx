@@ -19,7 +19,7 @@ export default function Library() {
   const columnDefs = useMemo(
     () => [
       {
-        field: 'text',
+        field: 'name',
         headerName: 'Name',
         flex: 1,
         onCellClicked: (event) => {
