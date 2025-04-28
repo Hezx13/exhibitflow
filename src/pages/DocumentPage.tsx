@@ -5,6 +5,8 @@ import { useEditor } from '../hooks/useEditor';
 import { useParams } from 'react-router-dom';
 import { Box, Stack } from '@mui/material';
 import { useEffect } from 'react';
+import { TopBar } from '../components/data-display/TopBar';
+import { SelectionProvider } from '../components/data-display/GridSelection.context';
 
 export default function Editor() {
   const { id } = useParams();
@@ -41,6 +43,9 @@ export default function Editor() {
 
   return (
     <Stack height="100%" width="100%" borderRadius={1} zIndex={1000}>
+      <SelectionProvider>
+        <TopBar documentId={id as string} type="document" />
+      </SelectionProvider>
       <BlockNoteView editor={editor} />
     </Stack>
   );

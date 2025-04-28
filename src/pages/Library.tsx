@@ -1,21 +1,17 @@
 import { AgGridReact } from 'ag-grid-react';
 import { useMemo } from 'react';
 import { useLoadListsQuery, usePatchListMutation } from '../store/api/listsApi';
-import { Stack } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import myTheme from '../theme/grid';
 import { useNavigate } from 'react-router-dom';
 import { useGetLibraryQuery, ResourseType } from '../store/api/libraryApi';
+import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
+import NotesRoundedIcon from '@mui/icons-material/NotesRounded';
+
 export default function Library() {
-  const { data: listsData = [] } = useLoadListsQuery();
   const { data: libraryData = [] } = useGetLibraryQuery({ type: ResourseType.ALL });
   const [patchList] = usePatchListMutation();
   const navigate = useNavigate();
-
-  const lists = useMemo(() => {
-    return listsData.map((list) => {
-      return Object.assign({}, list);
-    });
-  }, [listsData]);
 
   const columnDefs = useMemo(
     () => [
@@ -23,12 +19,41 @@ export default function Library() {
         field: 'name',
         headerName: 'Name',
         flex: 1,
+        cellRenderer: (params) => {
+          return (
+            <Stack direction="row" alignItems="center" gap={1} sx={{ cursor: 'pointer' }}>
+              {params.data.resourceType === ResourseType.DOCUMENT && <DescriptionRoundedIcon />}
+              {params.data.resourceType === ResourseType.TABLE && <NotesRoundedIcon />}
+              <Typography>{params.data.name || `Unnamed ${params.data.resourceType}`}</Typography>
+            </Stack>
+          );
+        },
         onCellClicked: (event) => {
-          navigate(`/projects/${event.data._id}`);
+          navigate(
+            `/${event.data.resourceType === 'document' ? 'documents' : 'projects'}/${event.data._id}`
+          );
         },
       },
-      { field: 'count', headerName: 'Materials', width: 100 },
-      { field: 'newOrders', headerName: 'New Orders', width: 100 },
+      { field: 'count', headerName: 'Materials', minWidth: 100, flex: 0.25 },
+      { field: 'newOrders', headerName: 'New Orders', minWidth: 100, flex: 0.25 },
+      {
+        field: 'createdAt',
+        headerName: 'Created',
+        minWidth: 100,
+        flex: 0.5,
+        valueGetter: (params) => {
+          return params.data.createdAt ? new Date(params.data.createdAt).toLocaleString() : '';
+        },
+      },
+      {
+        field: 'updatedAt',
+        headerName: 'Updated',
+        minWidth: 100,
+        flex: 0.5,
+        valueGetter: (params) => {
+          return params.data.updatedAt ? new Date(params.data.updatedAt).toLocaleString() : '';
+        },
+      },
       {
         field: 'isActive',
         headerName: 'Active',
@@ -50,7 +75,7 @@ export default function Library() {
   return (
     <Stack height="100%" width="100%" flexGrow={1}>
       <Stack flexGrow={1} pb={1}>
-        <AgGridReact rowData={lists} theme={myTheme} columnDefs={columnDefs} />
+        <AgGridReact rowData={libraryData} theme={myTheme} columnDefs={columnDefs} />
       </Stack>
     </Stack>
   );

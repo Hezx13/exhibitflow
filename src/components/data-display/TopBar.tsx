@@ -23,18 +23,32 @@ import {
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import debounce from '../../utils/debounce';
 import { useSelection } from './GridSelection.context';
+import {
+  useDeleteDocumentMutation,
+  useGetDocumentQuery,
+  usePatchDocumentMutation,
+} from '../../store/api/documentsApi';
 
 interface TopBarProps {
-  listId: string;
+  listId?: string;
+  documentId?: string;
+  type: 'list' | 'document';
 }
 
-export const TopBar = ({ listId }: TopBarProps) => {
-  const { data: list } = useLoadSingleListQuery(listId);
+export const TopBar = ({ listId, documentId, type }: TopBarProps) => {
+  const { data: list } = useLoadSingleListQuery(listId as string, {
+    skip: type !== 'list' || !listId,
+  });
+  const { data: document } = useGetDocumentQuery(documentId as string, {
+    skip: type !== 'document' || !documentId,
+  });
   const [patchList] = usePatchListMutation();
+  const [patchDocument] = usePatchDocumentMutation();
   const [deleteList] = useDeleteListMutation();
+  const [deleteDocument] = useDeleteDocumentMutation();
   const [deleteTasks] = useDeleteTasksMutation();
   const [duplicateTasks] = useDuplicateTasksMutation();
-  const [title, setTitle] = useState(list?.title || '');
+  const [title, setTitle] = useState(list?.title || document?.documentName);
   const [isUserEditing, setIsUserEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { selectedIds } = useSelection();
@@ -42,9 +56,13 @@ export const TopBar = ({ listId }: TopBarProps) => {
   // Debounced save function
   const debouncedSave = useCallback(
     debounce((newTitle: string) => {
-      patchList({ listId, payload: { name: newTitle } });
+      if (type === 'list') {
+        patchList({ listId: listId as string, payload: { name: newTitle } });
+      } else {
+        patchDocument({ documentId: documentId as string, payload: { documentName: newTitle } });
+      }
     }, 300),
-    [listId, patchList]
+    [listId, patchList, documentId, patchDocument]
   );
 
   // Handle user input
@@ -59,29 +77,47 @@ export const TopBar = ({ listId }: TopBarProps) => {
     if (!isUserEditing && list?.name) {
       setTitle(list.name);
     }
-  }, [list?.name, isUserEditing]);
+    if (!isUserEditing && document?.documentName) {
+      setTitle(document.documentName);
+    }
+  }, [list?.name, document?.documentName, isUserEditing]);
 
   // Reset user editing state when switching lists
   useEffect(() => {
     setIsUserEditing(false);
-    setTitle(list?.name || '');
-  }, [listId, list?.name]);
+    setTitle(list?.name || document?.documentName || '');
+  }, [listId, list?.name, document?.documentName]);
 
   const handleDelete = async () => {
-    await deleteList(listId);
+    if (type === 'list') {
+      await deleteList(listId as string);
+    } else {
+      await deleteDocument(documentId as string);
+    }
   };
 
-  const MotionInputBase = useMemo(() => motion.create(InputBase), [listId]);
+  const handlePatchSidebarVisibility = () => {
+    if (type === 'list') {
+      patchList({ listId: listId as string, payload: { isActive: !list?.isActive } });
+    } else {
+      patchDocument({
+        documentId: documentId as string,
+        payload: { isActive: !document?.isActive },
+      });
+    }
+  };
+
+  const MotionInputBase = useMemo(() => motion.create(InputBase), [listId, documentId]);
 
   const selectionActions = [
     {
       icon: <Delete fontSize="small" />,
-      onClick: () => deleteTasks({ listId, taskIds: selectedIds }),
+      onClick: () => deleteTasks({ listId: listId as string, taskIds: selectedIds }),
       label: 'Delete Selected',
     },
     {
       icon: <ContentCopy fontSize="small" />,
-      onClick: () => duplicateTasks({ listId, taskIds: selectedIds }),
+      onClick: () => duplicateTasks({ listId: listId as string, taskIds: selectedIds }),
       label: 'Duplicate Selected',
     },
   ];
@@ -95,7 +131,7 @@ export const TopBar = ({ listId }: TopBarProps) => {
     },
     {
       icon: <ViewSidebarRoundedIcon fontSize="small" />,
-      onClick: () => patchList({ listId, payload: { isActive: !list.isActive } }),
+      onClick: handlePatchSidebarVisibility,
       toggleActive: list?.isActive,
       label: list?.isActive ? 'Hide' : 'Show',
     },
