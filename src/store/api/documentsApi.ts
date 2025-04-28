@@ -45,5 +45,10 @@ export const documentsApi = createApi({
   }),
 });
 
-export const { useGetDocumentQuery, useCreateDocumentMutation, useGetDocumentsQuery, useGetDocumentsSidebarQuery, usePatchDocumentPositionMutation } =
-  documentsApi;
+export const {
+  useGetDocumentQuery,
+  useCreateDocumentMutation,
+  useGetDocumentsQuery,
+  useGetDocumentsSidebarQuery,
+  usePatchDocumentPositionMutation,
+} = documentsApi;

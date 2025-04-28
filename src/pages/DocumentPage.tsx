@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 export default function Editor() {
   const { id } = useParams();
   const { provider, threadStore, disconnect } = useEditor({ documentId: id || '' });
-  
+
   const editor = useCreateBlockNote({
     collaboration: {
       provider,
@@ -31,15 +31,14 @@ export default function Editor() {
       threadStore,
     },
   });
-  
+
   // Cleanup when component unmounts or document ID changes
   useEffect(() => {
     return () => {
       disconnect();
     };
   }, [id, disconnect]);
-  
-  console.log(threadStore);
+
   return (
     <Stack height="100%" width="100%" borderRadius={1} zIndex={1000}>
       <BlockNoteView editor={editor} />

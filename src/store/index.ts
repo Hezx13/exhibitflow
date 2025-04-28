@@ -14,6 +14,7 @@ import { TypedUseSelectorHook } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { documentsApi } from './api/documentsApi';
+import { libraryApi } from './api/libraryApi';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -27,6 +28,7 @@ export const store = configureStore({
     [searchApi.reducerPath]: searchApi.reducer,
     [statisticsApi.reducerPath]: statisticsApi.reducer,
     [documentsApi.reducerPath]: documentsApi.reducer,
+    [libraryApi.reducerPath]: libraryApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -41,7 +43,8 @@ export const store = configureStore({
       uploadApi.middleware,
       searchApi.middleware,
       statisticsApi.middleware,
-      documentsApi.middleware
+      documentsApi.middleware,
+      libraryApi.middleware
     ),
 });
 

@@ -35,7 +35,10 @@ import NotesRoundedIcon from '@mui/icons-material/NotesRounded';
 import SidebarActionsList from './SidebarActionsList';
 import { RightClickMenu } from '../../actions/RigtClickMenu';
 import { StatsDialog } from '../../dialogs/StatsDialog';
-import { useGetDocumentsSidebarQuery, usePatchDocumentPositionMutation } from '../../../store/api/documentsApi';
+import {
+  useGetDocumentsSidebarQuery,
+  usePatchDocumentPositionMutation,
+} from '../../../store/api/documentsApi';
 
 interface CustomTreeItemProps {
   id: string;
@@ -124,12 +127,12 @@ class TreeViewErrorBoundary extends Component<{ children: ReactNode }, { hasErro
 
 export const Sidebar = ({ open, onToggle }: SidebarProps) => {
   const { data: projects = [] } = useSidebarListsQuery();
+  const { data: documents = [] } = useGetDocumentsSidebarQuery();
   const [dataType, setDataType] = useState<'projects' | 'documents'>('projects');
   const [patchListPosition] = usePatchListPositionMutation();
   const [patchDocumentPosition] = usePatchDocumentPositionMutation();
   const [getStats, { data: statsData, isLoading: statsLoading }] = useLazyGetStatsQuery();
   const [deleteList] = useDeleteListMutation();
-  const { data: documents = [] } = useGetDocumentsSidebarQuery();
   const navigate = useNavigate();
   const { id: currentProjectId } = useParams();
   const [statsDialogOpen, setStatsDialogOpen] = useState(false);
@@ -183,9 +186,7 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
           <ViewSidebarRoundedIcon />
         </IconButton>
         <Divider orientation="vertical" flexItem />
-        <ToggleButtonGroup
-          size="small"
-        >
+        <ToggleButtonGroup size="small">
           <ToggleButton
             value="projects"
             selected={dataType === 'projects'}

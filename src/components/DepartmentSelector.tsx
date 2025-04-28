@@ -9,7 +9,6 @@ function DepartmentSelector() {
   const selectedDepartment = useAppSelector((state) => state.auth.department);
   const dispatch = useAppDispatch();
   const { data: departments } = useGetDepartmentsQuery();
-  console.log(departments);
   useEffect(() => {
     if (departments) {
       if (!selectedDepartment) {
@@ -20,6 +19,7 @@ function DepartmentSelector() {
 
   const handleDepartmentChange = (event) => {
     const newDepartment = event.target.value;
+    console.log('newDepartment', newDepartment);
     dispatch(setDepartment(newDepartment));
     localStorage.setItem('selectedDepartment', newDepartment);
     eventEmitter.emit('changedDepartment');
@@ -35,7 +35,7 @@ function DepartmentSelector() {
       label=""
     >
       {departments?.map((d, index) => (
-        <MenuItem key={index} value={d.name}>
+        <MenuItem key={index} value={d._id}>
           {d.name}
         </MenuItem>
       ))}

@@ -22,12 +22,12 @@ createRoot(document.getElementById('root')!).render(
 
 ModuleRegistry.registerModules([
   AllCommunityModule,
-  ExcelExportModule,
-  MasterDetailModule,
-  RichSelectModule,
-  RowGroupingModule,
-  SetFilterModule,
-  StatusBarModule,
-  TreeDataModule,
-  CellSelectionModule,
+  // ExcelExportModule,
+  // MasterDetailModule,
+  // RichSelectModule,
+  // RowGroupingModule,
+  // SetFilterModule,
+  // StatusBarModule,
+  // TreeDataModule,
+  // CellSelectionModule,
 ]);

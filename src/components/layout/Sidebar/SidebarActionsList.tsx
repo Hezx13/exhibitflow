@@ -26,7 +26,11 @@ import { useAddProjectMutation } from '../../../store/api/listsApi';
 import StaticLinksList from './StaticLinksList';
 import { useCreateDocumentMutation } from '../../../store/api/documentsApi';
 
-export default function SidebarActionsList({ setDataType }: { setDataType: (dataType: 'projects' | 'documents') => void }) {
+export default function SidebarActionsList({
+  setDataType,
+}: {
+  setDataType: (dataType: 'projects' | 'documents') => void;
+}) {
   const projectFileInputRef = useRef<HTMLInputElement>(null);
   const materialFileInputRef = useRef<HTMLInputElement>(null);
   const [previewData, setPreviewData] = useState<any>(null);

@@ -11,18 +11,18 @@ import { Provider } from 'react-redux';
 
 const App = () => {
   return (
-      <Provider store={store}>
-        <DndProvider backend={Backend}>
-            <ReportProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <ThemeProvider theme={theme}>
-                  <CssBaseline />
-                  <AppRouter />
-                </ThemeProvider>
-              </LocalizationProvider>
-            </ReportProvider>
-        </DndProvider>
-      </Provider>
+    <Provider store={store}>
+      <DndProvider backend={Backend}>
+        <ReportProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <AppRouter />
+            </ThemeProvider>
+          </LocalizationProvider>
+        </ReportProvider>
+      </DndProvider>
+    </Provider>
   );
 };
 

@@ -30,11 +30,6 @@ export const StaticLinksList = () => {
       label: 'Library',
       icon: <LocalLibraryRoundedIcon fontSize="small" />,
     },
-    {
-      path: '/document/:id',
-      label: 'Document',
-      icon: <DocumentScannerRoundedIcon fontSize="small" />,
-    },
   ];
 
   return (

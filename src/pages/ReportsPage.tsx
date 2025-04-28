@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
-import  CardComponent from '../components/cardComponent';
+import CardComponent from '../components/cardComponent';
 import ReportGenerationDialog from '../components/ReportGenerationDialog';
 import ReportTable from '../components/ReportsTable';
 import { useReport } from '../state/reportsContext'; // Adjust the import to your file structure
