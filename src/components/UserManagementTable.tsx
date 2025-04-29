@@ -12,11 +12,13 @@ import {
 } from '../store/api/userApi';
 import { Button, Box, Typography, Checkbox } from '@mui/material';
 import myTheme from '../theme/grid';
+import { useGetDepartmentsQuery } from '../store/api/departmentsApi';
 interface UserManagementTableProps {
   onAlert: (message: string) => void;
 }
 
 const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) => {
+  const { data: departments } = useGetDepartmentsQuery();
   const { data: users } = useGetUsersQuery();
   const [deleteUser] = useDeleteUserMutation();
   const [promoteUser] = usePromoteUserMutation();
@@ -27,7 +29,19 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
   const columnDefs = [
     { field: 'username', headerName: 'Username', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1 },
-    { field: 'department', headerName: 'Department', flex: 1 },
+    {
+      field: 'department',
+      headerName: 'Department',
+      flex: 1,
+      cellEditor: 'agRichSelectCellEditor',
+      editable: true,
+      cellEditorParams: {
+        values: departments,
+        multiSelect: true,
+        formatValue: (v) => v.name,
+        parseValue: (v) => v.name,
+      },
+    },
     {
       field: 'isApproved',
       headerName: 'Approved',

@@ -132,8 +132,9 @@ export const TopBar = ({ listId, documentId, type }: TopBarProps) => {
     {
       icon: <ViewSidebarRoundedIcon fontSize="small" />,
       onClick: handlePatchSidebarVisibility,
-      toggleActive: list?.isActive,
-      label: list?.isActive ? 'Hide' : 'Show',
+      toggleActive: type === 'list' ? list?.isActive : document?.isActive,
+      label:
+        type === 'list' ? (list?.isActive ? 'Hide' : 'Show') : document?.isActive ? 'Hide' : 'Show',
     },
     { icon: <Share fontSize="small" />, onClick: () => console.log('Share'), label: 'Share' },
   ];

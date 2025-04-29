@@ -81,7 +81,8 @@ type User = {
   username: string;
   password?: string;
   email: string;
-  department?: string;
+  selectedDepartment?: string;
+  departments?: [Department] | null;
   role?: UserRole;
   isApproved?: boolean;
 }

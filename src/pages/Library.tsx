@@ -7,13 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import { useGetLibraryQuery, ResourseType } from '../store/api/libraryApi';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 import NotesRoundedIcon from '@mui/icons-material/NotesRounded';
-
+import { ColDef } from 'ag-grid-community';
 export default function Library() {
   const { data: libraryData = [] } = useGetLibraryQuery({ type: ResourseType.ALL });
   const [patchList] = usePatchListMutation();
   const navigate = useNavigate();
 
-  const columnDefs = useMemo(
+  const columnDefs: ColDef[] = useMemo(
     () => [
       {
         field: 'name',

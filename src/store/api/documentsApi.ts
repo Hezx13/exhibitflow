@@ -23,7 +23,7 @@ export const documentsApi = createApi({
         url: `/documents/${documentId}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Document'],
+      invalidatesTags: ['Document', 'DocumentsSidebar'],
     }),
     getDocuments: builder.query<Document[], void>({
       query: () => '/documents',
@@ -39,7 +39,7 @@ export const documentsApi = createApi({
         method: 'PATCH',
         body: payload,
       }),
-      invalidatesTags: ['Document'],
+      invalidatesTags: ['Document', 'DocumentsSidebar'],
     }),
     patchDocument: builder.mutation<Document, { documentId: string; payload: any }>({
       query: ({ documentId, payload }) => ({
@@ -79,7 +79,7 @@ export const documentsApi = createApi({
         method: 'POST',
         body: document,
       }),
-      invalidatesTags: ['Document'],
+      invalidatesTags: ['Document', 'DocumentsSidebar'],
     }),
   }),
 });
