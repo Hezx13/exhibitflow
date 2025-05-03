@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './baseQuery';
 import { eventEmitter } from '../../state/EventEmitter';
-import { clearCredentials, setCredentials } from '../slices/authSlice';
+import { clearCredentials, setCredentials, setDepartment } from '../slices/authSlice';
 import { useAppDispatch } from '..';
 import { departmentsApi } from './departmentsApi';
 
@@ -127,23 +127,31 @@ export const userApi = createApi({
         body: { userToReset: username },
       }),
     }),
-    patchUser: builder.mutation<number, Partial<Omit<User, 'departments'>> & { departments: string[] }>({
+    patchUser: builder.mutation<number, Partial<Omit<User, 'departments'>> & { departments?: string[] }>({
       query: (userData) => ({
-        url: `/authz/user/${userData._id}`,
+        url: `/authz/user`,
         method: 'PATCH',
+        query: { id: userData._id },
         body: userData,
       }),
       onQueryStarted: async (userData, { queryFulfilled, dispatch }) => {
+        let departmentSelectAction;
         try {
-          await queryFulfilled;
+          if (userData.selectedDepartment) {
+            departmentSelectAction = dispatch(setDepartment(userData.selectedDepartment));
+          }
+            await queryFulfilled;
           if (userData.departments) {
             dispatch(departmentsApi.util.invalidateTags(['Departments']));
           }
         } catch (error) {
+          if (departmentSelectAction) {
+            departmentSelectAction.undo();
+          }
           console.error('Failed to update user:', error);
         }
       },
-      invalidatesTags: ['Users'],
+      invalidatesTags: ['Users', 'User'],
     }),
   }),
 });

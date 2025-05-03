@@ -82,6 +82,7 @@ type User = {
   password?: string;
   email: string;
   selectedDepartment?: string;
+  adminAccess?: boolean;
   departments?: [Department] | [string] | null;
   role?: UserRole;
   isApproved?: boolean;

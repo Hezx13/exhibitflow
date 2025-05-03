@@ -45,7 +45,6 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
         return departmentData?.name || '';
       },
       valueSetter: (params: ValueSetterParams<any, any[]>) => {
-        console.log('valueSetter', params);
         const user = params.data;
         const selectedDepartments = params.newValue;
 
@@ -90,7 +89,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
       flex: 1,
       editable: true,
       onCellValueChanged: (params: any) => {
-        console.log(params);
+       patchUser({ _id: params.data._id, role: params.newValue })
       },
       cellEditor: 'agRichSelectCellEditor',
       cellEditorParams: {
