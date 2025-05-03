@@ -3,6 +3,7 @@ import { baseQuery } from './baseQuery';
 import { eventEmitter } from '../../state/EventEmitter';
 import { clearCredentials, setCredentials } from '../slices/authSlice';
 import { useAppDispatch } from '..';
+import { departmentsApi } from './departmentsApi';
 
 interface LoginCredentials {
   username: string;
@@ -126,12 +127,23 @@ export const userApi = createApi({
         body: { userToReset: username },
       }),
     }),
-    patchUser: builder.mutation<number, { userData: Partial<User> }>({
-      query: ({ userData }) => ({
-        url: '/authz/user',
+    patchUser: builder.mutation<number, Partial<Omit<User, 'departments'>> & { departments: string[] }>({
+      query: (userData) => ({
+        url: `/authz/user/${userData._id}`,
         method: 'PATCH',
-        body: { userData },
+        body: userData,
       }),
+      onQueryStarted: async (userData, { queryFulfilled, dispatch }) => {
+        try {
+          await queryFulfilled;
+          if (userData.departments) {
+            dispatch(departmentsApi.util.invalidateTags(['Departments']));
+          }
+        } catch (error) {
+          console.error('Failed to update user:', error);
+        }
+      },
+      invalidatesTags: ['Users'],
     }),
   }),
 });

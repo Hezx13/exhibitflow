@@ -65,6 +65,8 @@ function FullFeaturedCrudGrid({ tableId }: { tableId: string }) {
             defaultColDef={{
               sortable: true,
               filter: true,
+              headerComponentParams: {
+              }
             }}
             onCellEditRequest={onCellValueChanged}
             onRowDragEnd={processRowDrag}

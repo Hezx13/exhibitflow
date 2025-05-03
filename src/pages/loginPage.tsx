@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { LinearProgress } from '@mui/material';
 import { useAppSelector } from '../store';
 import { useLoginMutation } from '../store/api/userApi';
@@ -84,6 +84,11 @@ function Login() {
                 Log in
               </Button>
             </Box>
+          </Box>
+          <Box>
+            <Typography component={Link} to="/register" variant="h5" color="#e3f2fd">
+              Sign up
+            </Typography>
           </Box>
         </Container>
       </Grid>

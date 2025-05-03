@@ -13,6 +13,8 @@ import {
 import { Button, Box, Typography, Checkbox } from '@mui/material';
 import myTheme from '../theme/grid';
 import { useGetDepartmentsQuery } from '../store/api/departmentsApi';
+import { ValueSetterParams } from 'ag-grid-community';
+
 interface UserManagementTableProps {
   onAlert: (message: string) => void;
 }
@@ -30,16 +32,50 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
     { field: 'username', headerName: 'Username', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1 },
     {
-      field: 'department',
-      headerName: 'Department',
+      field: 'departments',
+      headerName: 'Departments',
       flex: 1,
       cellEditor: 'agRichSelectCellEditor',
       editable: true,
+      valueFormatter: (params) => {
+        const departmentData = params.value;
+        if (Array.isArray(departmentData)) {
+          return departmentData.map((dep) => dep?.name || '').join(', ');
+        }
+        return departmentData?.name || '';
+      },
+      valueSetter: (params: ValueSetterParams<any, any[]>) => {
+        console.log('valueSetter', params);
+        const user = params.data;
+        const selectedDepartments = params.newValue;
+
+        if (!user || !user._id) {
+          console.error('User data or _id missing in valueSetter params');
+          return false;
+        }
+
+        const departmentIds = Array.isArray(selectedDepartments)
+          ? selectedDepartments.map(dep => dep?._id).filter(id => id != null)
+          : [];
+
+        const userId = user._id;
+
+        patchUser({ _id: userId, departments: departmentIds })
+          .unwrap()
+          .then(() => {
+            console.log('User departments updated via API');
+          })
+          .catch((error) => {
+            console.error('Failed to update user departments:', error);
+            onAlert('Failed to update departments');
+          });
+
+        return false;
+      },
       cellEditorParams: {
-        values: departments,
+        values: departments || [],
         multiSelect: true,
-        formatValue: (v) => v.name,
-        parseValue: (v) => v.name,
+        formatValue: (value: any) => value?.name || '',
       },
     },
     {
@@ -47,9 +83,6 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
       headerName: 'Approved',
       flex: 1,
       editable: true,
-      onCellValueChanged: (params: any) => {
-        console.log(params);
-      },
     },
     {
       field: 'role',

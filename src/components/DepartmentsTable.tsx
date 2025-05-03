@@ -31,7 +31,7 @@ const DepartmentsTable = () => {
         await patchDepartment({ id: event.data._id, name: event.newValue });
       },
     },
-    { field: 'count', headerName: 'Number of Users', flex: 1 },
+    { field: 'count', headerName: 'Number of Users', flex: 1, valueGetter: (params) => params.data.users.length },
   ];
 
   const handleAddDepartment = () => {

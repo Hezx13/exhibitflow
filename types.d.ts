@@ -82,7 +82,7 @@ type User = {
   password?: string;
   email: string;
   selectedDepartment?: string;
-  departments?: [Department] | null;
+  departments?: [Department] | [string] | null;
   role?: UserRole;
   isApproved?: boolean;
 }

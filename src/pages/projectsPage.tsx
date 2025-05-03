@@ -17,7 +17,6 @@ export default function ProjectsPage() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      {!matches && (
         <Box
           sx={{
             flexGrow: 1,
@@ -34,7 +33,6 @@ export default function ProjectsPage() {
             </Box>
           </SelectionProvider>
         </Box>
-      )}
     </Box>
   );
 }

@@ -4,6 +4,9 @@ import { eventEmitter } from '../state/EventEmitter';
 import { useGetDepartmentsQuery } from '../store/api/departmentsApi';
 import { useAppSelector, useAppDispatch } from '../store';
 import { setDepartment } from '../store/slices/authSlice';
+import { libraryApi } from '../store/api/libraryApi';
+import { listsApi } from '../store/api/listsApi';
+import { documentsApi } from '../store/api/documentsApi';
 
 function DepartmentSelector() {
   const selectedDepartment = useAppSelector((state) => state.auth.department);
@@ -19,8 +22,10 @@ function DepartmentSelector() {
 
   const handleDepartmentChange = (event) => {
     const newDepartment = event.target.value;
-    console.log('newDepartment', newDepartment);
     dispatch(setDepartment(newDepartment));
+    dispatch(libraryApi.util.invalidateTags(['Library']));
+    dispatch(listsApi.util.invalidateTags(['Lists']));
+    dispatch(documentsApi.util.invalidateTags(['Document', 'DocumentsSidebar']));
     localStorage.setItem('selectedDepartment', newDepartment);
     eventEmitter.emit('changedDepartment');
   };
