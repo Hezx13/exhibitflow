@@ -1,52 +1,64 @@
-// @ts-ignore
 import { BlockNoteView } from '@blocknote/mantine';
-import { useCreateBlockNote } from '@blocknote/react';
+import { BlockNoteEditor } from '@blocknote/core';
 import { useEditor } from '../hooks/useEditor';
 import { useParams } from 'react-router-dom';
-import { Box, Stack } from '@mui/material';
-import { useEffect } from 'react';
+import { Stack } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { TopBar } from '../components/data-display/TopBar';
 import { SelectionProvider } from '../components/data-display/GridSelection.context';
 
 export default function Editor() {
   const { id } = useParams();
-  const { provider, threadStore, disconnect } = useEditor({ documentId: id || '' });
+  const documentId = id || ''; 
+  const { provider, threadStore } = useEditor({ documentId });
 
-  const editor = useCreateBlockNote({
-    collaboration: {
-      provider,
-      fragment: provider.document.getXmlFragment('doc'),
-      user: {
-        name: 'John Doe',
-        color: '#ff0000',
-      },
-    },
-    resolveUsers: async (userIds) => {
-      // sample implementation, replace this with a call to your own user database for example
-      return userIds.map((userId) => ({
-        id: userId,
-        username: 'John Doe',
-        avatarUrl: 'https://placehold.co/100x100',
-      }));
-    },
-    comments: {
-      threadStore,
-    },
-  });
+  const [editor, setEditor] = useState<BlockNoteEditor | null>(null);
 
-  // Cleanup when component unmounts or document ID changes
   useEffect(() => {
+    if (!provider || !threadStore) {
+      setEditor(null);
+      return;
+    }
+
+    const newEditor = BlockNoteEditor.create({
+      collaboration: {
+        provider,
+        fragment: provider.document.getXmlFragment('doc'),
+        user: {
+          name: 'John Doe',
+          color: '#ff0000',
+        },
+      },
+      resolveUsers: async (userIds) => {
+        return userIds.map((userId) => ({
+          id: userId,
+          username: 'John Doe',
+          avatarUrl: 'https://placehold.co/100x100',
+        }));
+      },
+      comments: {
+        threadStore,
+      },
+    });
+
+    setEditor(newEditor);
+
+    // Cleanup function: Check if BlockNoteEditor has a destroy method
     return () => {
-      disconnect();
+      if (typeof (newEditor as any).destroy === 'function') {
+        (newEditor as any).destroy();
+      }
+      setEditor(null);
     };
-  }, [id, disconnect]);
+  }, [provider, threadStore, documentId]);
 
   return (
     <Stack height="100%" width="100%" borderRadius={1} zIndex={1000}>
       <SelectionProvider>
-        <TopBar documentId={id as string} type="document" />
+        <TopBar documentId={documentId} type="document" />
       </SelectionProvider>
-      <BlockNoteView editor={editor} />
+      {/* Render BlockNoteView only when editor is ready */}
+      {editor ? <BlockNoteView editor={editor} /> : <div>Loading Editor...</div>}
     </Stack>
   );
 }
