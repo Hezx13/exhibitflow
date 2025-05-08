@@ -90,7 +90,6 @@ const Register = () => {
                 fullWidth
                 label="Email"
                 name="email"
-                autoFocus
               />
               <TextField
                 margin="normal"
@@ -100,7 +99,6 @@ const Register = () => {
                 fullWidth
                 label="Department"
                 name="department"
-                autoFocus
               />
               <TextField
                 margin="normal"

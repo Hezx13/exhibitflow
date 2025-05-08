@@ -1,7 +1,5 @@
 import {
   Divider,
-  List,
-  ListItemButton,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -12,17 +10,27 @@ import {
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CreateNewFolderRoundedIcon from '@mui/icons-material/CreateNewFolderRounded';
 import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
+import NoteAddRoundedIcon from '@mui/icons-material/NoteAddRounded';
 import { useRef, useState } from 'react';
-import { useUploadListMutation, useUploadPreviewMutation, useUploadSingleMutation } from '../../../store/api/uploadApi';
+import {
+  useUploadListMutation,
+  useUploadPreviewMutation,
+  useUploadSingleMutation,
+} from '../../../store/api/uploadApi';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 import { UploadPreviewTable } from '../../data-display/UploadPreviewTable';
 import SearchBarButton from '../../actions/buttons/SearchBarButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useAddProjectMutation } from '../../../store/api/listsApi';
-import ManageAccountsRoundedIcon from '@mui/icons-material/ManageAccountsRounded';
 import StaticLinksList from './StaticLinksList';
-export default function SidebarActionsList() {
+import { useCreateDocumentMutation } from '../../../store/api/documentsApi';
+
+export default function SidebarActionsList({
+  setDataType,
+}: {
+  setDataType: (dataType: 'projects' | 'documents') => void;
+}) {
   const projectFileInputRef = useRef<HTMLInputElement>(null);
   const materialFileInputRef = useRef<HTMLInputElement>(null);
   const [previewData, setPreviewData] = useState<any>(null);
@@ -30,6 +38,7 @@ export default function SidebarActionsList() {
   const [uploadLists, { isLoading: uploadListsLoading }] = useUploadListMutation();
   const [uploadSingle, { isLoading: uploadSingleLoading }] = useUploadSingleMutation();
   const [addProject] = useAddProjectMutation();
+  const [createDocument] = useCreateDocumentMutation();
   const navigate = useNavigate();
   const pathname = useLocation().pathname;
   const { id } = useParams();
@@ -67,7 +76,15 @@ export default function SidebarActionsList() {
 
   const handleAddProject = async () => {
     const result = await addProject({}).unwrap();
+    setDataType('projects');
     navigate(`/projects/${result._id}`);
+    handleClose();
+  };
+
+  const handleAddDocument = async () => {
+    const result = await createDocument().unwrap();
+    setDataType('documents');
+    navigate(`/documents/${result._id}`);
     handleClose();
   };
 
@@ -83,7 +100,11 @@ export default function SidebarActionsList() {
   const handleMaterialFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && id) {
-      await uploadSingle({ file, listId: id as string, department: localStorage.getItem('selectedDepartment') || '' });
+      await uploadSingle({
+        file,
+        listId: id as string,
+        department: localStorage.getItem('selectedDepartment') || '',
+      });
     }
   };
 
@@ -124,6 +145,12 @@ export default function SidebarActionsList() {
             <AddRoundedIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Add Project</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleAddDocument}>
+          <ListItemIcon>
+            <NoteAddRoundedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Add Document</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleProjectClick}>

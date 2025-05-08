@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
-import NavBar from '../components/navBar';
 import CardComponent from '../components/cardComponent';
 import ReportGenerationDialog from '../components/ReportGenerationDialog';
 import ReportTable from '../components/ReportsTable';
-import { loadReports } from '../api';
-import { Calculate } from '@mui/icons-material';
 import { useReport } from '../state/reportsContext'; // Adjust the import to your file structure
 import { Navigate } from 'react-router-dom';
 

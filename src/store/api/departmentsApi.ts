@@ -7,22 +7,29 @@ export const departmentsApi = createApi({
   tagTypes: ['Departments'],
   endpoints: (builder) => ({
     getDepartments: builder.query<any[], void>({
-      query: () => '/projects/department',
+      query: () => '/departments',
       providesTags: ['Departments'],
     }),
-
-    addDepartment: builder.mutation({
-      query: (name) => ({
-        url: '/projects/department',
+    addDepartment: builder.mutation<any, { name: string }>({
+      query: ({ name }) => ({
+        url: '/departments',
         method: 'POST',
         body: { name },
       }),
       invalidatesTags: ['Departments'],
     }),
 
-    deleteDepartment: builder.mutation({
-      query: (name) => ({
-        url: `/projects/department/${name}`,
+    patchDepartment: builder.mutation<any, { id: string; name: string }>({
+      query: ({ id, name }) => ({
+        url: `/departments/${id}`,
+        method: 'PATCH',
+        body: { name },
+      }),
+      invalidatesTags: ['Departments'],
+    }),
+    deleteDepartment: builder.mutation<any, string>({
+      query: (id) => ({
+        url: `/departments/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Departments'],
@@ -30,5 +37,9 @@ export const departmentsApi = createApi({
   }),
 });
 
-export const { useGetDepartmentsQuery, useAddDepartmentMutation, useDeleteDepartmentMutation } =
-  departmentsApi;
+export const {
+  useGetDepartmentsQuery,
+  useAddDepartmentMutation,
+  useDeleteDepartmentMutation,
+  usePatchDepartmentMutation,
+} = departmentsApi;

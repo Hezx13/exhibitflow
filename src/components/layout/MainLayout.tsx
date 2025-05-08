@@ -1,9 +1,9 @@
 import { Box } from '@mui/material';
 import { Grid2 as Grid } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-import { NavBar } from '../navBar';
 import { Sidebar } from './Sidebar/Sidebar';
 import { useState } from 'react';
+import { NavBar } from '../navBar';
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);

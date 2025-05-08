@@ -60,6 +60,8 @@ export const PurchaseStatsChart: React.FC = () => {
                   />
                   <YAxis />
                   <Tooltip
+                    wrapperStyle={{ backgroundColor: '#000000', color: '#FFFFFF' }}
+                    contentStyle={{ backgroundColor: '#101010', color: '#FFFFFF', border: 'none', boxShadow:'1px 1px 1px 1px #000000' }}
                     formatter={(value: number) => [`$${value}`, 'Amount']}
                     labelFormatter={(date) => new Date(date).toLocaleDateString()}
                   />

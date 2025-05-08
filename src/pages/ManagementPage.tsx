@@ -8,7 +8,7 @@ const ManagementPage = () => {
   const [alert, setAlert] = React.useState<string | null>(null);
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container justifyContent="center" gap={2}>
       {alert && (
         <Grid size={12}>
           <Alert

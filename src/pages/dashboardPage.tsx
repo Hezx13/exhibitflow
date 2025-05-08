@@ -7,7 +7,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import DebitDialog from '../components/DebitDialog';
 import AddCardIcon from '@mui/icons-material/AddCard';
 import dayjs from 'dayjs';
-import BalanceHistoryDialog from '../components/BalanceHistoryDialog';
+import BalanceHistoryDialog from '../components/dialogs/BalanceHistoryDialog';
 import { StyledGenerateCashOrderButton } from '../styles/styles';
 import {
   useAddBalanceMutation,

@@ -3,9 +3,9 @@ import { baseQuery } from './baseQuery';
 
 export interface SearchResultItem {
   _id: string;
-  text: string;
+  name: string;
   score: number;
-  type: 'list' | 'task';
+  type: 'list' | 'task' | 'document';
   status?: string;
   listId?: string;
   listName?: string;
@@ -26,7 +26,6 @@ export const searchApi = createApi({
         url: `/search`,
         params: {
           query,
-          department: localStorage.getItem('selectedDepartment'),
         },
       }),
     }),

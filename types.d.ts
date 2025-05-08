@@ -1,6 +1,6 @@
 type Material = {
     id: string;
-    text: string;
+    name: string;
     article: string;
     price: string;
     quantity: number;
@@ -17,7 +17,7 @@ type Material = {
  type Task = {
   _id?: string;
   id?: string;
-  text: string;
+  name: string;
   article?: string;
   price?: string;
   quantity?: number;
@@ -35,7 +35,7 @@ type Material = {
  type List = {
   _id?: string
   id: string
-  text: string
+  name: string
   department: string,
   tasks: Task[]
   isActive: boolean
@@ -81,7 +81,9 @@ type User = {
   username: string;
   password?: string;
   email: string;
-  department?: string;
+  selectedDepartment?: string;
+  adminAccess?: boolean;
+  departments?: [Department] | [string] | null;
   role?: UserRole;
   isApproved?: boolean;
 }

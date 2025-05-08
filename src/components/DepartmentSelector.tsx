@@ -1,47 +1,63 @@
-import React, { useState, useEffect, memo } from 'react';
-import Cookies from 'js-cookie';
-import { getDepartments } from '../api/projects-api'; // Assuming you have an API utility to fetch departments
-import { Select, MenuItem } from '@mui/material';
+import { useEffect, memo } from 'react';
+import { Box, Typography, MenuItem, List, ListItemText, ListItemButton } from '@mui/material';
 import { eventEmitter } from '../state/EventEmitter';
 import { useGetDepartmentsQuery } from '../store/api/departmentsApi';
+import { useAppSelector, useAppDispatch } from '../store';
+import { setDepartment } from '../store/slices/authSlice';
+import { libraryApi } from '../store/api/libraryApi';
+import { listsApi } from '../store/api/listsApi';
+import { documentsApi } from '../store/api/documentsApi';
+import { useGetUserDataQuery, usePatchUserMutation } from '../store/api/userApi';
 
 function DepartmentSelector() {
-  const [selectedDepartment, setSelectedDepartment] = useState('');
-  const { data: departments } = useGetDepartmentsQuery();
+  const selectedDepartmentId = useAppSelector((state) => state.auth.department);
+  const [patchUser] = usePatchUserMutation();
+  const dispatch = useAppDispatch();
+  const { departments, _id } = useGetUserDataQuery(undefined, {
+    selectFromResult: ({ data }) => ({
+      departments: data?.departments || [],
+      _id: data?._id,
+    }),
+  });
+
   useEffect(() => {
-    if (departments) {
-      const departmentInCookies = localStorage.getItem('selectedDepartment');
-      if (departmentInCookies) {
-        setSelectedDepartment(departmentInCookies);
-      } else {
-        localStorage.setItem('selectedDepartment', departments[0].name);
-        setSelectedDepartment(departments[0].name);
+    if (departments.length > 0 && !selectedDepartmentId) {
+      const firstDepartment = departments[0];
+      if (firstDepartment?._id) {
+        dispatch(setDepartment(firstDepartment._id));
       }
     }
-  }, [departments]);
+  }, [departments, selectedDepartmentId, dispatch, _id, patchUser]);
 
-  const handleDepartmentChange = (event) => {
-    const newDepartment = event.target.value;
-    setSelectedDepartment(newDepartment);
-    localStorage.setItem('selectedDepartment', newDepartment);
-    eventEmitter.emit('changedDepartment');
+  const handleDepartmentChange = (departmentId: string) => {
+    dispatch(setDepartment(departmentId));
+    patchUser({
+      _id: _id,
+      selectedDepartment: departmentId,
+    });
+    dispatch(libraryApi.util.invalidateTags(['Library']));
+    dispatch(listsApi.util.invalidateTags(['Lists']));
+    dispatch(documentsApi.util.invalidateTags(['Document', 'DocumentsSidebar']));
   };
 
   return (
-    <Select
-      size="small"
-      labelId="depSelectorLabel"
-      id="depSelector"
-      value={selectedDepartment}
-      onChange={handleDepartmentChange}
-      label=""
-    >
-      {departments?.map((d, index) => (
-        <MenuItem key={index} value={d.name}>
-          {d.name}
-        </MenuItem>
-      ))}
-    </Select>
+    <Box sx={{ maxHeight: 200, overflowY: 'auto', width: '100%' }}>
+      <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', color: 'text.secondary' }}>
+        {departments.length > 1 ? 'Select Department' : 'Department'}
+      </Typography>
+      <List dense disablePadding>
+        {departments.map((d) => (
+          <ListItemButton
+            key={d._id}
+            selected={d._id === selectedDepartmentId}
+            onClick={() => handleDepartmentChange(d._id)}
+            sx={{ pl: 2,my: 0.125 }}
+          >
+            <ListItemText primary={d.name} />
+          </ListItemButton>
+        ))}
+      </List>
+    </Box>
   );
 }
 

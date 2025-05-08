@@ -19,3 +19,7 @@
   scrollbar-width: thin;
   scrollbar-color: #333333 transparent;
 }
+
+.bn-container {
+  --bn-colors-editor-background: #101010 !important;
+}

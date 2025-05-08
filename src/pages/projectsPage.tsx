@@ -17,7 +17,6 @@ export default function ProjectsPage() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      {!matches && (
         <Box
           sx={{
             flexGrow: 1,
@@ -29,12 +28,11 @@ export default function ProjectsPage() {
         >
           <SelectionProvider>
             <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-              <TopBar listId={id as string} />
+              <TopBar listId={id as string} type="list" />
               <FullFeaturedCrudGrid tableId={id as string} />
             </Box>
           </SelectionProvider>
         </Box>
-      )}
     </Box>
   );
 }

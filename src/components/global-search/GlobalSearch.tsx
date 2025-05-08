@@ -18,6 +18,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import GlobalSearchResults from './GlobalSearchResults';
 import SourceRoundedIcon from '@mui/icons-material/SourceRounded';
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded';
+import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 
 export default function GlobalSearch({ closeSearch }: { closeSearch: () => void }) {
   const navigate = useNavigate();
@@ -44,22 +45,39 @@ export default function GlobalSearch({ closeSearch }: { closeSearch: () => void 
     }
     const handleClick = () => {
       closeSearch();
-      if (option.type === 'list') {
-        navigate(`/projects/${option._id}`);
-      } else {
-        navigate(`/projects/${option.listId}`);
+      switch (option.type) {
+        case 'list':
+          navigate(`/projects/${option._id}`);
+          break;
+        case 'task':
+          navigate(`/projects/${option.listId}`);
+          break;
+        case 'document':
+          navigate(`/documents/${option._id}`);
+          break;
+          
       }
     };
+    const renderIcon = (type) => {
+      switch (type) {
+        case 'list':
+          return <SourceRoundedIcon />;
+        case 'task':
+          return <CategoryRoundedIcon />;
+        case 'document':
+          return <DescriptionRoundedIcon />;
+      }
+    }
     return (
       <MenuItem
-        data-cy={`search-result-${option.text}`}
+        data-cy={`search-result-${option.name}`}
         selected={option.selected}
         onClick={handleClick}
       >
         <Stack direction="row" color="text.secondary" maxWidth="100%" gap={1}>
-          {option.type === 'list' ? <SourceRoundedIcon /> : <CategoryRoundedIcon />}
+          {renderIcon(option.type)}
           <Typography variant="body1" color="text.secondary" noWrap>
-            {option.text}
+            {option.name}
           </Typography>
         </Stack>
       </MenuItem>

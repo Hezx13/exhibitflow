@@ -23,18 +23,32 @@ import {
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import debounce from '../../utils/debounce';
 import { useSelection } from './GridSelection.context';
+import {
+  useDeleteDocumentMutation,
+  useGetDocumentQuery,
+  usePatchDocumentMutation,
+} from '../../store/api/documentsApi';
 
 interface TopBarProps {
-  listId: string;
+  listId?: string;
+  documentId?: string;
+  type: 'list' | 'document';
 }
 
-export const TopBar = ({ listId }: TopBarProps) => {
-  const { data: list } = useLoadSingleListQuery(listId);
+export const TopBar = ({ listId, documentId, type }: TopBarProps) => {
+  const { data: list } = useLoadSingleListQuery(listId as string, {
+    skip: type !== 'list' || !listId,
+  });
+  const { data: document } = useGetDocumentQuery(documentId as string, {
+    skip: type !== 'document' || !documentId,
+  });
   const [patchList] = usePatchListMutation();
+  const [patchDocument] = usePatchDocumentMutation();
   const [deleteList] = useDeleteListMutation();
+  const [deleteDocument] = useDeleteDocumentMutation();
   const [deleteTasks] = useDeleteTasksMutation();
   const [duplicateTasks] = useDuplicateTasksMutation();
-  const [title, setTitle] = useState(list?.title || '');
+  const [title, setTitle] = useState(list?.title || document?.documentName);
   const [isUserEditing, setIsUserEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { selectedIds } = useSelection();
@@ -42,9 +56,13 @@ export const TopBar = ({ listId }: TopBarProps) => {
   // Debounced save function
   const debouncedSave = useCallback(
     debounce((newTitle: string) => {
-      patchList({ listId, payload: { text: newTitle } });
+      if (type === 'list') {
+        patchList({ listId: listId as string, payload: { name: newTitle } });
+      } else {
+        patchDocument({ documentId: documentId as string, payload: { documentName: newTitle } });
+      }
     }, 300),
-    [listId, patchList]
+    [listId, patchList, documentId, patchDocument]
   );
 
   // Handle user input
@@ -56,33 +74,51 @@ export const TopBar = ({ listId }: TopBarProps) => {
 
   // Update title from backend only if user is not currently editing
   useEffect(() => {
-    if (!isUserEditing && list?.text) {
-      setTitle(list.text);
+    if (!isUserEditing && list?.name) {
+      setTitle(list.name);
     }
-  }, [list?.text, isUserEditing]);
+    if (!isUserEditing && document?.documentName) {
+      setTitle(document.documentName);
+    }
+  }, [list?.name, document?.documentName, isUserEditing]);
 
   // Reset user editing state when switching lists
   useEffect(() => {
     setIsUserEditing(false);
-    setTitle(list?.text || '');
-  }, [listId, list?.text]);
+    setTitle(list?.name || document?.documentName || '');
+  }, [listId, list?.name, document?.documentName]);
 
   const handleDelete = async () => {
-    await deleteList(listId);
+    if (type === 'list') {
+      await deleteList(listId as string);
+    } else {
+      await deleteDocument(documentId as string);
+    }
   };
 
-  const MotionInputBase = useMemo(() => motion.create(InputBase), [listId]);
+  const handlePatchSidebarVisibility = () => {
+    if (type === 'list') {
+      patchList({ listId: listId as string, payload: { isActive: !list?.isActive } });
+    } else {
+      patchDocument({
+        documentId: documentId as string,
+        payload: { isActive: !document?.isActive },
+      });
+    }
+  };
+
+  const MotionInputBase = useMemo(() => motion.create(InputBase), [listId, documentId]);
 
   const selectionActions = [
-    { 
-      icon: <Delete fontSize="small" />, 
-      onClick: () => deleteTasks({ listId, taskIds: selectedIds }), 
-      label: 'Delete Selected' 
+    {
+      icon: <Delete fontSize="small" />,
+      onClick: () => deleteTasks({ listId: listId as string, taskIds: selectedIds }),
+      label: 'Delete Selected',
     },
-    { 
-      icon: <ContentCopy fontSize="small" />, 
-      onClick: () => duplicateTasks({ listId, taskIds: selectedIds }), 
-      label: 'Duplicate Selected' 
+    {
+      icon: <ContentCopy fontSize="small" />,
+      onClick: () => duplicateTasks({ listId: listId as string, taskIds: selectedIds }),
+      label: 'Duplicate Selected',
     },
   ];
 
@@ -95,9 +131,10 @@ export const TopBar = ({ listId }: TopBarProps) => {
     },
     {
       icon: <ViewSidebarRoundedIcon fontSize="small" />,
-      onClick: () => patchList({ listId, payload: { isActive: !list.isActive } }),
-      toggleActive: list?.isActive,
-      label: list?.isActive ? 'Hide' : 'Show',
+      onClick: handlePatchSidebarVisibility,
+      toggleActive: type === 'list' ? list?.isActive : document?.isActive,
+      label:
+        type === 'list' ? (list?.isActive ? 'Hide' : 'Show') : document?.isActive ? 'Hide' : 'Show',
     },
     { icon: <Share fontSize="small" />, onClick: () => console.log('Share'), label: 'Share' },
   ];
@@ -108,7 +145,7 @@ export const TopBar = ({ listId }: TopBarProps) => {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        pb: 0.5
+        pb: 0.5,
       }}
     >
       <Stack direction="row" gap={1} alignItems="center" flexGrow={1}>
@@ -136,14 +173,13 @@ export const TopBar = ({ listId }: TopBarProps) => {
               animate={{ opacity: 1, x: 0, width: 'auto' }}
               exit={{ opacity: 0, x: 20, width: 0 }}
               transition={{ duration: 0.2 }}
-              style={{ 
-                display: 'flex', 
-                gap: '4px', 
+              style={{
+                display: 'flex',
+                gap: '4px',
                 marginRight: '8px',
-                overflow: 'hidden'
+                overflow: 'hidden',
               }}
             >
-
               <AnimatePresence mode="sync">
                 {selectionActions.map((action, index) => (
                   <motion.div
@@ -173,7 +209,6 @@ export const TopBar = ({ listId }: TopBarProps) => {
                   </motion.div>
                 ))}
               </AnimatePresence>
-              
             </motion.div>
           )}
         </AnimatePresence>
