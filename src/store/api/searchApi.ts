@@ -5,7 +5,7 @@ export interface SearchResultItem {
   _id: string;
   name: string;
   score: number;
-  type: 'list' | 'task';
+  type: 'list' | 'task' | 'document';
   status?: string;
   listId?: string;
   listName?: string;
