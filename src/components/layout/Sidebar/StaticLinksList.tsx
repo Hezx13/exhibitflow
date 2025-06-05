@@ -5,6 +5,7 @@ import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import AssessmentRoundedIcon from '@mui/icons-material/AssessmentRounded';
 import LocalLibraryRoundedIcon from '@mui/icons-material/LocalLibraryRounded';
 import DocumentScannerRoundedIcon from '@mui/icons-material/DocumentScannerRounded';
+import EventNoteRoundedIcon from '@mui/icons-material/EventNoteRounded';
 export const StaticLinksList = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -30,9 +31,14 @@ export const StaticLinksList = () => {
       label: 'Library',
       icon: <LocalLibraryRoundedIcon fontSize="small" />,
     },
+    {
+      path: '/logs',
+      label: 'Logs',
+      icon: <EventNoteRoundedIcon fontSize="small" />,
+    },
   ];
 
-  return (
+  return (  
     <List component="nav" sx={{ width: '100%' }}>
       {links.map(({ path, label, icon }) => (
         <ListItemButton

@@ -15,6 +15,7 @@ import UnauthorizedLayout from './components/layout/UnauthorizedLayout';
 import { RootState, useAppSelector } from './store';
 import DocumentPage from './pages/DocumentPage';
 import { YDocProvider } from '@y-sweet/react';
+import LogsPage from './pages/LogsPage';
 
 const PrivateRoute = ({ children, roles }) => {
   const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();
@@ -77,6 +78,11 @@ const routes = [
   {
     path: '/reports',
     element: <ReportsPage />,
+    protected: true,
+  },
+  {
+    path: '/logs',
+    element: <LogsPage />,
     protected: true,
   },
   {
