@@ -58,7 +58,7 @@ const routes = [
   {
     path: '/documents/:id',
     element: <DocumentPage />,
-    protected: true,
+    protected: false,
   },
   {
     path: '/',

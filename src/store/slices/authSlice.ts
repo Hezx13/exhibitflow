@@ -5,6 +5,7 @@ const initialState = {
   token: null,
   role: null,
   department: null,
+  userName: null,
 };
 
 const authSlice = createSlice({
@@ -15,14 +16,16 @@ const authSlice = createSlice({
       state.department = action.payload;
     },
     setCredentials: (state, action) => {
-      const { token, role } = action.payload;
+      const { token, role, userName } = action.payload;
       state.token = token;
       state.role = role;
+      state.userName = userName;
     },
     clearCredentials: (state) => {
       state.token = null;
       state.role = null;
       state.department = null;
+      state.userName = null;
     },
   },
 });

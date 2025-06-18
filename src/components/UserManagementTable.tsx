@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import {
   useGetUsersQuery,
@@ -82,6 +82,14 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
       headerName: 'Approved',
       flex: 1,
       editable: true,
+      valueSetter: (params: any) => {
+        console.log(params);
+        if (params.data.isApproved) {
+          disapproveUser(params.data.username)
+        } else {
+          approveUser(params.data.username)
+        }
+      },
     },
     {
       field: 'role',

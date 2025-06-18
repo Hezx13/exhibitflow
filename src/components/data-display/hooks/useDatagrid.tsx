@@ -1,5 +1,5 @@
 import { RowDragEndEvent, RowDragLeaveEvent, CellEditRequestEvent } from 'ag-grid-community';
-import { generateJitteredKeyBetween } from 'fractional-indexing-jittered';
+import { generateJitteredKeyBetween, generateKeyBetween } from 'fractional-indexing-jittered';
 import { useMemo, useState } from 'react';
 import {
   Payment,
@@ -7,6 +7,7 @@ import {
   useLoadSingleListQuery,
   usePatchTaskMutation,
 } from '../../../store/api/listsApi';
+import { formatDateTime } from '../../../utils/timeUtils';
 
 const useDatagrid = (tableId: string) => {
   const [patchTask] = usePatchTaskMutation();
@@ -45,7 +46,7 @@ const useDatagrid = (tableId: string) => {
         editable: false,
         flex: 1,
         cellRenderer: (params) => {
-          return params.value ? new Date(params.value).toLocaleString() : '';
+          return params.value ? formatDateTime(params.value) : '';
         },
       },
       {
@@ -150,29 +151,35 @@ const useDatagrid = (tableId: string) => {
   const processRowDrag = async (event: RowDragEndEvent | RowDragLeaveEvent) => {
     console.log(event);
     const rows = list?.tasks || [];
-    let newPos: string;
     if (rows.length < 2) return;
 
-    if (event.overIndex === -1) {
-      newPos = generateJitteredKeyBetween(rows[rows.length - 1].positionKey as string, null);
-    } else if (event.overIndex === 0) {
-      newPos = generateJitteredKeyBetween(null, rows[0].positionKey as string);
-    } else if (event.overIndex > rows.findIndex((row) => row._id === event.node.data._id)) {
-      newPos = generateJitteredKeyBetween(
-        rows[event.overIndex].positionKey as string,
-        event.overIndex + 1 < rows.length ? (rows[event.overIndex + 1].positionKey as string) : null
-      );
+    const currentItemIndex = rows.findIndex((row) => row._id === event.node.data._id);
+    const newIndex = event.overIndex;
+    
+    let newKey: string;
+    if (newIndex === 0) {
+      // Moving to the start
+      const afterKey = rows[0]?.positionKey || null;
+      // TODO: weird bug here, lower null is generating last key, check & fix
+      // temp fix hardcoded a0
+      newKey = generateJitteredKeyBetween('a0', afterKey);
+    } else if (newIndex >= rows.length - 1 || newIndex === -1) {
+      // Moving to the end
+      const beforeKey = rows[rows.length - 1]?.positionKey || null;
+      newKey = generateJitteredKeyBetween(beforeKey, null);
     } else {
-      const pos1 = rows[event.overIndex - 1].positionKey as string;
-      const pos2 = rows[event.overIndex].positionKey as string;
-      // Ensure pos1 is less than pos2 by swapping if necessary
-      newPos = generateJitteredKeyBetween(pos1 < pos2 ? pos1 : pos2, pos1 < pos2 ? pos2 : pos1);
+      // Moving between two items
+      const isMovingDown = newIndex > currentItemIndex;
+      const beforeKey = rows[newIndex + (isMovingDown ? 0 : -1)]?.positionKey;
+      const afterKey = rows[newIndex + (isMovingDown ? 1 : 0)]?.positionKey;
+      newKey = generateJitteredKeyBetween(beforeKey, afterKey);
     }
-    console.log(newPos);
+
+    console.log(newKey);
     await patchTask({
       listId: tableId,
       taskId: event.node.data._id as string,
-      payload: { positionKey: newPos },
+      payload: { positionKey: newKey },
     });
   };
 

@@ -39,6 +39,7 @@ import {
   useGetDocumentsSidebarQuery,
   usePatchDocumentPositionMutation,
 } from '../../../store/api/documentsApi';
+import { useAppSelector } from '../../../store';
 
 interface CustomTreeItemProps {
   id: string;
@@ -126,8 +127,13 @@ class TreeViewErrorBoundary extends Component<{ children: ReactNode }, { hasErro
 }
 
 export const Sidebar = ({ open, onToggle }: SidebarProps) => {
-  const { data: projects = [] } = useSidebarListsQuery();
-  const { data: documents = [] } = useGetDocumentsSidebarQuery();
+  const department = useAppSelector((state) => state.auth.department);
+  const { data: projects = [] } = useSidebarListsQuery(undefined, {
+    skip: !department,
+  });
+  const { data: documents = [] } = useGetDocumentsSidebarQuery(undefined, {
+    skip: !department,
+  });
   const [dataType, setDataType] = useState<'projects' | 'documents'>('projects');
   const [patchListPosition] = usePatchListPositionMutation();
   const [patchDocumentPosition] = usePatchDocumentPositionMutation();
@@ -153,6 +159,14 @@ export const Sidebar = ({ open, onToggle }: SidebarProps) => {
       if (toRemove) {
         toRemove.remove();
       }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (window.location.pathname.includes('documents')) {
+      setDataType('documents');
+    } else {
+      setDataType('projects');
     }
   }, []);
 
