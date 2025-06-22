@@ -85,11 +85,6 @@ const routes = [
     element: <LogsPage />,
     protected: true,
   },
-  {
-    path: '/report',
-    element: <div>Report</div>,
-    protected: true,
-  },
 ];
 
 const AppRouter = () => {

@@ -21,11 +21,13 @@ import {
   StyledSelectDark,
   StyledTableContainer,
 } from '../styles/styles';
-import { downloadReport } from '../api';
+// import { downloadReport } from '../api';
 import DownloadIcon from '@mui/icons-material/Download';
+import { useLazyDownloadReportQuery } from '../store/api/reportsApi';
 
-const ReportTable = ({ data, updateCall }) => {
+const ReportTable = ({ data }) => {
   const navigate = useNavigate();
+  const [downloadReport] = useLazyDownloadReportQuery();
   const [payment, setPayment] = useState('');
   const [filteredData, setFilteredData] = useState(data);
   const months = [
@@ -52,12 +54,16 @@ const ReportTable = ({ data, updateCall }) => {
     }
   }, [payment, data]);
 
-  const handleExpandToTable = (month, pay) => {
-    navigate('/report', { state: { reports: data, period: month, payment: pay } });
+  const handleExpandToTable = async (month, pay, id) => {
+    const res = await downloadReport({id});
+    if (!res.data) return;
+    const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   };
 
-  const handleDownloadReport = (per, payment) => {
-    downloadReport(per, payment);
+  const handleDownloadReport = (id) => {
+    downloadReport({id});
   };
 
   return (
@@ -97,7 +103,7 @@ const ReportTable = ({ data, updateCall }) => {
               <StyledTableCell>
                 <SyledListButton
                   onClick={() => {
-                    handleExpandToTable(data.month, data.payment);
+                    handleExpandToTable(data.month, data.payment, data._id);
                   }}
                 >
                   {months[Number(data.month.start.split('-')[1][1]) - 1] +
@@ -129,7 +135,7 @@ const ReportTable = ({ data, updateCall }) => {
               <TableCell>{data.materials.length}</TableCell>
 
               <TableCell>
-                <IconButton onClick={() => handleDownloadReport(data.month.start, data.payment)}>
+                <IconButton onClick={() => handleDownloadReport(data._id)}>
                   <DownloadIcon htmlColor="#008000" />
                 </IconButton>
               </TableCell>
