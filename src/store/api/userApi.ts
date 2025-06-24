@@ -19,7 +19,6 @@ interface RegisterCredentials {
   username: string;
   password: string;
   email: string;
-  department: string;
 }
 
 interface LoginResponse {

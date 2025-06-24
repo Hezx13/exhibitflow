@@ -8,8 +8,10 @@ import {
   usePatchTaskMutation,
 } from '../../../store/api/listsApi';
 import { formatDateTime } from '../../../utils/timeUtils';
+import { useAppSelector } from '../../../store';
 
 const useDatagrid = (tableId: string) => {
+  const { isAdmin, isManager } = useAppSelector((state) => state.auth);
   const [patchTask] = usePatchTaskMutation();
   const { data: list, isLoading, isFetching } = useLoadSingleListQuery(tableId);
 
@@ -64,7 +66,7 @@ const useDatagrid = (tableId: string) => {
       {
         field: 'deliveryDate',
         headerName: 'Delivery Date',
-        editable: true,
+        editable: isAdmin || isManager,
         flex: 1,
         cellEditor: 'agDateCellEditor',
         cellEditorPopup: true,
@@ -114,14 +116,14 @@ const useDatagrid = (tableId: string) => {
       {
         field: 'orderedBy',
         headerName: 'Ordered By',
-        editable: true,
+        editable: false,
         flex: 1,
       },
       {
         field: 'status',
         headerName: 'Status',
         cellEditor: 'agRichSelectCellEditor',
-        editable: true,
+        editable: isAdmin || isManager,
         flex: 1,
         valueFormatter: (params) => {
           return params.value ? params.value.charAt(0).toUpperCase() + params.value.slice(1) : '';
@@ -134,7 +136,7 @@ const useDatagrid = (tableId: string) => {
       {
         field: 'payment',
         headerName: 'Payment',
-        editable: true,
+        editable: isAdmin || isManager,
         flex: 1,
         valueFormatter: (params) => {
           return params.value ? params.value.charAt(0).toUpperCase() + params.value.slice(1) : '';
@@ -149,7 +151,6 @@ const useDatagrid = (tableId: string) => {
   );
 
   const processRowDrag = async (event: RowDragEndEvent | RowDragLeaveEvent) => {
-    console.log(event);
     const rows = list?.tasks || [];
     if (rows.length < 2) return;
 
