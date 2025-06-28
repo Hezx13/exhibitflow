@@ -47,11 +47,7 @@ export default defineConfig({
             'object-hash',
             'throttle-debounce-ts'
           ],
-          
-          
-          // Socket and real-time
-          'realtime': ['socket.io-client'],
-          
+                    
           // Styling
           'styling': ['styled-components'],
           
