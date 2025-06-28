@@ -60,8 +60,6 @@ export default defineConfig({
             'js-cookie',
             'nanoid',
             'object-hash',
-            'immer',
-            'use-immer',
             'throttle-debounce-ts'
           ],
           
