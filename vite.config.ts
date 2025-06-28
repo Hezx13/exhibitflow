@@ -12,10 +12,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // React ecosystem
-          'react-vendor': ['react', 'react-dom'],
-          'react-router': ['react-router-dom'],
-          
           // Redux ecosystem  
           'redux-vendor': ['@reduxjs/toolkit', 'react-redux', 'redux-persist'],
           
@@ -41,18 +37,7 @@ export default defineConfig({
           'charts': ['recharts'],
           
           // Grid components
-          'grid': ['ag-grid-community', 'ag-grid-react'],
-          
-          // Editor and collaborative tools
-          'editor': [
-            '@blocknote/core',
-            '@blocknote/mantine', 
-            '@blocknote/react',
-            '@hocuspocus/provider',
-            'yjs',
-            '@y-sweet/react'
-          ],
-          
+          'grid': ['ag-grid-community', 'ag-grid-react'],          
           // Utilities and smaller libraries
           'utils': [
             'axios',
@@ -63,13 +48,6 @@ export default defineConfig({
             'throttle-debounce-ts'
           ],
           
-          // Animation and interaction
-          'interaction': [
-            'motion',
-            'react-dnd',
-            'react-dnd-html5-backend',
-            'react-transition-group'
-          ],
           
           // Socket and real-time
           'realtime': ['socket.io-client'],
