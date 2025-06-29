@@ -23,3 +23,7 @@
 .bn-container {
   --bn-colors-editor-background: #101010 !important;
 }
+
+.bn-inline-content {
+  flex-grow: 1;
+}

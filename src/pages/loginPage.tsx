@@ -86,9 +86,16 @@ function Login() {
             </Box>
           </Box>
           <Box>
-            <Typography component={Link} to="/register" variant="h5" color="#e3f2fd">
-              Sign up
-            </Typography>
+            {/* @ts-ignore */}
+          <Button
+          LinkComponent={Link}
+                to="/register"
+                fullWidth
+                variant="contained"
+              >
+                 Sign up
+              </Button>
+           
           </Box>
         </Container>
       </Grid>

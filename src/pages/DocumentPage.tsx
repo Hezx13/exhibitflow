@@ -6,9 +6,15 @@ import { Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { TopBar } from '../components/data-display/TopBar';
 import { SelectionProvider } from '../components/data-display/GridSelection.context';
+import { useAppSelector } from '../store';
+import { generateUserColorHex } from '../utils/colorUtils';
+import { useCreateBlockNote } from '@blocknote/react';
 
 export default function Editor() {
   const { id } = useParams();
+  const username = useAppSelector((state) => state.auth.userName);
+  const userRole = useAppSelector((state) => state.auth.role); // Assuming you have user role in auth state
+  
   const documentId = id || ''; 
   const { provider, threadStore } = useEditor({ documentId });
 
@@ -25,15 +31,15 @@ export default function Editor() {
         provider,
         fragment: provider.document.getXmlFragment('doc'),
         user: {
-          name: 'John Doe',
-          color: '#ff0000',
+          name: username || 'Anonymous',
+          color: generateUserColorHex(username || 'Anonymous'),
         },
       },
       resolveUsers: async (userIds) => {
         return userIds.map((userId) => ({
           id: userId,
-          username: 'John Doe',
-          avatarUrl: 'https://placehold.co/100x100',
+          username: userId,
+          avatarUrl: 'https://picsum.photos/50/50'
         }));
       },
       comments: {
@@ -58,7 +64,7 @@ export default function Editor() {
         <TopBar documentId={documentId} type="document" />
       </SelectionProvider>
       {/* Render BlockNoteView only when editor is ready */}
-      {editor ? <BlockNoteView editor={editor} /> : <div>Loading Editor...</div>}
+      {editor ? <BlockNoteView editor={editor}  editable={userRole !== 'User'}/> : <div>Loading Editor...</div>}
     </Stack>
   );
 }

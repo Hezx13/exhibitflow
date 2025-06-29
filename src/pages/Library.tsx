@@ -8,7 +8,9 @@ import { useGetLibraryQuery, ResourseType } from '../store/api/libraryApi';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 import NotesRoundedIcon from '@mui/icons-material/NotesRounded';
 import { ColDef } from 'ag-grid-community';
+import { useAppSelector } from '../store';
 export default function Library() {
+  const { isAdmin } = useAppSelector((state) => state.auth);
   const { data: libraryData = [] } = useGetLibraryQuery({ type: ResourseType.ALL });
   const [patchList] = usePatchListMutation();
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ export default function Library() {
         field: 'isActive',
         headerName: 'Active',
         width: 65,
-        editable: true,
+        editable: isAdmin,
         cellEditor: 'agCheckboxCellEditor',
         onCellValueChanged: (event) => {
           // Update the server with the new value
@@ -69,7 +71,7 @@ export default function Library() {
         },
       },
     ],
-    [navigate, patchList]
+    [navigate, patchList, isAdmin]
   );
 
   return (

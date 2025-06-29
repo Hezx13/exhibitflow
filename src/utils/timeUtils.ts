@@ -7,6 +7,15 @@ export const getCurrentDateAndTime = () => {
   return today;
 };
 
+export function formatDateTime(date: string) {
+  const dateObj = new Date(date);
+  return `${dateObj.toLocaleDateString()} ${dateObj.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })}`;
+}
+
 export const getNextWeek = () => {
   const today = new Date();
   const weekFromNow = new Date(today);

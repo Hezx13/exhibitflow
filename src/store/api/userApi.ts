@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './baseQuery';
 import { eventEmitter } from '../../state/EventEmitter';
 import { clearCredentials, setCredentials, setDepartment } from '../slices/authSlice';
-import { useAppDispatch } from '..';
+import { RootState, useAppDispatch } from '..';
 import { departmentsApi } from './departmentsApi';
 
 interface LoginCredentials {
@@ -19,12 +19,12 @@ interface RegisterCredentials {
   username: string;
   password: string;
   email: string;
-  department: string;
 }
 
 interface LoginResponse {
   token: string;
   role: string;
+  username: string;
 }
 
 export const userApi = createApi({
@@ -47,6 +47,7 @@ export const userApi = createApi({
             setCredentials({
               token: loginData.token,
               role: loginData.role,
+              userName: loginData.username,
             })
           );
 
@@ -68,6 +69,19 @@ export const userApi = createApi({
     getUserData: builder.query<any, void>({
       query: () => '/authn/user',
       providesTags: ['User'],
+      onQueryStarted: async (_, { queryFulfilled, dispatch, getState }) => {
+        const { auth } = getState() as RootState;
+        const { department } = auth;
+       
+        try {
+          const { data } = await queryFulfilled;
+          if (!department && data) {
+            dispatch(setDepartment(data.departments[0]._id));
+          }
+        } catch (error) {
+          console.error('Failed to get user data:', error);
+        }
+      },
     }),
 
     getUsers: builder.query<any, void>({

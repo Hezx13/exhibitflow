@@ -8,18 +8,22 @@ import { libraryApi } from '../store/api/libraryApi';
 import { listsApi } from '../store/api/listsApi';
 import { documentsApi } from '../store/api/documentsApi';
 import { useGetUserDataQuery, usePatchUserMutation } from '../store/api/userApi';
+import { useNavigate, useParams } from 'react-router-dom';
+import { statisticsApi } from '../store/api/statisticsApi';
+import { balanceApi } from '../store/api/balanceApi';
 
 function DepartmentSelector() {
   const selectedDepartmentId = useAppSelector((state) => state.auth.department);
+  const {id} = useParams();
   const [patchUser] = usePatchUserMutation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { departments, _id } = useGetUserDataQuery(undefined, {
     selectFromResult: ({ data }) => ({
       departments: data?.departments || [],
       _id: data?._id,
     }),
   });
-
   useEffect(() => {
     if (departments.length > 0 && !selectedDepartmentId) {
       const firstDepartment = departments[0];
@@ -38,6 +42,11 @@ function DepartmentSelector() {
     dispatch(libraryApi.util.invalidateTags(['Library']));
     dispatch(listsApi.util.invalidateTags(['Lists']));
     dispatch(documentsApi.util.invalidateTags(['Document', 'DocumentsSidebar']));
+    dispatch(statisticsApi.util.invalidateTags(['Statistics']));  
+    dispatch(balanceApi.util.invalidateTags(['Balance']));
+    if (id) {
+      navigate('/');
+    }
   };
 
   return (

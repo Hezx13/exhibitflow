@@ -25,6 +25,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useAddProjectMutation } from '../../../store/api/listsApi';
 import StaticLinksList from './StaticLinksList';
 import { useCreateDocumentMutation } from '../../../store/api/documentsApi';
+import { useAppSelector } from '../../../store';
 
 export default function SidebarActionsList({
   setDataType,
@@ -33,6 +34,7 @@ export default function SidebarActionsList({
 }) {
   const projectFileInputRef = useRef<HTMLInputElement>(null);
   const materialFileInputRef = useRef<HTMLInputElement>(null);
+  const { isAdmin } = useAppSelector((state) => state.auth);
   const [previewData, setPreviewData] = useState<any>(null);
   const [uploadPreview] = useUploadPreviewMutation();
   const [uploadLists, { isLoading: uploadListsLoading }] = useUploadListMutation();
@@ -120,6 +122,7 @@ export default function SidebarActionsList({
       <Stack direction="column" gap={1}>
         <Stack direction="row" gap={1} alignItems="center">
           <SearchBarButton />
+          {isAdmin && (
           <ToggleButton
             {...bindTrigger(popupState)}
             value={popupState.isOpen}
@@ -134,8 +137,9 @@ export default function SidebarActionsList({
                 theme.palette.mode === 'dark' ? 'brightness(0.85)' : 'brightness(0.95)',
             }}
           >
-            <AddRoundedIcon fontSize="small" />
-          </ToggleButton>
+              <AddRoundedIcon fontSize="small" />
+            </ToggleButton>
+          )}
         </Stack>
         <StaticLinksList />
       </Stack>

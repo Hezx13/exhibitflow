@@ -3,7 +3,7 @@ import { Grid2 as Grid } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar/Sidebar';
 import { useState } from 'react';
-import { NavBar } from '../navBar';
+import NavBar from '../AppNavBar';
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);

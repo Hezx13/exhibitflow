@@ -8,15 +8,16 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useRegisterMutation } from '../store/api/userApi';
+import { Link } from 'react-router-dom';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [department, setDepartment] = useState('');
   const [email, setEmail] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  console.log(errorMessage);
   const [register] = useRegisterMutation();
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,16 +31,26 @@ const Register = () => {
 
     try {
       // Replace with your backend API endpoint as needed.
-      const response = await register({ username, password, email, department });
-
+      const response = await register({ username, password, email });
+      console.log("response", response);
       if (response.data) {
         setSuccessMessage('Successfully registered!');
         setUsername('');
         setPassword('');
+        setEmail('');
         setConfirmPassword('');
       }
-    } catch (error) {
-      setErrorMessage('Error during registration. Please try again.');
+      else{
+        if (response.error && 'data' in response.error) {
+          setErrorMessage((response.error.data as any).message);
+        }
+        else{
+          setErrorMessage('Error during registration. Please try again.');
+        }
+      }
+    } catch (error: any) {
+      console.log(error);
+      setErrorMessage(error.data.message);
     }
   };
 
@@ -93,15 +104,6 @@ const Register = () => {
               />
               <TextField
                 margin="normal"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                required
-                fullWidth
-                label="Department"
-                name="department"
-              />
-              <TextField
-                margin="normal"
                 required
                 fullWidth
                 name="password"
@@ -129,8 +131,19 @@ const Register = () => {
               >
                 Sign up
               </Button>
+              
             </Box>
           </Box>
+             {/* @ts-ignore */}
+          <Button
+          LinkComponent={Link}
+                to="/login"
+                fullWidth
+                variant="contained"
+              >
+                 Back to login
+              </Button>
+           
         </Container>
       </Grid>
     </Grid>

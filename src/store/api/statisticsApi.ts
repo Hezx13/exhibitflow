@@ -32,14 +32,13 @@ export interface PurchaseStatsResponse {
 export const statisticsApi = createApi({
   reducerPath: 'statisticsApi',
   baseQuery,
+  tagTypes: ['Statistics'],
   endpoints: (builder) => ({
     getPurchaseStats: builder.query<PurchaseStatsResponse, void>({
       query: () => ({
         url: '/statistics/purchases',
-        params: {
-          department: localStorage.getItem('selectedDepartment'),
-        },
       }),
+      providesTags: ['Statistics'],
     }),
   }),
 });

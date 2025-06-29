@@ -30,7 +30,6 @@ export const UserMenu = memo(() => {
   };
 
   const handleLogOut = async () => {
-    await logout(); // Assuming logout is an async function that handles API call
     dispatch(clearCredentials());
     closeMenu();
   };

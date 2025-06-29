@@ -40,7 +40,6 @@
     "dayjs": "^1.11.13",
     "excel-date-to-js": "^1.1.5",
     "fractional-indexing-jittered": "^1.0.0",
-    "immer": "^9.0.21",
     "js-cookie": "^3.0.5",
     "material-ui-popup-state": "^5.3.3",
     "motion": "^11.18.1",
@@ -51,7 +50,6 @@
     "react-dnd": "^14.0.5",
     "react-dnd-html5-backend": "^14.1.0",
     "react-dom": "^19.0.0",
-    "react-is": "^18.3.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.28.1",
     "react-transition-group": "^4.4.5",
@@ -60,7 +58,6 @@
     "socket.io-client": "^4.8.1",
     "styled-components": "^5.3.11",
     "throttle-debounce-ts": "^1.1.1",
-    "use-immer": "^0.9.0",
     "yjs": "^13.6.24"
   },
   "devDependencies": {
@@ -74,6 +71,7 @@
     "@vitejs/plugin-react-swc": "^3.7.2",
     "eslint": "^9.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
+    "rollup-plugin-visualizer": "^6.0.3",
     "typescript": "^5.7.3",
     "vite": "^5.4.11"
   }

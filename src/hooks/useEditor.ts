@@ -3,56 +3,60 @@ import { DefaultThreadStoreAuth, RESTYjsThreadStore } from '@blocknote/core/comm
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 import { HocuspocusProvider } from '@hocuspocus/provider';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useAppSelector } from '../store';
 
 interface UseEditorProps {
   documentId: string;
 }
 
-const USER_ID = 'user123';
-const USER_ROLE: 'COMMENT-ONLY' | 'READ-WRITE' = 'READ-WRITE';
-
-const TOKEN = `${USER_ID}__${USER_ROLE}`;
-
-
 export const useEditor = ({ documentId }: UseEditorProps) => {
-  const provider = useMemo(() => {
-    return new HocuspocusProvider({
+  const token = useAppSelector((state) => state.auth.token);
+  const role = useAppSelector((state) => state.auth.role);
+  const username = useAppSelector((state) => state.auth.userName);
+  const providerRef = useRef<HocuspocusProvider | null>(null);
+  const [connected, setConnected] = useState(false);
+  useEffect(() => {
+    console.log('creating provider');
+    const provider = new HocuspocusProvider({
       url: 'ws://localhost:4500/hocuspocus',
-      token: TOKEN,
+      token: token,
       name: documentId,
-      connect: false
+      onConnect: () => {
+        setConnected(true);
+      },
+      onDisconnect: () => {
+        setConnected(false);
+      }
     });
+    providerRef.current = provider;
+    return () => {
+      providerRef.current?.disconnect();
+      providerRef.current?.destroy();
+    };
   }, [documentId]);
 
-  useEffect(() => {
-    if (!provider) return;
-    provider.connect();
-
-    return () => {
-      provider.disconnect();
-    };
-  }, [provider, documentId]);
-
-  const threadStoreAuth = useMemo(() => new DefaultThreadStoreAuth(
-    USER_ID,
-    USER_ROLE === 'READ-WRITE' ? 'editor' : 'comment'
-  ), []);
+  const threadStoreAuth = useMemo(() => {
+    return new DefaultThreadStoreAuth(
+      username,
+      role === 'User' ? 'comment' : 'editor'
+    );
+  }, []);
 
   const threadStore = useMemo(() => {
-    if (!provider) return null;
+    if (!providerRef.current) return null;
     return new RESTYjsThreadStore(
-      `http://localhost:4500/documents/${documentId}/threads`,
+      `http://localhost:4500/api/documents/${documentId}/threads`,
       {
-        Authorization: `Bearer ${TOKEN}`,
+        Authorization: `Bearer ${token}`,
       },
-      provider.document.getMap('threads'),
+      providerRef.current.document.getMap('threads'),
       threadStoreAuth
     );
-  }, [documentId, provider, threadStoreAuth]);
+  }, [documentId, threadStoreAuth, token, connected]);
 
   return {
-    provider,
+    provider: providerRef.current,
     threadStore,
   };
 };

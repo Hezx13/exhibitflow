@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { StyledGenerateButton, StyledSelect } from '../styles/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useGenerateReportMutation } from '../store/api/reportsApi';
 import {
   FormControl,
   InputLabel,
@@ -11,16 +12,15 @@ import {
   Typography,
   Box,
 } from '@mui/material';
-import { generateReport } from '../api';
 import dayjs from 'dayjs';
 
-const ReportGenerationDialog = ({ onNewReport }) => {
+const ReportGenerationDialog = () => {
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
   const [payment, setPayment] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const isMobile = useMediaQuery('(max-width:500px)');
-
+  const [generateReport] = useGenerateReportMutation();
   const months = [
     'January',
     'February',
@@ -50,8 +50,11 @@ const ReportGenerationDialog = ({ onNewReport }) => {
       setIsGenerating(true);
       let dates = getFirstAndLastDay(month, year);
       try {
-        await generateReport(dates, payment);
-        onNewReport();
+        await generateReport({
+          periodStart: dates.periodStart,
+          periodEnd: dates.periodEnd,
+          payment,
+        });
         setIsGenerating(false);
       } catch (err) {
         console.error('An error occurred:', err);
@@ -62,7 +65,7 @@ const ReportGenerationDialog = ({ onNewReport }) => {
   }
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 2 }, (_, i) => currentYear - i);
+  const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
 
   const card = (
     <>

@@ -15,6 +15,7 @@ import UnauthorizedLayout from './components/layout/UnauthorizedLayout';
 import { RootState, useAppSelector } from './store';
 import DocumentPage from './pages/DocumentPage';
 import { YDocProvider } from '@y-sweet/react';
+import LogsPage from './pages/LogsPage';
 
 const PrivateRoute = ({ children, roles }) => {
   const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();
@@ -22,7 +23,7 @@ const PrivateRoute = ({ children, roles }) => {
   if (userDataLoading) return <CircularProgress />;
   if (!token) return <Navigate to="/login" />;
   if (!userData?.role || !roles.includes(userData.role)) {
-    return <Navigate to="/" />;
+    return <Navigate to="/library" />;
   }
 
   return children;
@@ -47,42 +48,50 @@ const routes = [
     path: '/projects/:id',
     element: <ProjectsPage />,
     protected: true,
+    allowedRoles: ['Admin', 'Manager', 'User'],
   },
   // Protected routes
   {
     path: '/library',
     element: <Library />,
     protected: true,
+    allowedRoles: ['Admin', 'Manager', 'User'],
   },
   {
     path: '/documents/:id',
     element: <DocumentPage />,
-    protected: true,
+    protected: false,
+    allowedRoles: ['Admin', 'Manager', 'User'],
   },
   {
     path: '/',
     element: <DashboardPage />,
     protected: true,
+    allowedRoles: ['Admin'],
   },
   {
     path: '/management',
     element: <ManagementPage />,
     protected: true,
+    allowedRoles: ['Admin'],
   },
   {
     path: '/saved',
     element: <SavedMaterialsPage />,
     protected: true,
+    allowedRoles: ['Admin'],
   },
   {
     path: '/reports',
     element: <ReportsPage />,
     protected: true,
+    allowedRoles: ['Admin'],
   },
   {
-    path: '/report',
-    element: <div>Report</div>,
+    path: '/logs',
+    element: <LogsPage />,
     protected: true,
+    allowedRoles: ['Admin'],
   },
 ];
 
@@ -102,14 +111,14 @@ const AppRouter = () => {
               path={route.path}
               element={
                 route.protected ? (
-                  <PrivateRoute roles={['Admin']}>{route.element}</PrivateRoute>
+                  <PrivateRoute roles={route.allowedRoles}>{route.element}</PrivateRoute>
                 ) : (
                   route.element
                 )
               }
             />
           ))}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/library" />} />
         </Route>
       </Routes>
     </Router>

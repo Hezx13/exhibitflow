@@ -8,7 +8,7 @@ import { motion } from 'motion/react';
 import { opacityZoomIn } from '../animations/opacityZoomIn';
 import UserMenu from './UserMenu';
 
-export const NavBar = ({
+const NavBar = ({
   isSidebarOpen,
   setSidebarOpen,
 }: {

@@ -1,37 +1,30 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { loadReports } from '../api';
+import { useGetReportsQuery, Report } from '../store/api/reportsApi';
+// import { loadReports } from '../api';
 
 // Define the shape of the context
 type ReportContextType = {
-  reports: Report[];
+  reports?: Report[];
   fetchReports: () => void;
   updateReports: () => void;
 };
 
-type Report = {
-  materials: any[];
-  month: any;
-  debit: number[];
-  payment: string;
-  credit: number;
-  activeProjects: any[];
-};
 
 // Create the context with a default undefined value
 const ReportContext = createContext<ReportContextType | undefined>(undefined);
 
 // Create a provider component
 export const ReportProvider = ({ children }: { children: React.ReactNode }) => {
-  const [reports, setReports] = useState<Report[]>([]);
   const [reportsUpdated, setReportsUpdated] = useState(false);
+  const { data, isLoading } = useGetReportsQuery();
 
   useEffect(() => {
     if (!!localStorage.getItem('token') && localStorage.getItem('role') === 'Admin') fetchReports();
   }, [reportsUpdated]);
 
   const fetchReports = async () => {
-    const fetchedReports = await loadReports();
-    setReports(fetchedReports);
+    // const fetchedReports = await loadReports();
+    // setReports(fetchedReports);
   };
 
   const updateReports = () => {
@@ -39,7 +32,7 @@ export const ReportProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <ReportContext.Provider value={{ reports, fetchReports, updateReports }}>
+    <ReportContext.Provider value={{ reports: data?.reports, fetchReports, updateReports }}>
       {children}
     </ReportContext.Provider>
   );
