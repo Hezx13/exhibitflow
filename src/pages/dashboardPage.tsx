@@ -1,5 +1,5 @@
 import { useState, memo } from 'react';
-import { Grid2 as Grid, CircularProgress, TextField, Stack, Skeleton } from '@mui/material';
+import { Grid, CircularProgress, TextField, Stack, Skeleton } from '@mui/material';
 import CardComponent from '../components/cardComponent';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';

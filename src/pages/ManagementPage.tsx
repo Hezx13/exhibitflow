@@ -1,4 +1,4 @@
-import { Alert, Grid2 as Grid } from '@mui/material';
+import { Alert, Grid } from '@mui/material';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import UserManagementTable from '../components/UserManagementTable';

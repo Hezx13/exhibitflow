@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    // Base
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "esnext",
+    "allowJs": true,
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    // Module resolution
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    // Output
+    "outDir": "dist",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "declaration": true,
+
+    // Prettify
+    "pretty": true,
+    "newLine": "lf",
+    "removeComments": true,
+    "stripInternal": true,
+
+    // Strictness
+    "strict": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+
+    // Types
+    "types": ["bun-types"],
+    "typeRoots": ["./node_modules/@types", "./types"]
+  },
+  "include": ["server/**/*", "utils/**/*", "types/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

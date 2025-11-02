@@ -4,7 +4,6 @@ import CardComponent from '../components/cardComponent';
 import ReportGenerationDialog from '../components/ReportGenerationDialog';
 import ReportTable from '../components/ReportsTable';
 import { useReport } from '../state/reportsContext'; // Adjust the import to your file structure
-import { Navigate } from 'react-router-dom';
 import { Report } from '../store/api/reportsApi';
 
 const ReportsPage = () => {
@@ -29,29 +28,27 @@ const ReportsPage = () => {
   }
 
   return (
-    <>
-      <Grid container>
-        <Grid item xs={12} sx={{ marginBottom: '15px' }}>
-          <Grid container justifyContent="center" spacing={8}>
-            <Grid item xl={2}>
-              {reports?.length ? (
-                <CardComponent
-                  textColor={balance >= 0 ? 'green' : 'red'}
-                  text="Start of month balance"
-                  amount={balance.toFixed(2)}
-                />
-              ) : null}
-            </Grid>
-            <Grid item xl={2}>
-              <ReportGenerationDialog />
-            </Grid>
+    <Grid container spacing={2}>
+      <Grid container size={12} justifyContent="center" spacing={3}>
+        {reports?.length ? (
+          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+            <CardComponent
+              textColor={balance >= 0 ? 'green' : 'red'}
+              text="Start of month balance"
+              amount={balance.toFixed(2)}
+            />
           </Grid>
-        </Grid>
-        <Grid item xs={12} sx={{ marginBottom: '15px' }}>
-          {reports?.length ? <ReportTable data={reports} /> : null}
+        ) : null}
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+          <ReportGenerationDialog />
         </Grid>
       </Grid>
-    </>
+      {reports?.length ? (
+        <Grid size={12}>
+          <ReportTable data={reports} />
+        </Grid>
+      ) : null}
+    </Grid>
   );
 };
 

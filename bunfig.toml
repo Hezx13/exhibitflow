@@ -1,0 +1,9 @@
+[install]
+optional = true
+
+[root]
+workspaces = [".", "backend"]
+
+[define]
+experimentalDecorators = true
+emitDecoratorMetadata = true

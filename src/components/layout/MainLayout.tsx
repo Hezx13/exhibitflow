@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { Grid2 as Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar/Sidebar';
 import { useState } from 'react';

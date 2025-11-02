@@ -1,0 +1,6 @@
+[target]
+default = "node"
+
+[define]
+experimentalDecorators = true
+emitDecoratorMetadata = true 

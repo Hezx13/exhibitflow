@@ -3,7 +3,7 @@ import {
   DialogTitle,
   DialogContent,
   Typography,
-  Grid2 as Grid,
+  Grid,
   Chip,
   Box,
   IconButton,
