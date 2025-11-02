@@ -1,10 +1,8 @@
 import {
-  IMongoList,
   IReport,
   IReportPeriod,
   IActiveProject,
   IReportMaterial,
-  IMongoTask,
 } from '../models/types';
 import { AppError } from './errors';
 import Transaction from '../models/transaction.model';
@@ -49,14 +47,14 @@ export const generateReport = async (
   payment: string,
   department: string
 ): Promise<IReport> => {
-  const startDate = new Date(period.start.split('-').reverse().join('-'));
-  const endDate = new Date(period.end.split('-').reverse().join('-'));
+  const startDate = new Date(period.start);
+  const endDate = new Date(period.end);
   const activeProjects: IActiveProject[] = lists.map((list) => ({
     id: list._id as string,
     name: list.name || 'Unnamed',
   }));
   const materials = await collectMaterials(lists, startDate, endDate);
-  const debits = await Transaction.find({ department, date: { $gte: startDate, $lte: endDate }, debit: { $gte: 0} }).lean();
+  const debits = await Transaction.find({ department, date: { $gte: startDate, $lte: endDate }, debit: { $gte: 0} });
   return {
     materials,
     month: period,
@@ -86,6 +84,7 @@ const collectMaterials = async (lists: List[], startDate: Date, endDate: Date): 
         )
     )
   );
+  console.log('Collected materials count:', materials.length);
   return materials;
 };
 

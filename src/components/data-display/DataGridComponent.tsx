@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import { AgGridReact } from 'ag-grid-react';
 import { RightClickMenu } from '../actions/RigtClickMenu';
-import myTheme from '../../theme/grid';
+import exhibitflowTheme from '../../theme/grid';
 import { Skeleton } from '@mui/material';
 import useDatagrid from './hooks/useDatagrid';
 import { useAddTaskMutation } from '../../store/api/listsApi';
@@ -58,7 +58,7 @@ function FullFeaturedCrudGrid({ tableId }: { tableId: string }) {
           <AgGridReact
             singleClickEdit
             rowData={rows}
-            theme={myTheme}
+            theme={exhibitflowTheme}
             rowDragManaged={true}
             columnDefs={columnDefs as any}
             getRowId={(params) => params.data._id}

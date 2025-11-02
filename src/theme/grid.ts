@@ -1,6 +1,6 @@
 import { themeQuartz } from 'ag-grid-community';
 
-const myTheme = themeQuartz.withParams({
+const exhibitflowTheme = themeQuartz.withParams({
   accentColor: '#D17E08',
   backgroundColor: '#101010',
   borderColor: '#1F1F1F',
@@ -29,4 +29,4 @@ const myTheme = themeQuartz.withParams({
   wrapperBorderRadius: 8,
 });
 
-export default myTheme;
+export default exhibitflowTheme;

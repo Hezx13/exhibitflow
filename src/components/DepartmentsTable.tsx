@@ -5,7 +5,7 @@ import {
   usePatchDepartmentMutation,
 } from '../store/api/departmentsApi';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import myTheme from '../theme/grid';
+import exhibitflowTheme from '../theme/grid';
 import { ColDef } from 'ag-grid-community';
 
 const DepartmentsTable = () => {
@@ -47,7 +47,7 @@ const DepartmentsTable = () => {
         </Button>
       </Stack>
       <div className="ag-theme-material" style={{ height: 350, width: '100%' }}>
-        <AgGridReact rowData={departments} theme={myTheme} columnDefs={columnDefs as any} />
+        <AgGridReact rowData={departments} theme={exhibitflowTheme} columnDefs={columnDefs as any} />
       </div>
     </Stack>
   );

@@ -23,7 +23,6 @@
     "express-ws": "^5.0.2",
     "fractional-indexing-jittered": "^1.0.0",
     "html-to-text": "^9.0.5",
-    "immer": "^9.0.21",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.12.0",
     "mongoose": "^8.9.5",

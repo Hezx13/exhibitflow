@@ -79,7 +79,7 @@ export interface DownloadReportParams {
 export const reportsApi = createApi({
   reducerPath: 'reportsApi',
   baseQuery,
-  tagTypes: ['Report'],
+  tagTypes: ['Report', 'ReportDetail'],
   endpoints: (builder) => ({
     generateReport: builder.mutation<string, GenerateReportRequest>({
       query: (data) => ({
@@ -93,6 +93,11 @@ export const reportsApi = createApi({
     getReports: builder.query<{ reports: Report[] }, void>({
       query: () => '/reports',
       providesTags: ['Report'],
+    }),
+
+    getReportDetails: builder.query<Report, string>({
+      query: (id) => `/reports/${id}`,
+      providesTags: ['ReportDetail'],
     }),
 
     addDebit: builder.mutation<{ message: string }, AddDebitRequest>({
@@ -130,6 +135,7 @@ export const reportsApi = createApi({
 export const {
   useGenerateReportMutation,
   useGetReportsQuery,
+  useGetReportDetailsQuery,
   useAddDebitMutation,
   useRemoveDebitMutation,
   useLazyDownloadReportQuery,

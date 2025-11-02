@@ -12,10 +12,10 @@ import { useGetUserDataQuery } from './store/api/userApi';
 import { CircularProgress } from '@mui/material';
 import Library from './pages/Library';
 import UnauthorizedLayout from './components/layout/UnauthorizedLayout';
-import { RootState, useAppSelector } from './store';
+import { useAppSelector } from './store';
 import DocumentPage from './pages/DocumentPage';
-import { YDocProvider } from '@y-sweet/react';
 import LogsPage from './pages/LogsPage';
+import ReportDetailsPage from './pages/reportDetailsPage';
 
 const PrivateRoute = ({ children, roles }) => {
   const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();
@@ -84,6 +84,12 @@ const routes = [
   {
     path: '/reports',
     element: <ReportsPage />,
+    protected: true,
+    allowedRoles: ['Admin'],
+  },
+  {
+    path: '/reports/:id',
+    element: <ReportDetailsPage/>,
     protected: true,
     allowedRoles: ['Admin'],
   },

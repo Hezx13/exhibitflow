@@ -31,7 +31,7 @@ const ReportsPage = () => {
     <Grid container spacing={2}>
       <Grid container size={12} justifyContent="center" spacing={3}>
         {reports?.length ? (
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+          <Grid>
             <CardComponent
               textColor={balance >= 0 ? 'green' : 'red'}
               text="Start of month balance"
@@ -39,7 +39,7 @@ const ReportsPage = () => {
             />
           </Grid>
         ) : null}
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+        <Grid>
           <ReportGenerationDialog />
         </Grid>
       </Grid>

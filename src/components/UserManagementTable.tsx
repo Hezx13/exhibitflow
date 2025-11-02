@@ -11,7 +11,7 @@ import {
   Roles,
 } from '../store/api/userApi';
 import { Button, Box, Typography, Checkbox } from '@mui/material';
-import myTheme from '../theme/grid';
+import exhibitflowTheme from '../theme/grid';
 import { useGetDepartmentsQuery } from '../store/api/departmentsApi';
 import { ValueSetterParams } from 'ag-grid-community';
 
@@ -161,7 +161,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ onAlert }) =>
         User Management
       </Typography>
       <div className="ag-theme-material" style={{ height: 400, width: '100%' }}>
-        <AgGridReact rowData={users} columnDefs={columnDefs as any} theme={myTheme} />
+        <AgGridReact rowData={users} columnDefs={columnDefs as any} theme={exhibitflowTheme} />
       </div>
     </Box>
   );

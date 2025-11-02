@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { StyledGenerateButton, StyledSelect } from '../styles/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { useGenerateReportMutation } from '../store/api/reportsApi';
 import {
-  FormControl,
-  InputLabel,
   Button,
-  MenuItem,
   Card,
   CardContent,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
   Typography,
-  Box,
 } from '@mui/material';
+import SummarizeRoundedIcon from '@mui/icons-material/SummarizeRounded';
 import dayjs from 'dayjs';
 
 const ReportGenerationDialog = () => {
@@ -19,7 +19,6 @@ const ReportGenerationDialog = () => {
   const [year, setYear] = useState('');
   const [payment, setPayment] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const isMobile = useMediaQuery('(max-width:500px)');
   const [generateReport] = useGenerateReportMutation();
   const months = [
     'January',
@@ -36,114 +35,107 @@ const ReportGenerationDialog = () => {
     'December',
   ];
 
-  function getFirstAndLastDay(month, year) {
-    const monthIndex = months.indexOf(month);
+  function getFirstAndLastDay(selectedMonth: string, selectedYear: string) {
+    const monthIndex = months.indexOf(selectedMonth);
+    if (monthIndex < 0) {
+      throw new Error('Selected month is not valid');
+    }
 
-    // Get the first and last day of the month
-    const periodStart = dayjs(new Date(year, monthIndex, 1)).format('DD-MM-YYYY');
-    const periodEnd = dayjs(new Date(year, monthIndex + 1, 0)).format('DD-MM-YYYY');
+    const periodStart = dayjs(new Date(Number(selectedYear), monthIndex, 1)).format('YYYY-MM-DD');
+    const periodEnd = dayjs(new Date(Number(selectedYear), monthIndex + 1, 0)).format('YYYY-MM-DD');
 
     return { periodStart, periodEnd };
   }
   async function handleGenerateReport() {
-    if (month && year && payment) {
-      setIsGenerating(true);
-      let dates = getFirstAndLastDay(month, year);
-      try {
-        await generateReport({
-          periodStart: dates.periodStart,
-          periodEnd: dates.periodEnd,
-          payment,
-        });
-        setIsGenerating(false);
-      } catch (err) {
-        console.error('An error occurred:', err);
-        setIsGenerating(false); // Log the error
-      }
+    if (!month || !year || !payment) {
+      return;
     }
-    setIsGenerating(false);
+
+    setIsGenerating(true);
+
+    try {
+      const { periodStart, periodEnd } = getFirstAndLastDay(month, year);
+      await generateReport({ periodStart, periodEnd, payment });
+    } catch (err) {
+      console.error('An error occurred:', err);
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
-
-  const card = (
-    <>
-      <CardContent>
-        <Typography sx={{ fontSize: 18 }} color={isGenerating ? 'red' : '#ffffff'} gutterBottom>
-          {isGenerating ? 'Generating report...' : 'Generate report'}
-        </Typography>
-        <FormControl variant="filled" style={{ margin: '0 10px', width: '120px' }}>
-          <InputLabel sx={{ color: 'orange' }}>Month</InputLabel>
-          <StyledSelect
-            value={month}
-            onChange={(e) => setMonth(e.target.value as string)}
-            label="Month"
-            size="small"
-            margin="dense"
-          >
-            {months.map((m, index) => (
-              <MenuItem key={index} value={m}>
-                {m}
-              </MenuItem>
-            ))}
-          </StyledSelect>
-        </FormControl>
-
-        <FormControl
-          variant="filled"
-          style={{ margin: '0 10px', width: '120px', height: '15px !important' }}
-        >
-          <InputLabel sx={{ color: 'orange' }}>Year</InputLabel>
-          <StyledSelect
-            value={year}
-            onChange={(e) => setYear(e.target.value as string)}
-            label="Year"
-            size="small"
-            margin="dense"
-          >
-            {years.map((y, index) => (
-              <MenuItem key={index} value={y}>
-                {y}
-              </MenuItem>
-            ))}
-          </StyledSelect>
-        </FormControl>
-        <FormControl variant="filled" style={{ margin: '0 10px', width: '120px' }}>
-          <InputLabel sx={{ color: 'orange' }}>Payment</InputLabel>
-          <StyledSelect
-            value={payment}
-            onChange={(e) => setPayment(e.target.value as string)}
-            label="Month"
-            size="small"
-            margin="dense"
-          >
-            <MenuItem value="cash">Cash</MenuItem>
-            <MenuItem value="card">Card</MenuItem>
-            <MenuItem value="credit">Credit</MenuItem>
-            <MenuItem value="bank transfer">Bank Transfer</MenuItem>
-            <MenuItem value="pemo card">Pemo card</MenuItem>
-          </StyledSelect>
-        </FormControl>
-
-        <StyledGenerateButton disabled={isGenerating} onClick={handleGenerateReport}>
-          Generate
-        </StyledGenerateButton>
-      </CardContent>
-    </>
-  );
+  const isActionDisabled = !month || !year || !payment || isGenerating;
 
   return (
-    <Box
-      sx={{
-        width: isMobile ? '350px' : '500px',
-        boxShadow: '8px 12px 15px -10px rgba(0, 0, 0, 0.2)',
-      }}
-    >
-      <Card variant="outlined" sx={{ backgroundColor: '#ffffff10' }}>
-        {card}
-      </Card>
-    </Box>
+    <Card variant="outlined">
+      <CardContent>
+        <Stack gap={3} justifyContent="center">
+          <Stack spacing={0.5}>
+            <Typography variant="h6">
+              {isGenerating ? 'Generating report…' : 'Monthly report'}
+            </Typography>
+          </Stack>
+
+          <Stack direction="row" gap={2} flexWrap="wrap" useFlexGap alignItems="center">
+            <FormControl variant="outlined" size="small" sx={{ width: 140 }}>
+              <InputLabel>Month</InputLabel>
+              <Select
+                value={month}
+                onChange={(e) => setMonth(e.target.value as string)}
+                label="Month"
+              >
+                {months.map((m) => (
+                  <MenuItem key={m} value={m}>
+                    {m}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl variant="outlined" size="small" sx={{ width: 140 }}>
+              <InputLabel>Year</InputLabel>
+              <Select
+                value={year}
+                onChange={(e) => setYear(e.target.value as string)}
+                label="Year"
+              >
+                {years.map((y) => (
+                  <MenuItem key={y} value={String(y)}>
+                    {y}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl variant="outlined" size="small" sx={{ width: 140 }}>
+              <InputLabel>Payment</InputLabel>
+              <Select
+                value={payment}
+                onChange={(e) => setPayment(e.target.value as string)}
+                label="Payment"
+              >
+                <MenuItem value="cash">Cash</MenuItem>
+                <MenuItem value="card">Card</MenuItem>
+                <MenuItem value="credit">Credit</MenuItem>
+                <MenuItem value="bank transfer">Bank Transfer</MenuItem>
+                <MenuItem value="pemo card">Pemo Card</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Button
+              variant="contained"
+              disabled={isActionDisabled}
+              onClick={handleGenerateReport}
+              startIcon={<SummarizeRoundedIcon />}
+              sx={{ width: 140 }}
+            >
+              {isGenerating ? 'Generating…' : 'Generate'}
+            </Button>
+          </Stack>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 };
 

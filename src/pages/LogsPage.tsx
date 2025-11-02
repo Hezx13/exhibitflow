@@ -28,7 +28,7 @@ import {
   LogEntry,
   LogsQueryParams 
 } from '../store/api/logsApi';
-import myTheme from '../theme/grid';
+import exhibitflowTheme from '../theme/grid';
 
 export default function LogsPage() {
   const [queryParams, setQueryParams] = useState<LogsQueryParams>({
@@ -254,7 +254,7 @@ export default function LogsPage() {
           <AgGridReact
             rowData={logsData?.logs || []}
             columnDefs={columnDefs}
-            theme={myTheme}
+            theme={exhibitflowTheme}
             getRowId={(params) => params.data._id}
             defaultColDef={{
               sortable: true,

@@ -21,6 +21,7 @@ class ReportService {
   private initializeRoutes() {
     this.router.post('/generate', authenticateToken,verifyDepartment, permit(Roles.MANAGER), this.generateReport.bind(this));
     this.router.get('/', authenticateToken, permit(Roles.USER), this.getReports.bind(this));
+    this.router.get('/:id', authenticateToken, permit(Roles.MANAGER), this.getReportDetails.bind(this));
     this.router.post('/debit', authenticateToken, permit(Roles.MANAGER), this.addDebit.bind(this));
     this.router.get('/download', authenticateToken, permit(Roles.USER), this.downloadReport.bind(this));
   }
@@ -33,17 +34,26 @@ class ReportService {
         throw new AppError(400, 'Missing required parameters');
       }
 
-      // Delete existing report if any
       await Report.findOneAndDelete({
         'month.start': periodStart,
         payment: payment,
       });
-
+      
       const period = new Period(periodStart, periodEnd);
-      const fetchedLists = await List.find({ department: department }).lean();
+      const startDate = new Date(periodStart);
+      const endDate = new Date(periodEnd);
+      
+      const fetchedLists = await List.find({
+        department: department,
+        'tasks.deliveryDate': {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      });
 
       const report = await generateReport(period, fetchedLists, payment, department);
       console.log('report', report.activeProjects);
+      console.log(report.materials.length);
       if (report?.materials.length) {
         const dbReport = new Report(report);
         await dbReport.save();
@@ -63,8 +73,23 @@ class ReportService {
         throw new AppError(400, 'Department is required');
       }
 
-      const reports = await Report.find({ department: department });
-      res.json({ reports });
+      const reports = await Report.find({ department: department }).lean();
+      res.json({ reports: reports.map((report) => ({...report,materials: report.materials.length})) });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+  
+  async getReportDetails(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      const report = await Report.findById(id).lean();
+
+      if (!report) {
+        throw new AppError(404, 'Report not found');
+      }
+      
+      res.json(report);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import dayjs from 'dayjs';
 import { AgGridReact } from 'ag-grid-react';
-import myTheme from '../../theme/grid';
+import exhibitflowTheme from '../../theme/grid';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SaveAsRoundedIcon from '@mui/icons-material/SaveAsRounded';
 
@@ -136,7 +136,7 @@ export const UploadPreviewTable: React.FC<TasksDialogProps> = ({
         >
           <AgGridReact
             columnDefs={columnDefs as any}
-            theme={myTheme}
+            theme={exhibitflowTheme}
             rowData={data?.[selectedPage]?.tasks || []}
             suppressCellFocus={true}
             defaultColDef={{

@@ -2,7 +2,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { useMemo } from 'react';
 import { useLoadListsQuery, usePatchListMutation } from '../store/api/listsApi';
 import { Stack, Typography } from '@mui/material';
-import myTheme from '../theme/grid';
+import exhibitflowTheme from '../theme/grid';
 import { useNavigate } from 'react-router-dom';
 import { useGetLibraryQuery, ResourseType } from '../store/api/libraryApi';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
@@ -77,7 +77,7 @@ export default function Library() {
   return (
     <Stack height="100%" width="100%" flexGrow={1}>
       <Stack flexGrow={1} pb={1}>
-        <AgGridReact rowData={libraryData} theme={myTheme} columnDefs={columnDefs} />
+        <AgGridReact rowData={libraryData} theme={exhibitflowTheme} columnDefs={columnDefs} />
       </Stack>
     </Stack>
   );
