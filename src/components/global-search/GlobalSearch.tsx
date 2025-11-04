@@ -25,24 +25,66 @@ export default function GlobalSearch({ closeSearch }: { closeSearch: () => void 
   const [, setSearchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState<string>('');
   const [isFocused, setIsFocused] = useState(false);
-  const searchInputRef = useRef<HTMLDivElement | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const menuItemRefs = useRef<Map<number, HTMLLIElement>>(new Map());
   const { data, isLoading } = useSearchQuery(searchValue, {
     skip: !searchValue,
   });
+
+  useEffect(() => {
+    searchInputRef.current?.focus();
+  }, []);
+
+  // Focus management: selected item vs input
+  useEffect(() => {
+    if (selectedIndex >= 0) {
+      menuItemRefs.current.get(selectedIndex)?.focus();
+    } else {
+      searchInputRef.current?.focus();
+    }
+  }, [selectedIndex]);
+
+  // Return focus to input when typing
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      const isNavigationKey = ['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(e.key);
+      const isModifierOnly = e.key === 'Control' || e.key === 'Alt' || e.key === 'Shift' || e.key === 'Meta';
+      
+      if (!isNavigationKey && !isModifierOnly && document.activeElement !== searchInputRef.current) {
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   const handleInputChange = (val: string) => {
     setSearchValue(val);
   };
 
-  const renderOption = useCallback((option: SearchResultItem & { selected: boolean }) => {
+  const handleNavigationChange = useCallback((index: number) => {
+    setSelectedIndex(index);
+  }, []);
+
+  const setMenuItemRef = useCallback((index: number, element: HTMLLIElement | null) => {
+    if (element) {
+      menuItemRefs.current.set(index, element);
+    } else {
+      menuItemRefs.current.delete(index);
+    }
+  }, []);
+
+  const renderOption = useCallback((option: SearchResultItem & { selected: boolean }, index: number) => {
     if (option._id === 'divider') {
-      // Prevent it from being clickable as default autocomplete item
       return (
         <Box py={0.5}>
-          <Divider flexItem className="" onClick={() => {}} />
+          <Divider flexItem />
         </Box>
       );
     }
+
     const handleClick = () => {
       closeSearch();
       switch (option.type) {
@@ -55,10 +97,10 @@ export default function GlobalSearch({ closeSearch }: { closeSearch: () => void 
         case 'document':
           navigate(`/documents/${option._id}`);
           break;
-          
       }
     };
-    const renderIcon = (type) => {
+
+    const renderIcon = (type: string) => {
       switch (type) {
         case 'list':
           return <SourceRoundedIcon />;
@@ -67,12 +109,15 @@ export default function GlobalSearch({ closeSearch }: { closeSearch: () => void 
         case 'document':
           return <DescriptionRoundedIcon />;
       }
-    }
+    };
+
     return (
       <MenuItem
+        ref={(el) => setMenuItemRef(index, el)}
         data-cy={`search-result-${option.name}`}
         selected={option.selected}
         onClick={handleClick}
+        tabIndex={option.selected ? 0 : -1}
       >
         <Stack direction="row" color="text.secondary" maxWidth="100%" gap={1}>
           {renderIcon(option.type)}
@@ -82,7 +127,7 @@ export default function GlobalSearch({ closeSearch }: { closeSearch: () => void 
         </Stack>
       </MenuItem>
     );
-  }, []);
+  }, [closeSearch, navigate, setMenuItemRef]);
 
   return (
     <Box width="100%" position="relative" overflow="hidden" height={500}>
@@ -126,6 +171,7 @@ export default function GlobalSearch({ closeSearch }: { closeSearch: () => void 
           searchValue={searchValue}
           onResultClick={() => {}}
           renderOption={renderOption}
+          onNavigationChange={handleNavigationChange}
         />
       </Box>
     </Box>

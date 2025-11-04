@@ -15,7 +15,7 @@ import UnauthorizedLayout from './components/layout/UnauthorizedLayout';
 import { useAppSelector } from './store';
 import DocumentPage from './pages/DocumentPage';
 import LogsPage from './pages/LogsPage';
-import ReportDetailsPage from './pages/reportDetailsPage';
+import ReportDetailsPage from './pages/ReportDetailsPage';
 
 const PrivateRoute = ({ children, roles }) => {
   const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();

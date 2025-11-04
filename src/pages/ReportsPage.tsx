@@ -1,19 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useEffectEvent, useEffect, useState } from 'react';
 import { Grid } from '@mui/material';
 import CardComponent from '../components/cardComponent';
 import ReportGenerationDialog from '../components/ReportGenerationDialog';
 import ReportTable from '../components/ReportsTable';
 import { useReport } from '../state/reportsContext'; // Adjust the import to your file structure
 import { Report } from '../store/api/reportsApi';
+import { useReportNotifications } from '../hooks/useReportNotifications';
 
 const ReportsPage = () => {
-  const { reports } = useReport();
+  const { reports, refetch } = useReport();
   const [balance, setBalance] = useState(0);
+  
+  useReportNotifications();
 
   useEffect(() => {
     if (reports)
     calculateTotalReports(reports);
   }, [reports]);
+  
+  const handleReportGenerated = useEffectEvent(() => {
+    refetch();
+  });
+
+
+  useEffect(() => {
+    
+    window.addEventListener('report-generated', handleReportGenerated);
+    
+    return () => {
+      window.removeEventListener('report-generated', handleReportGenerated);
+    };
+  }, []);
 
   function calculateTotalReports(reports: Report[]) {
     if (!reports) return 0;

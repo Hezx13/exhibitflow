@@ -7,6 +7,7 @@ type ReportContextType = {
   reports?: Report[];
   fetchReports: () => void;
   updateReports: () => void;
+  refetch: () => void;
 };
 
 
@@ -16,7 +17,7 @@ const ReportContext = createContext<ReportContextType | undefined>(undefined);
 // Create a provider component
 export const ReportProvider = ({ children }: { children: React.ReactNode }) => {
   const [reportsUpdated, setReportsUpdated] = useState(false);
-  const { data, isLoading } = useGetReportsQuery();
+  const { data, isLoading, refetch } = useGetReportsQuery();
 
   useEffect(() => {
     if (!!localStorage.getItem('token') && localStorage.getItem('role') === 'Admin') fetchReports();
@@ -32,7 +33,7 @@ export const ReportProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <ReportContext.Provider value={{ reports: data?.reports, fetchReports, updateReports }}>
+    <ReportContext.Provider value={{ reports: data?.reports, fetchReports, updateReports, refetch }}>
       {children}
     </ReportContext.Provider>
   );

@@ -95,7 +95,7 @@ export const DashboardPage = () => {
   const handleViewSavedMaterials = () => {
     navigate('/saved');
   };
-  console.log(current);
+
   const handleRemoveDebitClick = async (debit) => {
     try {
       await removeBalance(debit._id);

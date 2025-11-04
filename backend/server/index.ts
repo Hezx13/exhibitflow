@@ -22,6 +22,9 @@ import libraryService from './services/library-service';
 import departmentService from './services/departments-service';
 import logsRouter from './services/logs-service';
 import { ProvisioningService } from './services/provisioning-service';
+import { RabbitMQService } from './services/rabbitmq-service';
+import ReportWorker from './workers/report-worker';
+import NotificationService from './services/notification-service';
 
 const app: Application = express();
 
@@ -50,7 +53,44 @@ app.use(errorHandler);
 
 // Server setup
 const server = createServer(app);
-const hocuspocusService = new HocuspocusService(server);
+
+// Initialize Hocuspocus service
+const hocuspocusService = new HocuspocusService();
+
+// Initialize Socket.IO notification service
+const notificationService = NotificationService.getInstance();
+notificationService.initialize(server);
+
+// Single upgrade handler that routes to the appropriate service
+// This MUST be registered AFTER Socket.IO initialization to override its handler
+server.removeAllListeners('upgrade'); // Remove Socket.IO's auto-registered handler
+server.on('upgrade', (request, socket, head) => {
+  const pathname = new URL(request.url || '', `http://${request.headers.host}`).pathname;
+  
+  console.log(`🔀 Upgrade request for path: ${pathname}`);
+  
+  // Route to Hocuspocus for /hocuspocus path
+  if (pathname === '/hocuspocus') {
+    console.log('→ Routing to Hocuspocus');
+    hocuspocusService.handleUpgrade(request, socket, head);
+    return;
+  }
+  
+  // Route to Socket.IO for /notifications/* paths
+  if (pathname.startsWith('/notifications')) {
+    console.log('→ Routing to Socket.IO');
+    const io = notificationService.getIO();
+    if (io) {
+      // @ts-expect-error - accessing internal engine
+      io.engine.handleUpgrade(request, socket, head);
+    }
+    return;
+  }
+  
+  console.log('→ No handler for this path, destroying socket');
+  socket.destroy();
+});
+
 app.use('/api/documents/:documentId', (req, res, next) =>
   documentMiddleware(req, res, next, hocuspocusService.hocuspocusServer)
 );
@@ -59,6 +99,17 @@ app.use('/api/documents/:documentId', (req, res, next) =>
 const startServer = async () => {
   try {
     await connectDB();
+    
+    // Initialize RabbitMQ
+    const rabbitMQ = RabbitMQService.getInstance();
+    await rabbitMQ.connect();
+    
+    // Start report worker
+    const reportWorker = new ReportWorker();
+    await reportWorker.start();
+    
+    // Start notification listener
+    await notificationService.startNotificationListener();
     
     // Check and provision default setup if database is empty
     await ProvisioningService.checkAndProvision();

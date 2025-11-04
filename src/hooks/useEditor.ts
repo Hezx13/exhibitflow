@@ -17,7 +17,6 @@ export const useEditor = ({ documentId }: UseEditorProps) => {
   const providerRef = useRef<HocuspocusProvider | null>(null);
   const [connected, setConnected] = useState(false);
   useEffect(() => {
-    console.log('creating provider');
     const provider = new HocuspocusProvider({
       url: 'ws://localhost:4500/hocuspocus',
       token: token,
@@ -34,7 +33,7 @@ export const useEditor = ({ documentId }: UseEditorProps) => {
       providerRef.current?.disconnect();
       providerRef.current?.destroy();
     };
-  }, [documentId]);
+  }, [documentId, token]);
 
   const threadStoreAuth = useMemo(() => {
     return new DefaultThreadStoreAuth(

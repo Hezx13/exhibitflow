@@ -118,6 +118,10 @@ const ReportDetailsPage = () => {
     );
   }, [data, selectedProject]);
 
+  const debitAmount = useMemo(() => {
+    if (!data?.debit) return 0;
+    return data.debit.reduce((sum, transaction) => sum + (transaction.debit || 0), 0);
+  }, [data]);
   if (isLoading) {
     return <Typography>Loading...</Typography>;
   }
@@ -137,14 +141,14 @@ const ReportDetailsPage = () => {
   const hasMoreProjects = data.activeProjects.length > 8;
 
   return (
-    <Box display="flex" flexDirection="column" height="100vh">
+    <Box display="flex" flexDirection="column" height="100%">
       {/* Fixed Header Section */}
-      <Box padding={3} paddingBottom={2}>
-        <Stack spacing={3}>
+      <Box>
+        <Stack gap={3}>
           {/* Header and Summary */}
           <Box>
             <Typography variant="h4" gutterBottom>
-              Report - {data.month.start} to {data.month.end}
+              Report - {new Date(data.month.start).toLocaleDateString()} to {new Date(data.month.end).toLocaleDateString()}
             </Typography>
             
             <Stack direction="row" spacing={4} paddingY={2}>
@@ -164,16 +168,24 @@ const ReportDetailsPage = () => {
                 <Typography variant="caption" color="text.secondary">
                   Total
                 </Typography>
-                <Typography variant="h6" color="primary">
-                  {totalAmount.toFixed(2)} AED
+                <Typography variant="h6" color="error">
+                  {(debitAmount - data.credit).toFixed(2)} AED
                 </Typography>
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary">
-                  Credit
+                  Debit
                 </Typography>
-                <Typography variant="h6" color="error">
-                  {data.credit.toFixed(2)} AED
+                <Typography variant="h6" color="success">
+                  {debitAmount} AED
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Credit 
+                </Typography>
+                <Typography variant="h6" color="primary">
+                  {totalAmount.toFixed(2)} AED
                 </Typography>
               </Box>
               <Box>
@@ -223,7 +235,7 @@ const ReportDetailsPage = () => {
       </Box>
 
       {/* Scrollable Table Section */}
-      <Box flex={1} paddingX={3} paddingBottom={3} overflow="auto">
+      <Box flex={1} py={2} overflow="auto">
         <Box className="ag-theme-alpine-dark" height="100%">
           <AgGridReact
             columnDefs={columnDefs}

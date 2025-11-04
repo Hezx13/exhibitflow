@@ -9,9 +9,10 @@ interface GlobalSearchResultsProps {
   loading: boolean;
   items: SearchResultItem[];
   searchValue: string;
-  renderOption: (item: SearchResultItem & { selected: boolean }) => React.ReactNode;
+  renderOption: (item: SearchResultItem & { selected: boolean }, index: number) => React.ReactNode;
   onResultClick: (item: SearchResultItem | null | undefined) => void;
   displayCreateNew?: boolean;
+  onNavigationChange?: (index: number) => void;
 }
 
 export default function GlobalSearchResults({
@@ -21,6 +22,7 @@ export default function GlobalSearchResults({
   searchValue,
   renderOption,
   onResultClick,
+  onNavigationChange,
 }: GlobalSearchResultsProps) {
   const searchResultsRef = useRef<HTMLUListElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
@@ -58,6 +60,10 @@ export default function GlobalSearchResults({
     },
     [items, selectedIndex, onResultClick]
   );
+
+  useEffect(() => {
+    onNavigationChange?.(selectedIndex);
+  }, [selectedIndex, onNavigationChange]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -102,7 +108,7 @@ export default function GlobalSearchResults({
     return (
       <ResultsList 
         items={items} 
-        selectedIndex={selectedIndex} 
+        selectedIndex={selectedIndex}
         renderOption={renderOption} 
         ref={searchResultsRef}
       />
@@ -135,7 +141,7 @@ const ResultsList = motion(forwardRef(function ResultsList({
 }: { 
   items: SearchResultItem[]; 
   selectedIndex: number; 
-  renderOption: (item: SearchResultItem & { selected: boolean }) => React.ReactNode;
+  renderOption: (item: SearchResultItem & { selected: boolean }, index: number) => React.ReactNode;
 }, ref: React.Ref<HTMLUListElement>) {
   return (
     <motion.div
@@ -159,7 +165,7 @@ const ResultsList = motion(forwardRef(function ResultsList({
             }}
             layout
           >
-            {renderOption({ ...item, selected: index === selectedIndex })}
+            {renderOption({ ...item, selected: index === selectedIndex }, index)}
           </motion.div>
         ))}
       </MenuList>

@@ -1,14 +1,14 @@
 import { Request, Response, Router } from 'express';
 import { AppError } from 'server/utils/errors';
-import List from 'server/models/List/list.model';
 import { Report } from 'server/models/reports';
-import { generateReport, Period } from 'server/utils/report-utils';
 import * as XLSX from 'xlsx';
 import path from 'path';
 import fs from 'fs';
 import { authenticateToken } from 'server/middleware/authenticate';
 import { permit, Roles } from 'server/middleware/permit';
 import verifyDepartment from 'server/middleware/department';
+import { RabbitMQService } from './rabbitmq-service';
+import { ReportGenerationJob } from '../workers/report-worker';
 
 class ReportService {
   public router = Router();
@@ -30,36 +30,28 @@ class ReportService {
     try {
       const { periodStart, periodEnd, payment } = req.body;
       const department = req.headers.department as string;
+      const userId = (req as any).user?.id;
+      
       if (!periodStart || !periodEnd || !payment || !department) {
         throw new AppError(400, 'Missing required parameters');
       }
 
-      await Report.findOneAndDelete({
-        'month.start': periodStart,
-        payment: payment,
-      });
+      const rabbitMQ = RabbitMQService.getInstance();
       
-      const period = new Period(periodStart, periodEnd);
-      const startDate = new Date(periodStart);
-      const endDate = new Date(periodEnd);
+      const job: ReportGenerationJob = {
+        periodStart,
+        periodEnd,
+        payment,
+        department,
+        userId,
+      };
+
+      await rabbitMQ.publishToQueue(rabbitMQ.REPORT_QUEUE, job);
       
-      const fetchedLists = await List.find({
-        department: department,
-        'tasks.deliveryDate': {
-          $gte: startDate,
-          $lte: endDate,
-        },
+      res.status(202).json({ 
+        message: 'Report generation started. You will be notified when it is ready.',
+        status: 'processing'
       });
-
-      const report = await generateReport(period, fetchedLists, payment, department);
-      console.log('report', report.activeProjects);
-      console.log(report.materials.length);
-      if (report?.materials.length) {
-        const dbReport = new Report(report);
-        await dbReport.save();
-      }
-
-      res.status(200).send('Report generated');
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
