@@ -23,7 +23,7 @@ export interface ReportNotification {
   };
   payment: string;
 }
-
+//todo: add logs
 export class ReportWorker {
   private rabbitMQ: RabbitMQService;
 
@@ -32,14 +32,13 @@ export class ReportWorker {
   }
 
   async start(): Promise<void> {
-    console.log('🔄 Starting report worker...');
     
     await this.rabbitMQ.consumeQueue(
       this.rabbitMQ.REPORT_QUEUE,
       this.processReportGeneration.bind(this)
     );
     
-    console.log('✅ Report worker started and listening for jobs');
+    console.log('\x1b[32m%s\x1b[0m','Report worker started and listening for jobs');
   }
 
   private async processReportGeneration(job: ReportGenerationJob): Promise<void> {
@@ -70,8 +69,8 @@ export class ReportWorker {
       });
 
       const report = await generateReport(period, fetchedLists, payment, department);
-      console.log('📋 Report generated - Active Projects:', report.activeProjects.length);
-      console.log('📦 Materials count:', report.materials.length);
+      console.log('Report generated - Active Projects:', report.activeProjects.length);
+      console.log('Materials count:', report.materials.length);
       
       let reportId: string | undefined;
       
@@ -79,7 +78,6 @@ export class ReportWorker {
         const dbReport = new Report(report);
         const savedReport = await dbReport.save();
         reportId = savedReport._id.toString();
-        console.log('💾 Report saved to database with ID:', reportId);
       }
 
       // Send success notification
@@ -103,11 +101,10 @@ export class ReportWorker {
         notification
       );
       
-      console.log('✅ Report generation completed and notification sent');
+      console.log('\x1b[32m%s\x1b[0m', 'Report generation completed and notification sent');
     } catch (error: any) {
-      console.error('❌ Error generating report:', error);
+      console.error(error);
       
-      // Send error notification
       const notification: ReportNotification = {
         status: 'error',
         message: error.message || 'Failed to generate report',

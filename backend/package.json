@@ -20,6 +20,7 @@
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "excel-date-to-js": "^1.1.5",
+    "execa": "^9.6.0",
     "express": "^5.0.0",
     "express-ws": "^5.0.2",
     "fractional-indexing-jittered": "^1.0.0",

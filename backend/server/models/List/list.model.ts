@@ -17,6 +17,7 @@ interface ITask extends Document {
   payment: string;
   listParent?: { id: string; name: string };
   positionKey: string;
+  invoiceRef?: { type: Schema.Types.ObjectId; ref: 'FileData'}
 }
 
 interface Position {

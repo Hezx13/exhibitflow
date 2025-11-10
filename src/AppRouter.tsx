@@ -16,6 +16,7 @@ import { useAppSelector } from './store';
 import DocumentPage from './pages/DocumentPage';
 import LogsPage from './pages/LogsPage';
 import ReportDetailsPage from './pages/ReportDetailsPage';
+import InvoicesPage from './pages/InvoicesPage';
 
 const PrivateRoute = ({ children, roles }) => {
   const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();
@@ -96,6 +97,12 @@ const routes = [
   {
     path: '/logs',
     element: <LogsPage />,
+    protected: true,
+    allowedRoles: ['Admin'],
+  },
+  {
+    path: '/invoices',
+    element: <InvoicesPage />,
     protected: true,
     allowedRoles: ['Admin'],
   },

@@ -33,7 +33,7 @@ export class NotificationService {
     });
 
     this.io.on('connection', (socket) => {
-      console.log('🔌 Client connected to notifications:', socket.id);
+      console.log('Client connected to notifications:', socket.id);
 
       socket.on('join-department', (department: string) => {
         socket.join(`department:${department}`);
@@ -41,7 +41,7 @@ export class NotificationService {
       });
 
       socket.on('disconnect', () => {
-        console.log('🔌 Client disconnected from notifications:', socket.id);
+        console.log('Client disconnected from notifications:', socket.id);
       });
     });
     
@@ -49,14 +49,13 @@ export class NotificationService {
   }
   
   async startNotificationListener(): Promise<void> {
-    console.log('👂 Starting notification listener...');
     
     await this.rabbitMQ.consumeQueue(
       this.rabbitMQ.REPORT_NOTIFICATION_QUEUE,
       this.handleNotification.bind(this)
     );
     
-    console.log('✅ Notification listener started');
+    console.log('\x1b[32m%s\x1b[0m','Notification listener started');
   }
 
   private async handleNotification(notification: ReportNotification): Promise<void> {
@@ -67,7 +66,6 @@ export class NotificationService {
       return;
     }
 
-    // Emit to all clients in the department room
     this.io.to(`department:${notification.department}`).emit('report-ready', {
       status: notification.status,
       reportId: notification.reportId,
@@ -77,7 +75,6 @@ export class NotificationService {
       timestamp: new Date().toISOString(),
     });
 
-    console.log(`✅ Notification sent to department: ${notification.department}`);
   }
 
   getIO(): SocketIOServer | null {

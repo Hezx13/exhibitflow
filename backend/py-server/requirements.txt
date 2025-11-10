@@ -1,0 +1,6 @@
+paddleocr>=2.7.0.3
+paddlepaddle>=2.5.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+requests>=2.31.0
+pymongo>=4.15.3

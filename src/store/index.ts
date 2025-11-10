@@ -17,6 +17,7 @@ import { documentsApi } from './api/documentsApi';
 import { libraryApi } from './api/libraryApi';
 import { logsApi } from './api/logsApi';
 import { reportsApi } from './api/reportsApi';
+import { ocrApi } from './api/ocrApi';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -33,6 +34,7 @@ export const store = configureStore({
     [libraryApi.reducerPath]: libraryApi.reducer,
     [logsApi.reducerPath]: logsApi.reducer,
     [reportsApi.reducerPath]: reportsApi.reducer,
+    [ocrApi.reducerPath]: ocrApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -50,7 +52,8 @@ export const store = configureStore({
       documentsApi.middleware,
       libraryApi.middleware,
       logsApi.middleware,
-      reportsApi.middleware
+      reportsApi.middleware,
+      ocrApi.middleware
     ),
 });
 

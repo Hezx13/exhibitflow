@@ -6,6 +6,7 @@ import AssessmentRoundedIcon from '@mui/icons-material/AssessmentRounded';
 import LocalLibraryRoundedIcon from '@mui/icons-material/LocalLibraryRounded';
 import DocumentScannerRoundedIcon from '@mui/icons-material/DocumentScannerRounded';
 import EventNoteRoundedIcon from '@mui/icons-material/EventNoteRounded';
+import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 import { useAppSelector } from '../../../store';
 import { useMemo } from 'react';
 export const StaticLinksList = () => {
@@ -28,6 +29,11 @@ export const StaticLinksList = () => {
       path: '/reports',
       label: 'Reports',
       icon: <AssessmentRoundedIcon fontSize="small" />,
+    }):null,
+    isAdmin ? ({
+      path: '/invoices',
+      label: 'Invoices',
+      icon: <FileUploadRoundedIcon fontSize="small" />,
     }):null,
     {
       path: '/library',

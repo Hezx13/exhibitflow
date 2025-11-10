@@ -65,7 +65,7 @@ class HocuspocusService {
 
   private initConnection(ws: WebSocket, request: IncomingMessage) {
     console.log(
-      `📡 New WebSocket connection established from ${request.socket.remoteAddress || request.socket.localAddress || 'unknown'
+      `New WebSocket connection established from ${request.socket.remoteAddress || request.socket.localAddress || 'unknown'
       }`
     );
     this.hocuspocusServer.handleConnection(ws, request);
