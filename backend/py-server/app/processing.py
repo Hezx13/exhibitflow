@@ -8,6 +8,7 @@ from pymongo import collection
 import fitz
 from paddleocr import PaddleOCR
 import json
+from bson import ObjectId
 
 logger = logging.getLogger(__name__)
 
@@ -120,19 +121,72 @@ def run_ocr_batch(ocr: PaddleOCR, image_paths: Sequence[str], output_root: str, 
 
     os.makedirs(output_root, exist_ok=True)
     results: List[ImageOCRResult] = []
-
+    
+    jobCollection.update_one({"_id": ObjectId(jobId)},
+        {"$set": {
+            "jobStatus": "in_progress"
+        }}
+    )
+    
     for index, img_path in enumerate(image_paths, 1):
         filename = os.path.basename(img_path)
         basename, _ = os.path.splitext(filename)
         out_dir = os.path.join(output_root, basename)
         os.makedirs(out_dir, exist_ok=True)
-        
         logger.info("Running OCR on [%d/%d] %s", index, len(image_paths), filename)
-
+        
+        if fileDataCollection is None or jobCollection is None:
+            raise ValueError("Cannot save OCR results: fileDataCollection or jobCollection is None")
+        
+        fileDbData = fileDataCollection.find_one({"filePath": img_path}, {"_id": 1, "ocrStatus": 1})
+        if fileDbData is None:
+            logger.warning("File not found in database: %s", img_path)
+            continue
+            
+        fileDbId = fileDbData.get("_id")
+        fileDbOcrStatus = fileDbData.get("ocrStatus")
+        
+        # Skip only if already completed (not pending and not failed)
+        if fileDbOcrStatus not in ["pending", "failed"]:
+            logger.info("Skipping OCR for %s because it was processed (status: %s)", filename, fileDbOcrStatus)
+            continue
+        
+        fileDataCollection.update_one(
+            {"_id": ObjectId(fileDbId)},
+            {"$set": {
+                    "ocrStatus": "in_progress"
+                }
+            },
+            upsert=False
+        )
+        
+        jobCollection.update_one({"_id": ObjectId(jobId), "fileRefs.fileData": ObjectId(fileDbId)},
+            {"$set": {
+                "fileRefs.$.processingStatus": "in_progress"
+            }}
+        )
+        
+        
         try:
             predict_results = ocr.predict(input=img_path)
         except Exception:
             logger.exception("PaddleOCR.predict failed for %s", filename)
+            fileDataCollection.update_one(
+                {"_id": ObjectId(fileDbId)},
+                {
+                    "$set": {
+                        "ocrStatus": "failed"
+                    }
+                },
+                upsert=False
+            )
+            
+            jobCollection.update_one(
+                {"_id": ObjectId(jobId), "fileRefs.fileData": ObjectId(fileDbId)},
+                {"$set": {
+                    "fileRefs.$.processingStatus": "failed"
+                }}
+            )
             raise
 
         if not predict_results:
@@ -166,25 +220,27 @@ def run_ocr_batch(ocr: PaddleOCR, image_paths: Sequence[str], output_root: str, 
             )
         )
         
-        if fileDataCollection is not None:
-            try:
-                fileDataCollection.update_one(
-                    {"filePath": img_path},
-                    {
-                        "$set": {
-                            "textContent": {
-                                "text_lines": aggregated_lines,
-                                "ocr_data": ocr_json_data,
-                                "pages": len(predict_results)
-                            },
-                            "ocrStatus": "completed"
-                        }
-                    },
-                    upsert=False
-                )
-                logger.info("Saved OCR results to fileData for %s", filename)
-            except Exception as e:
-                logger.error("Failed to save OCR results to fileData for %s: %s", filename, str(e))
+        try:
+            fileDataCollection.update_one(
+                {"_id": ObjectId(fileDbId)},
+                {
+                    "$set": {
+                        "ocrContent": ocr_json_data,
+                        "ocrStatus": "completed"
+                    }
+                },
+                upsert=False
+            )
+            
+            jobCollection.update_one(
+                {"_id": ObjectId(jobId), "fileRefs.fileData": ObjectId(fileDbId)},
+                {"$set": {
+                    "fileRefs.$.processingStatus": "completed"
+                }}
+            )
+            logger.info("Saved OCR results to fileData for %s", filename)
+        except Exception as e:
+            logger.error("Failed to save OCR results to fileData for %s: %s", filename, str(e))
 
     logger.info("OCR batch complete")
 

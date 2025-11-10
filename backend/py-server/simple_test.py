@@ -48,21 +48,37 @@ def main() -> None:
     
     print(f"Found {len(image_files)} image(s)\n")
     fileRefs = []
+    fileDataIds = []
+    
     for img_path in image_files:
         fileStats = os.stat(img_path)
-        fileRefs.append({
-            "filePath": img_path,
-            "fileName": os.path.basename(img_path),
-            "fileModifiedAt": fileStats.st_mtime,
-            "fileSize": fileStats.st_size,
-            "ocrStatus": "pending",
-            "isInvoice": True,
-        })
-    insertedFiles = fileDataCollection.insert_many(fileRefs)
+        existing_file = fileDataCollection.find_one({"filePath": img_path}, {"_id": 1})
+        
+        if existing_file:
+            print(f"File {img_path} already exists in database, using existing entry.")
+            fileDataIds.append(existing_file["_id"])
+        else:
+            fileRefs.append({
+                "filePath": img_path,
+                "fileName": os.path.basename(img_path),
+                "fileModifiedAt": fileStats.st_mtime,
+                "fileSize": fileStats.st_size,
+                "ocrStatus": "pending",
+                "isInvoice": True,
+            })
+    
+    if fileRefs:
+        insertedFiles = fileDataCollection.insert_many(fileRefs)
+        fileDataIds.extend(insertedFiles.inserted_ids)
+        print(f"Inserted {len(fileRefs)} new file records\n")
+    else:
+        print(f"All {len(image_files)} files already exist in database\n")
+    
     fileRefsWithStatus = [
-    {"ref": _id, "processingStatus": "not_started"}
-    for _id in insertedFiles.inserted_ids
+        {"fileData": _id, "processingStatus": "not_started"}
+        for _id in fileDataIds
     ]
+    
     jobCollection.update_one(
         {"_id": ObjectId(jobId)},
         {"$set": {"fileRefs": fileRefsWithStatus}}
@@ -70,7 +86,6 @@ def main() -> None:
     print(f"Updated job entry with {len(fileRefs)} fileRefs\n")
     batch_results = run_ocr_batch(ocr, image_files, output_root=OCR_OUTPUT_DIR, jobCollection=jobCollection, jobId=jobId, fileDataCollection=fileDataCollection)
 
-    # Present a concise preview similar to the previous inline printing
     for idx, result in enumerate(batch_results, 1):
         filename = os.path.basename(result.image_path)
         print(f"[{idx}/{len(batch_results)}] Processed: {filename}")
