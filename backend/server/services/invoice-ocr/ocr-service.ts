@@ -1,24 +1,22 @@
 import { Router, Response, Request } from 'express';
-import { spawn } from 'child_process';
-import path from 'path';
 import { AuthenticatedRequest, authenticateToken } from 'server/middleware/authenticate';
 import { permit, Roles } from 'server/middleware/permit';
 import RabbitMQService from '../rabbitmq-service';
+import PythonRunnerService from '../python-runner-service';
+import OCRJob, { JOB_STATUS } from 'server/models/ocrJob';
 
 class OCRService {
   public router = Router();
-  private pyServerPath: string;
-  private pythonExecutable: string;
-
+  private pythonRunner: PythonRunnerService;
+  
   constructor() {
-    this.pyServerPath = path.join(__dirname, '../../../py-server');
-    this.pythonExecutable = path.join(this.pyServerPath, '.venv', 'bin', 'python3');
+    this.pythonRunner = new PythonRunnerService();
     this.initializeRoutes();
   }
 
   async initialize(): Promise<void> {    
     try {
-      const helloOutput = await this.runOcrPythonScript('hello.py');
+      const helloOutput = await this.pythonRunner.runOcrPythonScript('hello.py', '');
       console.log('!!! Python environment:', helloOutput.trim());
     } catch (error: any) {
       console.error('!!! Python environment test failed:', error.message);
@@ -30,44 +28,7 @@ class OCRService {
   private initializeRoutes() {
     this.router.post('/process', authenticateToken, permit(Roles.ADMIN), this.processOCR.bind(this));
     this.router.get('/test', this.testOCR.bind(this));
-  }
-  // todo: remove this
-  public runOcrPythonScript (scriptName: string = 'simple_test.py'): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const pythonProcess = spawn(this.pythonExecutable, [scriptName], {
-        cwd: this.pyServerPath,
-      });
-
-      let stdout = '';
-      let stderr = '';
-
-      pythonProcess.stdout?.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      pythonProcess.stderr?.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      pythonProcess.on('close', (code) => {
-        if (code === 0) {
-          resolve(stdout);
-        } else {
-          reject(new Error(`Process exited with code ${code}: ${stderr}`));
-        }
-      });
-
-      pythonProcess.on('error', (error) => {
-        reject(error);
-      });
-
-      const timeout = setTimeout(() => {
-        pythonProcess.kill();
-        reject(new Error('Process timeout after 120 seconds'));
-      }, 120000);
-
-      pythonProcess.on('close', () => clearTimeout(timeout));
-    });
+    this.router.get('/unfinished-jobs', authenticateToken, permit(Roles.ADMIN), this.getUnfinishedJobs.bind(this));
   }
 
   private async processOCR(req: AuthenticatedRequest, res: Response) {
@@ -79,7 +40,7 @@ class OCRService {
 
       console.log(`📄 Processing OCR request for: ${imagePath}`);
 
-      const result = await this.runOcrPythonScript();
+      const result = await this.pythonRunner.runOcrPythonScript('simple_test.py', '');
 
       return res.status(200).json({
         success: true,
@@ -113,8 +74,13 @@ class OCRService {
     }
   }
 
+  private async getUnfinishedJobs(_req: Request, res: Response){
+    const jobs = await OCRJob.find({ jobStatus: {$ne: JOB_STATUS.Completed} }).lean();
+    return res.json(jobs);
+  }
+
   async shutdown(): Promise<void> {
-    console.log('🛑 OCR Service shutdown');
+    console.log('🛑OCR Service shutdown');
   }
 }
 

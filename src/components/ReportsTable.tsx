@@ -137,7 +137,7 @@ const ReportTable = ({ data }) => {
       ...data,
       monthDisplay: months[Number(data.month.start.split('-')[1][1]) - 1] +
         ' ' +
-        data.month.start.split('-')[2] +
+        data.month.start.split('-')[0] +
         ' ' +
         data.payment,
       debitAmount: data.debit

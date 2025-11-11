@@ -14,10 +14,31 @@ export interface OCRTestResponse {
   error?: string;
 }
 
+export interface OCRFileRef {
+    fileData: string;
+    processingStatus: 'in_progress' | 'not_started' | 'completed' | 'failed';
+}
+
+export interface OCRJob {
+    _id: string;
+    jobStatus: string;
+    fileRefs: OCRFileRef[];
+    createdAt: string;
+    updatedAt: string;
+}
+
 export const ocrApi = createApi({
   reducerPath: 'ocrApi',
   baseQuery: baseQuery,
+  tagTypes: ['OCRJobs'],
   endpoints: (builder) => ({
+    ocrJobs: builder.query<any[], void>({
+      query: () => ({
+        url: '/ocr/unfinished-jobs',
+        method: 'GET',
+      }),
+        providesTags: ['OCRJobs'],
+    }),
     testOCR: builder.query<OCRTestResponse, void>({
       query: () => ({
         url: '/ocr/test',
@@ -34,4 +55,4 @@ export const ocrApi = createApi({
   }),
 });
 
-export const { useTestOCRQuery, useProcessOCRMutation } = ocrApi;
+export const { useTestOCRQuery, useProcessOCRMutation, useOcrJobsQuery } = ocrApi;

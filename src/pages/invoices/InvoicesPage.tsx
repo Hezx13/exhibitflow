@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Grid, Button, Stack, CircularProgress, Alert, Card, CardContent, Typography, Box } from '@mui/material';
-import CardComponent from '../components/cardComponent';
+import CardComponent from '../../components/cardComponent';
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
-import { useTestOCRQuery, useProcessOCRMutation } from '../store/api/ocrApi';
+import { useTestOCRQuery, useProcessOCRMutation, useOcrJobsQuery } from '../../store/api/ocrApi';
+import JobsDisplay from './components/JobsDisplay';
 
 const InvoicesPage = () => {
   const [testTrigger, setTestTrigger] = useState(false);
@@ -47,7 +48,10 @@ const InvoicesPage = () => {
           icon={<FileUploadRoundedIcon fontSize="large" />}
         />
       </Grid>
-
+      
+      <Grid size={12}>
+        <JobsDisplay />
+      </Grid>
       {/* Test Buttons */}
       <Grid size={12}>
         <Card>

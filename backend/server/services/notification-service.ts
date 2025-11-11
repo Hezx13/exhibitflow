@@ -52,14 +52,31 @@ export class NotificationService {
     
     await this.rabbitMQ.consumeQueue(
       this.rabbitMQ.REPORT_NOTIFICATION_QUEUE,
-      this.handleNotification.bind(this)
+      this.broadcastReportNotification.bind(this),
+    );
+
+    await this.rabbitMQ.consumeQueue(
+      this.rabbitMQ.OCR_JOB_NOTIFICATION_QUEUE,
+      this.broadcastOcrJobNotification.bind(this),
     );
     
     console.log('\x1b[32m%s\x1b[0m','Notification listener started');
   }
 
-  private async handleNotification(notification: ReportNotification): Promise<void> {
-    console.log('📢 Broadcasting notification:', notification);
+  private async broadcastOcrJobNotification(notification: any): Promise<void> {
+    console.log('\x1b[34m%s\x1b[0m', 'Broadcasting notification:', notification);
+    if (!this.io) {
+      console.error('Socket.IO not initialized');
+      return;
+    }
+
+    this.io.emit('ocr-job-updated', {
+      jobId: notification.jobId,
+    });
+  }
+
+  private async broadcastReportNotification(notification: ReportNotification): Promise<void> {
+    console.log('\x1b[34m%s\x1b[0m', 'Broadcasting notification:', notification);
 
     if (!this.io) {
       console.error('Socket.IO not initialized');

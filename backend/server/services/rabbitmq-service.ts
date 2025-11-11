@@ -13,6 +13,7 @@ export class RabbitMQService {
   public readonly REPORT_QUEUE = 'report_generation_queue';
   public readonly REPORT_NOTIFICATION_QUEUE = 'report_notification_queue';
   public readonly INVOICE_OCR_QUEUE = 'invoice_ocr_queue';
+  public readonly OCR_JOB_NOTIFICATION_QUEUE = 'ocr_job_notification_queue';
 
   private constructor() {
     this.url = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
@@ -39,6 +40,7 @@ export class RabbitMQService {
       await assertQueuePromise(this.REPORT_QUEUE, { durable: true });
       await assertQueuePromise(this.REPORT_NOTIFICATION_QUEUE, { durable: true });
       await assertQueuePromise(this.INVOICE_OCR_QUEUE, { durable: true });
+      await assertQueuePromise(this.OCR_JOB_NOTIFICATION_QUEUE, { durable: true });
       
       console.log('\x1b[32mRabbitMQ connected successfully\x1b[0m');
       

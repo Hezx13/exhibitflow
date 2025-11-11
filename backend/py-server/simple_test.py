@@ -6,7 +6,7 @@ import sys
 from paddleocr import PaddleOCR
 
 from app.config import OCR_OUTPUT_DIR
-from app.processing import collect_image_inputs, run_ocr_batch
+from app.processing import collect_image_inputs, run_ocr_batch, publish_ocr_notification
 from pymongo import MongoClient
 from bson import ObjectId
 def main() -> None:
@@ -33,7 +33,7 @@ def main() -> None:
     print("✓ OCR initialized\n")
     jobData = jobCollection.find_one({"_id": ObjectId(jobId)})
     print(f"Job data: {jobData}")
-    # Get test images
+    # test images
     test_dir = os.path.join(os.path.dirname(__file__), "test-data")
     
     if not os.path.exists(test_dir):
@@ -83,9 +83,23 @@ def main() -> None:
         {"_id": ObjectId(jobId)},
         {"$set": {"fileRefs": fileRefsWithStatus}}
     )
-    print(f"Updated job entry with {len(fileRefs)} fileRefs\n")
+    print(f"Updated job entry with {len(fileDataIds)} fileRefs\n")
+    
+    # Publish notification after setting up job
+    publish_ocr_notification(jobId, "pending", fileRefsWithStatus)
     batch_results = run_ocr_batch(ocr, image_files, output_root=OCR_OUTPUT_DIR, jobCollection=jobCollection, jobId=jobId, fileDataCollection=fileDataCollection)
-
+    
+    currentJob = jobCollection.find_one({"_id": ObjectId(jobId)})
+    allFinishedInCurrentJob = all(ref.get("processingStatus") == "completed" for ref in currentJob.get("fileRefs", []))
+    if (allFinishedInCurrentJob):
+        jobCollection.update_one(
+            {"_id": ObjectId(jobId)},
+            {"$set": {"jobStatus": "completed"}}
+        )
+        # Publish final completion notification
+        publish_ocr_notification(jobId, "completed", currentJob.get("fileRefs", []))
+    print(f"Job {jobId} marked as completed\n")
+    
     for idx, result in enumerate(batch_results, 1):
         filename = os.path.basename(result.image_path)
         print(f"[{idx}/{len(batch_results)}] Processed: {filename}")

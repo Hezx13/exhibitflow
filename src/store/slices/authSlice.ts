@@ -1,7 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer } from 'redux-persist';
-const initialState = {
+
+interface AuthState {
+  token: string | null;
+  role: 'Admin' | 'Manager' | 'User' | null;
+  department: string | null;
+  userName: string | null;
+  isAdmin: boolean;
+  isManager: boolean;
+  isUser: boolean;
+}
+
+const initialState: AuthState = {
   token: null,
   role: null,
   department: null,

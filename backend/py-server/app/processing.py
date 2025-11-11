@@ -9,11 +9,42 @@ import fitz
 from paddleocr import PaddleOCR
 import json
 from bson import ObjectId
+import pika
+import json as json_module
 
 logger = logging.getLogger(__name__)
 
 SUPPORTED_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".bmp", ".tiff"}
 PDF_SUFFIXES = {".pdf"}
+
+
+def publish_ocr_notification(job_id: str, job_status: str, file_refs: list = None):
+    """Publish OCR job status update to RabbitMQ"""
+    try:
+        rabbitmq_url = os.getenv("RABBITMQ_URL", "amqp://localhost:5672")
+        connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_url))
+        channel = connection.channel()
+        
+        channel.queue_declare(queue='ocr_job_notification_queue', durable=True)
+        
+        message = {
+            "jobId": job_id,
+            "jobStatus": job_status,
+            "fileRefs": file_refs or [],
+            "timestamp": __import__("datetime").datetime.utcnow().isoformat()
+        }
+        
+        channel.basic_publish(
+            exchange='',
+            routing_key='ocr_job_notification_queue',
+            body=json_module.dumps(message),
+            properties=pika.BasicProperties(delivery_mode=2)
+        )
+        
+        logger.info(f"Published notification: job={job_id}, status={job_status}")
+        connection.close()
+    except Exception as e:
+        logger.error(f"Failed to publish RabbitMQ notification: {e}")
 
 
 @dataclass
@@ -127,6 +158,7 @@ def run_ocr_batch(ocr: PaddleOCR, image_paths: Sequence[str], output_root: str, 
             "jobStatus": "in_progress"
         }}
     )
+    publish_ocr_notification(jobId, "in_progress")
     
     for index, img_path in enumerate(image_paths, 1):
         filename = os.path.basename(img_path)
@@ -146,9 +178,13 @@ def run_ocr_batch(ocr: PaddleOCR, image_paths: Sequence[str], output_root: str, 
         fileDbId = fileDbData.get("_id")
         fileDbOcrStatus = fileDbData.get("ocrStatus")
         
-        # Skip only if already completed (not pending and not failed)
         if fileDbOcrStatus not in ["pending", "failed"]:
             logger.info("Skipping OCR for %s because it was processed (status: %s)", filename, fileDbOcrStatus)
+            jobCollection.update_one({"_id": ObjectId(jobId), "fileRefs.fileData": ObjectId(fileDbId)},
+            {"$set": {
+                "fileRefs.$.processingStatus": fileDbOcrStatus
+            }}
+        )
             continue
         
         fileDataCollection.update_one(
@@ -238,10 +274,14 @@ def run_ocr_batch(ocr: PaddleOCR, image_paths: Sequence[str], output_root: str, 
                     "fileRefs.$.processingStatus": "completed"
                 }}
             )
+            # Publish notification after completing file processing
+            publish_ocr_notification(jobId, "in_progress")
             logger.info("Saved OCR results to fileData for %s", filename)
         except Exception as e:
             logger.error("Failed to save OCR results to fileData for %s: %s", filename, str(e))
 
     logger.info("OCR batch complete")
+    # Publish final completion notification
+    publish_ocr_notification(jobId, "completed")
 
     return results

@@ -16,7 +16,7 @@ import { useAppSelector } from './store';
 import DocumentPage from './pages/DocumentPage';
 import LogsPage from './pages/LogsPage';
 import ReportDetailsPage from './pages/ReportDetailsPage';
-import InvoicesPage from './pages/InvoicesPage';
+import InvoicesPage from './pages/invoices/InvoicesPage';
 
 const PrivateRoute = ({ children, roles }) => {
   const { data: userData, isLoading: userDataLoading } = useGetUserDataQuery();

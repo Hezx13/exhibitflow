@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { JOB_STATUS } from "./ocrJob";
 
 const OcrDataItemSchema = new Schema(
     {
@@ -30,15 +31,18 @@ const fileDataSchema = new Schema(
         fileSize: { type: Number, required: true },
         pdfParent: { type: Schema.Types.ObjectId },
         isInvoice: { type: Boolean, default: false },
+        fileTags: { type: [String], default: [] },
         ocrStatus: {
             type: String,
-            enum: ["pending", "in_progress", "completed", "failed"],
-            default: "pending",
+            enum: Object.values(JOB_STATUS),
+            default: JOB_STATUS.Pending,
         },
         ocrContent: { type: [OcrDataItemSchema], required: false }
     },
     { timestamps: true, collection: "file_data" }
 );
+
+fileDataSchema.index({ ocrStatus: 1, fileName: 1 });
 
 const FileData = mongoose.model("FileData", fileDataSchema);
 export type IFileData = mongoose.InferSchemaType<typeof fileDataSchema>;
