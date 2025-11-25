@@ -3,6 +3,7 @@ import { baseQuery } from './baseQuery';
 export enum ResourseType {
   DOCUMENT = 'document',
   TABLE = 'table',
+  FILE = 'file',
   ALL = 'all',
 }
 interface LibraryPayload {

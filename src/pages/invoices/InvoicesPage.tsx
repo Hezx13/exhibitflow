@@ -1,30 +1,30 @@
 import { useState } from 'react';
-import { Grid, Button, Stack, CircularProgress, Alert, Card, CardContent, Typography, Box } from '@mui/material';
-import CardComponent from '../../components/cardComponent';
+import { Grid, Button, Stack, CircularProgress, Alert, Card, CardContent, Typography, Box, Tabs } from '@mui/material';
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
-import { useTestOCRQuery, useProcessOCRMutation, useOcrJobsQuery } from '../../store/api/ocrApi';
+import { useProcessOCRMutation, useOcrJobsQuery, useTestOCRMutation } from '../../store/api/ocrApi';
 import JobsDisplay from './components/JobsDisplay';
+import { useSnackbar } from 'notistack';
 
 const InvoicesPage = () => {
-  const [testTrigger, setTestTrigger] = useState(false);
   const [processResult, setProcessResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  const { enqueueSnackbar } = useSnackbar();
   // Test OCR endpoint
-  const { data: testData, isLoading: testLoading, error: testError, refetch: refetchTest } = useTestOCRQuery(
-    undefined,
-    { skip: !testTrigger }
-  );
+  const [testOcr, {isLoading, error: testError}] = useTestOCRMutation();
 
   // Process OCR mutation
   const [processOCR, { isLoading: processLoading, error: processError }] = useProcessOCRMutation();
 
   const handleTestOCR = async () => {
-    setTestTrigger(true);
     setError(null);
     setProcessResult(null);
-    await refetchTest();
+    
+    await testOcr();
+    enqueueSnackbar('The processing job has been requested', {
+          variant: 'success',
+          autoHideDuration: 5000,
+        });
   };
 
   const handleProcessOCR = async () => {
@@ -40,13 +40,7 @@ const InvoicesPage = () => {
 
   return (
     <Grid container spacing={3}>
-      {/* Header Card */}
       <Grid size={12}>
-        <CardComponent
-          text="Invoice OCR Processing"
-          secondaryText="Test and process invoices with OCR"
-          icon={<FileUploadRoundedIcon fontSize="large" />}
-        />
       </Grid>
       
       <Grid size={12}>
@@ -64,9 +58,9 @@ const InvoicesPage = () => {
               <Stack direction="row" spacing={2}>
                 <Button
                   variant="contained"
-                  startIcon={testLoading ? <CircularProgress size={20} /> : <AutoFixHighRoundedIcon />}
+                  startIcon={isLoading ? <CircularProgress size={20} /> : <AutoFixHighRoundedIcon />}
                   onClick={handleTestOCR}
-                  disabled={testLoading || processLoading}
+                  disabled={isLoading || processLoading}
                   fullWidth
                 >
                   Test OCR (GET)
@@ -77,7 +71,7 @@ const InvoicesPage = () => {
                   color="success"
                   startIcon={processLoading ? <CircularProgress size={20} /> : <FileUploadRoundedIcon />}
                   onClick={handleProcessOCR}
-                  disabled={testLoading || processLoading}
+                  disabled={isLoading || processLoading}
                   fullWidth
                 >
                   Process OCR (POST)
@@ -94,33 +88,6 @@ const InvoicesPage = () => {
           <Alert severity="error">
             {error || (testError as any)?.data?.error || (processError as any)?.data?.error || 'An error occurred'}
           </Alert>
-        </Grid>
-      )}
-
-      {/* Test Results */}
-      {testData && (
-        <Grid size={12}>
-          <Card sx={{ backgroundColor: 'success.light' }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="600" mb={2}>
-                Test Results ✓
-              </Typography>
-              <Box
-                component="pre"
-                sx={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                  p: 2,
-                  borderRadius: 1,
-                  overflow: 'auto',
-                  fontSize: '0.875rem',
-                  fontFamily: 'monospace',
-                  maxHeight: '400px',
-                }}
-              >
-                {JSON.stringify(testData, null, 2)}
-              </Box>
-            </CardContent>
-          </Card>
         </Grid>
       )}
 

@@ -39,6 +39,7 @@
   "scripts": {
     "start": "bun run dist/index.js",
     "dev": "bun --watch server/index.ts",
+    "file-server": "bun --watch file-server/index.ts",
     "build-app": "bun build ./server/index.ts --outdir ./dist --target bun",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",

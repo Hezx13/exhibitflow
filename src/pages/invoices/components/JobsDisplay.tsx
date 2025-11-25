@@ -1,7 +1,8 @@
 import { Alert, Card, Chip, Skeleton, Stack, Typography } from "@mui/material";
 import { useOcrJobsQuery } from "../../../store/api/ocrApi";
-import { Activity } from "react";
+import { Activity, useMemo } from "react";
 import StatusCircle, { StatusVariant } from "../../../components/StatusCircle";
+
 const statusMap: Record<string, string> = {
     in_progress: "In Progress",
     not_started: "Not Started",
@@ -16,9 +17,23 @@ const statusVariantMap: Record<string, StatusVariant> = {
     failed: "error"
 };
 
-
 const JobsDisplay = () => {
     const {data: ocrJobsData, isLoading: ocrJobsLoading, error: ocrJobsError} = useOcrJobsQuery();
+    
+    const processedFiles = useMemo(()=>{
+        if (!ocrJobsData) return 0;
+        let jobsCompletedFiles = {};
+        for (let job of ocrJobsData) {
+            const count = job.fileRefs.reduce((acc, fileRef) => {
+                if (fileRef.processingStatus === 'completed') {
+                    return acc + 1;
+                }
+                return acc;
+            }, 0);
+            jobsCompletedFiles[job._id] = count;
+        }
+        return jobsCompletedFiles;
+    },[ocrJobsData]);
     
     return (
         <Stack gap={1}> 
@@ -38,7 +53,7 @@ const JobsDisplay = () => {
                         <Card key={job._id} sx={{ padding: 2, marginBottom: 1 }}>
                             <Typography><StatusCircle variant={statusVariantMap[job.jobStatus]}/> {statusMap[job.jobStatus] || job.jobStatus}</Typography>
                             <Typography>Created At: {new Date(job.createdAt).toLocaleString()}</Typography>
-                            <Chip label={`Files: ${job.fileRefs.length}`} size="small" sx={{ marginTop: 1 }} />
+                            <Chip label={`Files: ${processedFiles[job._id]}/${job.fileRefs.length}`} size="small" sx={{ marginTop: 1 }} />
                         </Card>
                     ))
                 )}

@@ -32,17 +32,17 @@ export const ocrApi = createApi({
   baseQuery: baseQuery,
   tagTypes: ['OCRJobs'],
   endpoints: (builder) => ({
-    ocrJobs: builder.query<any[], void>({
+    ocrJobs: builder.query<OCRJob[], void>({
       query: () => ({
         url: '/ocr/unfinished-jobs',
         method: 'GET',
       }),
         providesTags: ['OCRJobs'],
     }),
-    testOCR: builder.query<OCRTestResponse, void>({
+    testOCR: builder.mutation<OCRTestResponse, void>({
       query: () => ({
         url: '/ocr/test',
-        method: 'GET',
+        method: 'POST',
       }),
     }),
     processOCR: builder.mutation<OCRResponse, { imagePath: string }>({
@@ -55,4 +55,4 @@ export const ocrApi = createApi({
   }),
 });
 
-export const { useTestOCRQuery, useProcessOCRMutation, useOcrJobsQuery } = ocrApi;
+export const { useTestOCRMutation, useProcessOCRMutation, useOcrJobsQuery } = ocrApi;

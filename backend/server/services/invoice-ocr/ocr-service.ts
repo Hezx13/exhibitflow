@@ -27,7 +27,7 @@ class OCRService {
 
   private initializeRoutes() {
     this.router.post('/process', authenticateToken, permit(Roles.ADMIN), this.processOCR.bind(this));
-    this.router.get('/test', this.testOCR.bind(this));
+    this.router.post('/test', this.testOCR.bind(this));
     this.router.get('/unfinished-jobs', authenticateToken, permit(Roles.ADMIN), this.getUnfinishedJobs.bind(this));
   }
 

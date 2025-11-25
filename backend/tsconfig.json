@@ -45,6 +45,6 @@
     "types": ["bun-types"],
     "typeRoots": ["./node_modules/@types", "./types"]
   },
-  "include": ["server/**/*", "utils/**/*", "types/**/*"],
+  "include": ["server/**/*", "utils/**/*", "types/**/*", "file-server/**/*"],
   "exclude": ["node_modules", "dist"]
 }

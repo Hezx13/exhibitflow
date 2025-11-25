@@ -11,7 +11,8 @@
     "dev": "vite --host",
     "dev:backend": "cd backend && bun --watch server/index.ts",
     "dev:frontend": "vite --host",
-    "dev:all": "concurrently -k \"bun run dev:backend\" \"sleep 1 && bun run dev:frontend\"",
+    "dev:file-server": "cd backend && bun --watch file-server/index.ts",
+    "dev:all": "concurrently -k \"bun run dev:backend\" \"bun run dev:file-server\" \"sleep 1 && bun run dev:frontend\"",
     "build": "tsc && vite build",
     "build:backend": "cd backend && bun build-app",
     "build:all": "bun run build:backend && bun run build",
@@ -44,6 +45,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "@types/papaparse": "^5.5.0",
     "@y-sweet/react": "0.9.1",
     "ag-grid-community": "33.1.0",
     "ag-grid-react": "33.1.0",
@@ -56,6 +58,7 @@
     "motion": "^11.18.1",
     "nanoid": "^3.3.8",
     "object-hash": "^3.0.0",
+    "papaparse": "^5.5.3",
     "prettier": "^3.4.2",
     "react": "^19.2.0",
     "react-dnd": "16.0.1",
@@ -69,6 +72,7 @@
     "socket.io-client": "^4.8.1",
     "styled-components": "^5.3.11",
     "throttle-debounce-ts": "^1.1.1",
+    "xlsx": "^0.18.5",
     "yjs": "^13.6.24"
   },
   "devDependencies": {

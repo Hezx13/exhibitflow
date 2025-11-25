@@ -27,6 +27,7 @@ const fileDataSchema = new Schema(
     {
         fileType: { type: String, required: true },
         fileName: { type: String, required: true },
+        filePath: { type: String, required: false },
         fileModifiedAt: { type: Date, required: true },
         fileSize: { type: Number, required: true },
         pdfParent: { type: Schema.Types.ObjectId },

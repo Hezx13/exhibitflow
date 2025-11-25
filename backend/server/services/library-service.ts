@@ -1,18 +1,21 @@
 import { Router, Request, Response } from 'express';
 import Document from '../models/Document/Document.model';
 import List from '../models/List/list.model';
+import FileData from '../models/fileData';
 import { Model } from 'mongoose';
 import verifyDepartment from 'server/middleware/department';
 
 enum ResourseType {
   DOCUMENT = 'document',
   TABLE = 'table',
+  FILE = 'file',
   ALL = 'all',
 }
 
 const resourceTypeMap = {
   [ResourseType.DOCUMENT]: [Document],
   [ResourseType.TABLE]: [List],
+  [ResourseType.FILE]: [FileData],
   [ResourseType.ALL]: [Document, List],
 };
 
@@ -55,6 +58,16 @@ class LibraryService {
         updatedAt: 1,
         resourceType: { $literal: ResourseType.TABLE },
       };
+      const fileProjection = {
+        _id: 1,
+        name: '$fileName',
+        fileType: 1,
+        fileSize: 1,
+        ocrStatus: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        resourceType: { $literal: ResourseType.FILE },
+      };
 
       console.log(`Fetching library resources for department: ${department}, type: ${type}`);
 
@@ -72,6 +85,14 @@ class LibraryService {
           { $project: listProjection },
         ]);
         console.timeEnd('list-aggregation');
+      } else if (type === ResourseType.FILE) {
+        console.time('file-aggregation');
+        // FileData does not have department, so we return all files or filter if we add department later
+        resources = await FileData.aggregate([
+          { $project: fileProjection },
+          { $sort: { createdAt: -1 } }
+        ]);
+        console.timeEnd('file-aggregation');
       } else {
         console.time('union-aggregation');
         resources = await Document.aggregate([
