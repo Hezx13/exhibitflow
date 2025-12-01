@@ -5,6 +5,7 @@ import '@blocknote/mantine/style.css';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAppSelector } from '../store';
+import { EXHIBITFLOW_API_URL, EXHIBITFLOW_WS_URL } from '../api/http';
 
 interface UseEditorProps {
   documentId: string;
@@ -18,7 +19,7 @@ export const useEditor = ({ documentId }: UseEditorProps) => {
   const [connected, setConnected] = useState(false);
   useEffect(() => {
     const provider = new HocuspocusProvider({
-      url: 'ws://localhost:4500/hocuspocus',
+      url: `${EXHIBITFLOW_WS_URL}/hocuspocus`,
       token: token,
       name: documentId,
       onConnect: () => {
@@ -45,7 +46,7 @@ export const useEditor = ({ documentId }: UseEditorProps) => {
   const threadStore = useMemo(() => {
     if (!providerRef.current) return null;
     return new RESTYjsThreadStore(
-      `http://localhost:4500/api/documents/${documentId}/threads`,
+      `${EXHIBITFLOW_API_URL}/documents/${documentId}/threads`,
       {
         Authorization: `Bearer ${token}`,
       },

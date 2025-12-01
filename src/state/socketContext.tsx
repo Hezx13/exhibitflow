@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { eventEmitter } from './EventEmitter';
 import { useAppSelector } from '../store';
 import { registerReportEventHandlers, type ReportReadyPayload } from './socketEventHandlers/reportEventsHandler';
 import { useDispatch } from 'react-redux';
 import { registerOcrJobEventHandlers } from './socketEventHandlers/ocrJobEventsHandler';
+import { EXHIBITFLOW_SERVER_URL } from '../api/http';
 
 interface ServerToClientEvents {
   'report-ready': (data: ReportReadyPayload) => void;
@@ -25,7 +25,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (token && department) {
-      const socket = io('http://localhost:4500', {
+      const socket = io(EXHIBITFLOW_SERVER_URL, {
         path: '/notifications',
         query: { token },
         transports: ['websocket', 'polling'],
