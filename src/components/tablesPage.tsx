@@ -9,7 +9,7 @@ const TablesPage: FC = () => {
   const receivedData = location.state?.myData || 0;
   return (
     <Grid container>
-      <Grid item xs={12}>
+      <Grid size={{xs:12}}>
         <FullFeaturedCrudGrid tableId={receivedData} />
       </Grid>
     </Grid>

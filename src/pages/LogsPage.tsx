@@ -163,7 +163,7 @@ export default function LogsPage() {
         <CardContent>
           <Toolbar sx={{ pl: 0, pr: 0 }}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={4}>
+              <Grid size={{xs:12, md:2}}>
                 <TextField
                   fullWidth
                   variant="outlined"
@@ -184,7 +184,7 @@ export default function LogsPage() {
                   }}
                 />
               </Grid>
-              <Grid item xs={12} md={2}>
+              <Grid size={{xs:12, md:2}}>
                 <FormControl fullWidth>
                   <InputLabel>Method</InputLabel>
                   <Select
@@ -203,7 +203,7 @@ export default function LogsPage() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={2}>
+              <Grid size={{xs:12, md:2}}>
                 <FormControl fullWidth>
                   <InputLabel>Status</InputLabel>
                   <Select
@@ -221,7 +221,7 @@ export default function LogsPage() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid size={{xs:12, md:2}}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                   <IconButton onClick={() => handleFilterChange({})}>
                     <FilterList />

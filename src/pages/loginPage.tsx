@@ -29,7 +29,7 @@ function Login() {
   return (
     <Grid container>
       {token && <Navigate to="/" />}
-      <Grid item xs={12} sx={{ marginBottom: '15px' }}>
+      <Grid size={{xs:12}} sx={{ marginBottom: '15px' }}>
         <Container component="main" maxWidth="xs">
           <Box
             sx={{

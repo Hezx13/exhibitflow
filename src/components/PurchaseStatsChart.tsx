@@ -36,7 +36,7 @@ export const PurchaseStatsChart: React.FC = () => {
       transition={{ duration: 0.5 }}
     >
       {/* Chart */}
-      <Grid item xs={12}>
+      <Grid size={{xs:12}}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
